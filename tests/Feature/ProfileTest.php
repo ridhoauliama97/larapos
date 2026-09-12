@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -95,5 +97,70 @@ class ProfileTest extends TestCase
             ->assertRedirect(route('profile.edit'));
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_profile_avatar_can_be_updated(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'avatar' => UploadedFile::fake()->image('avatar.png'),
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('profile.edit'));
+
+        $avatar = $user->refresh()->getRawOriginal('avatar');
+
+        $this->assertNotNull($avatar);
+        Storage::disk('public')->assertExists($avatar);
+    }
+
+    public function test_profile_avatar_replacement_deletes_the_old_file(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('avatars/old.png', 'old');
+
+        $user = User::factory()->create(['avatar' => 'avatars/old.png']);
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'avatar' => UploadedFile::fake()->image('new.png'),
+            ])
+            ->assertSessionHasNoErrors();
+
+        $avatar = $user->refresh()->getRawOriginal('avatar');
+
+        Storage::disk('public')->assertMissing('avatars/old.png');
+        Storage::disk('public')->assertExists($avatar);
+    }
+
+    public function test_profile_update_without_avatar_keeps_the_existing_file(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('avatars/old.png', 'old');
+
+        $user = User::factory()->create(['avatar' => 'avatars/old.png']);
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('avatars/old.png', $user->refresh()->getRawOriginal('avatar'));
+        Storage::disk('public')->assertExists('avatars/old.png');
     }
 }

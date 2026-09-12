@@ -1,111 +1,109 @@
-import { useRef } from 'react';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
+import React from "react";
+import { useForm } from "@inertiajs/react";
+import toast from "react-hot-toast";
+import { IconLock } from "@tabler/icons-react";
+import Input from "@/Components/Dashboard/Input";
 
-export default function UpdatePasswordForm({ className = '' }) {
-    const passwordInput = useRef();
-    const currentPasswordInput = useRef();
-
-    const { data, setData, errors, put, reset, processing, recentlySuccessful } = useForm({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
+export default function UpdatePasswordForm() {
+    const {
+        data,
+        setData,
+        errors,
+        put,
+        reset,
+        processing,
+        recentlySuccessful,
+    } = useForm({
+        current_password: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const updatePassword = (e) => {
         e.preventDefault();
 
-        put(route('password.update'), {
+        put(route("password.update"), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                toast.success("Kata sandi diperbarui");
+            },
             onError: (errors) => {
                 if (errors.password) {
-                    reset('password', 'password_confirmation');
-                    passwordInput.current.focus();
+                    reset("password", "password_confirmation");
+                    document.getElementById("new_password")?.focus();
                 }
 
                 if (errors.current_password) {
-                    reset('current_password');
-                    currentPasswordInput.current.focus();
+                    reset("current_password");
+                    document.getElementById("current_password")?.focus();
                 }
             },
         });
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">Update Password</h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay secure.
+        <section>
+            <header className="mb-6">
+                <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <IconLock size={16} />
+                    Ubah Kata Sandi
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Gunakan kata sandi yang panjang dan tidak dipakai di tempat
+                    lain.
                 </p>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="current_password" value="Current Password" />
+            <form onSubmit={updatePassword} className="space-y-4">
+                <Input
+                    id="current_password"
+                    type="password"
+                    label="Kata Sandi Saat Ini"
+                    placeholder="Kata sandi saat ini"
+                    value={data.current_password}
+                    onChange={(e) =>
+                        setData("current_password", e.target.value)
+                    }
+                    errors={errors.current_password}
+                    autoComplete="current-password"
+                />
+                <Input
+                    id="new_password"
+                    type="password"
+                    label="Kata Sandi Baru"
+                    placeholder="Kata sandi baru"
+                    value={data.password}
+                    onChange={(e) => setData("password", e.target.value)}
+                    errors={errors.password}
+                    autoComplete="new-password"
+                />
+                <Input
+                    id="password_confirmation"
+                    type="password"
+                    label="Konfirmasi Kata Sandi Baru"
+                    placeholder="Ulangi kata sandi baru"
+                    value={data.password_confirmation}
+                    onChange={(e) =>
+                        setData("password_confirmation", e.target.value)
+                    }
+                    errors={errors.password_confirmation}
+                    autoComplete="new-password"
+                />
 
-                    <TextInput
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) => setData('current_password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
-
-                    <InputError message={errors.current_password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
-
-                    <TextInput
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
+                <div className="flex items-center justify-end gap-3 pt-2">
+                    {recentlySuccessful && (
+                        <span className="text-xs font-medium text-success-600 dark:text-success-400">
+                            Tersimpan.
+                        </span>
+                    )}
+                    <button
+                        type="submit"
+                        disabled={processing}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors disabled:opacity-50"
                     >
-                        <p className="text-sm text-gray-600">Saved.</p>
-                    </Transition>
+                        {processing ? "Menyimpan..." : "Simpan Kata Sandi"}
+                    </button>
                 </div>
             </form>
         </section>

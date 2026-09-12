@@ -1,36 +1,122 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import DeleteUserForm from './Partials/DeleteUserForm';
-import UpdatePasswordForm from './Partials/UpdatePasswordForm';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
-import { Head } from '@inertiajs/react';
+import React, { useRef, useState } from "react";
+import DashboardLayout from "@/Layouts/DashboardLayout";
+import { Head } from "@inertiajs/react";
+import { IconLock, IconUserCircle } from "@tabler/icons-react";
+import DeleteUserForm from "./Partials/DeleteUserForm";
+import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
+import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
 
-export default function Edit({ auth, mustVerifyEmail, status }) {
+const TABS = [
+    { key: "profile", label: "Profil", icon: IconUserCircle },
+    { key: "security", label: "Keamanan", icon: IconLock },
+];
+
+export default function Edit({ mustVerifyEmail, status }) {
+    const [active, setActive] = useState("profile");
+    const tabRefs = useRef({});
+
+    const focusTab = (index) => {
+        const next = TABS[(index + TABS.length) % TABS.length];
+        setActive(next.key);
+        tabRefs.current[next.key]?.focus();
+    };
+
+    const onTabKeyDown = (event, index) => {
+        if (event.key === "ArrowRight") {
+            event.preventDefault();
+            focusTab(index + 1);
+        } else if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            focusTab(index - 1);
+        } else if (event.key === "Home") {
+            event.preventDefault();
+            focusTab(0);
+        } else if (event.key === "End") {
+            event.preventDefault();
+            focusTab(TABS.length - 1);
+        }
+    };
+
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Profile</h2>}
-        >
-            <Head title="Profile" />
+        <>
+            <Head title="Profil" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            className="max-w-xl"
-                        />
-                    </div>
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <IconUserCircle size={28} className="text-primary-500" />
+                    Profil Saya
+                </h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    Kelola informasi akun, keamanan, dan preferensi Anda.
+                </p>
+            </div>
 
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <UpdatePasswordForm className="max-w-xl" />
-                    </div>
+            <div
+                role="tablist"
+                aria-label="Pengaturan profil"
+                className="mb-6 grid w-full grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800 lg:w-[280px]"
+            >
+                {TABS.map((tab, index) => {
+                    const Icon = tab.icon;
+                    const isActive = active === tab.key;
 
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <DeleteUserForm className="max-w-xl" />
+                    return (
+                        <button
+                            key={tab.key}
+                            ref={(node) => {
+                                tabRefs.current[tab.key] = node;
+                            }}
+                            type="button"
+                            role="tab"
+                            id={`profile-tab-${tab.key}`}
+                            aria-selected={isActive}
+                            aria-controls={`profile-panel-${tab.key}`}
+                            tabIndex={isActive ? 0 : -1}
+                            onClick={() => setActive(tab.key)}
+                            onKeyDown={(event) => onTabKeyDown(event, index)}
+                            className={`inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 ${
+                                isActive
+                                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"
+                                    : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                            }`}
+                        >
+                            <Icon size={16} strokeWidth={1.5} />
+                            {tab.label}
+                        </button>
+                    );
+                })}
+            </div>
+
+            <div className="max-w-3xl">
+                <div
+                    id="profile-panel-profile"
+                    role="tabpanel"
+                    aria-labelledby="profile-tab-profile"
+                    hidden={active !== "profile"}
+                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6"
+                >
+                    <UpdateProfileInformationForm
+                        mustVerifyEmail={mustVerifyEmail}
+                        status={status}
+                    />
+                </div>
+
+                <div
+                    id="profile-panel-security"
+                    role="tabpanel"
+                    aria-labelledby="profile-tab-security"
+                    hidden={active !== "security"}
+                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6"
+                >
+                    <UpdatePasswordForm />
+
+                    <div className="mt-8 border-t border-slate-100 pt-8 dark:border-slate-800">
+                        <DeleteUserForm />
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Edit.layout = (page) => <DashboardLayout children={page} />;

@@ -1,15 +1,11 @@
-import { useRef, useState } from 'react';
-import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
+import React, { useState } from "react";
+import { useForm } from "@inertiajs/react";
+import { IconAlertTriangle, IconTrash } from "@tabler/icons-react";
+import Input from "@/Components/Dashboard/Input";
+import Modal from "@/Components/Dashboard/Modal";
 
-export default function DeleteUserForm({ className = '' }) {
-    const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
-    const passwordInput = useRef();
+export default function DeleteUserForm() {
+    const [confirming, setConfirming] = useState(false);
 
     const {
         data,
@@ -19,78 +15,88 @@ export default function DeleteUserForm({ className = '' }) {
         reset,
         errors,
     } = useForm({
-        password: '',
+        password: "",
     });
 
-    const confirmUserDeletion = () => {
-        setConfirmingUserDeletion(true);
+    const closeModal = () => {
+        setConfirming(false);
+        reset();
     };
 
     const deleteUser = (e) => {
         e.preventDefault();
 
-        destroy(route('profile.destroy'), {
+        destroy(route("profile.destroy"), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
-            onError: () => passwordInput.current.focus(),
+            onError: () => document.getElementById("delete_password")?.focus(),
             onFinish: () => reset(),
         });
     };
 
-    const closeModal = () => {
-        setConfirmingUserDeletion(false);
-
-        reset();
-    };
-
     return (
-        <section className={`space-y-6 ${className}`}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">Delete Account</h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data will be permanently deleted. Before
-                    deleting your account, please download any data or information that you wish to retain.
+        <section>
+            <header className="mb-6">
+                <h2 className="text-sm font-semibold text-danger-600 dark:text-danger-400 flex items-center gap-2">
+                    <IconAlertTriangle size={16} />
+                    Hapus Akun
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Menghapus akun akan menghapus seluruh data secara permanen.
+                    Pastikan data penting sudah dicadangkan.
                 </p>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>Delete Account</DangerButton>
+            <button
+                type="button"
+                onClick={() => setConfirming(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-danger-200 bg-danger-50 text-danger-600 hover:bg-danger-100 dark:border-danger-800 dark:bg-danger-900/30 dark:text-danger-400 font-medium transition-colors"
+            >
+                <IconTrash size={18} />
+                Hapus Akun
+            </button>
 
-            <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={deleteUser} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
-                        Are you sure you want to delete your account?
-                    </h2>
-
-                    <p className="mt-1 text-sm text-gray-600">
-                        Once your account is deleted, all of its resources and data will be permanently deleted. Please
-                        enter your password to confirm you would like to permanently delete your account.
+            <Modal
+                show={confirming}
+                onClose={closeModal}
+                title="Hapus akun?"
+                maxWidth="md"
+            >
+                <form onSubmit={deleteUser} className="space-y-4">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Semua data akun akan dihapus permanen. Masukkan kata
+                        sandi untuk mengonfirmasi.
                     </p>
 
-                    <div className="mt-6">
-                        <InputLabel htmlFor="password" value="Password" className="sr-only" />
+                    <Input
+                        id="delete_password"
+                        type="password"
+                        label="Kata Sandi"
+                        placeholder="Kata sandi"
+                        value={data.password}
+                        onChange={(e) =>
+                            setData("password", e.target.value)
+                        }
+                        errors={errors.password}
+                        autoComplete="current-password"
+                    />
 
-                        <TextInput
-                            id="password"
-                            type="password"
-                            name="password"
-                            ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            className="mt-1 block w-3/4"
-                            isFocused
-                            placeholder="Password"
-                        />
-
-                        <InputError message={errors.password} className="mt-2" />
-                    </div>
-
-                    <div className="mt-6 flex justify-end">
-                        <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
-
-                        <DangerButton className="ms-3" disabled={processing}>
-                            Delete Account
-                        </DangerButton>
+                    <div className="flex justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
+                        <button
+                            type="button"
+                            onClick={closeModal}
+                            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="inline-flex items-center gap-2 rounded-xl bg-danger-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-danger-600 disabled:opacity-50"
+                        >
+                            <IconTrash size={16} />
+                            {processing ? "Menghapus..." : "Hapus Akun"}
+                        </button>
                     </div>
                 </form>
             </Modal>
