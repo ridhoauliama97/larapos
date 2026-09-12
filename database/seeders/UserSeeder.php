@@ -16,6 +16,12 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('UserSeeder dilewati: akun dengan kredensial default tidak dibuat di production.');
+
+            return;
+        }
+
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $admin = User::updateOrCreate(

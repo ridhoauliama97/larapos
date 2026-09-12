@@ -85,7 +85,6 @@ class ProductsImport implements ToModel, WithChunkReading, WithHeadingRow, WithV
     {
         return [
             'barcode.required' => 'Barcode wajib diisi.',
-            'barcode.unique' => 'Barcode sudah terdaftar.',
             'nama.required' => 'Nama produk wajib diisi.',
         ];
     }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BankAccount;
 use App\Services\AuditLogService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -210,9 +211,11 @@ class BankAccountController extends Controller
             ])
             ->all();
 
-        foreach ($validated['order'] as $index => $id) {
-            BankAccount::where('id', $id)->update(['sort_order' => $index]);
-        }
+        DB::transaction(function () use ($validated) {
+            foreach ($validated['order'] as $index => $id) {
+                BankAccount::where('id', $id)->update(['sort_order' => $index]);
+            }
+        });
 
         $afterOrder = BankAccount::ordered()
             ->get(['id', 'bank_name', 'sort_order'])

@@ -4,27 +4,29 @@ namespace App\Imports;
 
 use App\Models\Customer;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class CustomersImport implements ToModel, WithBatchInserts, WithChunkReading, WithHeadingRow, WithValidation
+class CustomersImport implements ToModel, WithChunkReading, WithHeadingRow, WithValidation
 {
     public function model(array $row)
     {
-        return new Customer([
-            'name' => $row['nama'],
-            'no_telp' => $row['telepon'] ?? null,
-            'address' => $row['alamat'] ?? null,
-        ]);
+        return Customer::updateOrCreate(
+            ['no_telp' => (string) $row['telepon']],
+            [
+                'name' => $row['nama'],
+                'address' => $row['alamat'],
+            ]
+        );
     }
 
     public function rules(): array
     {
         return [
             'nama' => ['required', 'string', 'max:255'],
-            'telepon' => ['nullable', 'string', 'max:20'],
+            'telepon' => ['required', 'string', 'max:20'],
+            'alamat' => ['required', 'string'],
         ];
     }
 
@@ -32,12 +34,9 @@ class CustomersImport implements ToModel, WithBatchInserts, WithChunkReading, Wi
     {
         return [
             'nama.required' => 'Nama customer wajib diisi.',
+            'telepon.required' => 'Telepon customer wajib diisi.',
+            'alamat.required' => 'Alamat customer wajib diisi.',
         ];
-    }
-
-    public function batchSize(): int
-    {
-        return 100;
     }
 
     public function chunkSize(): int
