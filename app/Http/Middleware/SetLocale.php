@@ -17,7 +17,7 @@ class SetLocale
 
         if ($request->user() && $request->user()->locale) {
             $locale = $request->user()->locale;
-        } elseif ($request->session()->has('locale')) {
+        } elseif ($request->hasSession() && $request->session()->has('locale')) {
             $locale = $request->session()->get('locale');
         } elseif ($request->cookie('locale')) {
             $locale = $request->cookie('locale');

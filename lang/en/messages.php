@@ -399,22 +399,4 @@ return [
         'changed' => 'Language changed successfully.',
         'not_found' => 'Language not found.',
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Messages
-    |--------------------------------------------------------------------------
-    */
-    'validation' => [
-        'required' => 'The :attribute field is required.',
-        'email' => 'The :attribute must be a valid email address.',
-        'min' => 'The :attribute must be at least :min characters.',
-        'max' => 'The :attribute must not exceed :max characters.',
-        'numeric' => 'The :attribute must be a number.',
-        'unique' => 'The :attribute has already been taken.',
-        'exists' => 'The selected :attribute is invalid.',
-        'date' => 'The :attribute is not a valid date.',
-        'integer' => 'The :attribute must be an integer.',
-        'positive' => 'The :attribute must be a positive number.',
-    ],
 ];

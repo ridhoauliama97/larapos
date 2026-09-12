@@ -1,29 +1,47 @@
-import React from "react";
-import { usePage, useForm } from "@inertiajs/react";
+import React, { useState } from "react";
+import { usePage, router } from "@inertiajs/react";
 import { IconLanguage } from "@tabler/icons-react";
 import { Menu, Transition } from "@headlessui/react";
+import i18n from "@/i18n";
+
+const FLAGS = {
+    id: "🇮🇩",
+    en: "🇬🇧",
+};
 
 export default function LanguageSwitcher() {
     const { locale } = usePage().props;
-    const { post, processing } = useForm({
-        locale: locale?.current || "id",
-    });
+    const [busy, setBusy] = useState(false);
 
-    const handleChange = (e) => {
-        post(route("language.switch", { locale: e }), {
-            preserveScroll: true,
-            onSuccess: () => {
-                window.location.reload();
+    const options = (locale?.available ?? ["id", "en"]).map((code) => ({
+        code,
+        name: locale?.names?.[code] ?? code.toUpperCase(),
+        flag: FLAGS[code] ?? "🏳️",
+    }));
+
+    const current = locale?.current ?? "id";
+
+    const handleChange = (code) => {
+        if (busy || code === current) {
+            return;
+        }
+
+        setBusy(true);
+
+        router.post(
+            route("language.switch"),
+            { locale: code },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    i18n.changeLanguage(code);
+                    document.documentElement.lang = code;
+                },
+                onFinish: () => setBusy(false),
             },
-        });
+        );
     };
-
-    const languages = [
-        { code: "id", name: "Indonesia", flag: "🇮🇩" },
-        { code: "en", name: "English", flag: "🇬🇧" },
-    ];
-
-    const currentLang = languages.find((l) => l.code === locale?.current) || languages[0];
 
     return (
         <Menu as="div" className="relative">
@@ -32,7 +50,9 @@ export default function LanguageSwitcher() {
                 title="Change Language"
             >
                 <IconLanguage size={20} strokeWidth={1.5} />
-                <span className="hidden lg:inline text-sm font-medium">{currentLang.code.toUpperCase()}</span>
+                <span className="hidden lg:inline text-sm font-medium">
+                    {current.toUpperCase()}
+                </span>
             </Menu.Button>
 
             <Transition
@@ -48,23 +68,29 @@ export default function LanguageSwitcher() {
                         <div className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                             Select Language
                         </div>
-                        {languages.map((lang) => (
+                        {options.map((lang) => (
                             <Menu.Item key={lang.code}>
                                 {({ active }) => (
                                     <button
                                         onClick={() => handleChange(lang.code)}
-                                        disabled={processing}
+                                        disabled={busy}
                                         className={`${
-                                            active ? "bg-slate-100 dark:bg-slate-700" : ""
+                                            active
+                                                ? "bg-slate-100 dark:bg-slate-700"
+                                                : ""
                                         } ${
-                                            locale?.current === lang.code
+                                            current === lang.code
                                                 ? "bg-primary-50 dark:bg-primary-900/20"
                                                 : ""
                                         } flex w-full items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 rounded-lg transition-colors disabled:opacity-50`}
                                     >
-                                        <span className="text-lg">{lang.flag}</span>
-                                        <span className="flex-1 text-left">{lang.name}</span>
-                                        {locale?.current === lang.code && (
+                                        <span className="text-lg">
+                                            {lang.flag}
+                                        </span>
+                                        <span className="flex-1 text-left">
+                                            {lang.name}
+                                        </span>
+                                        {current === lang.code && (
                                             <svg
                                                 className="w-4 h-4 text-primary-600"
                                                 fill="none"

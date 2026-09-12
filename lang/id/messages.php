@@ -399,22 +399,4 @@ return [
         'changed' => 'Bahasa berhasil diubah.',
         'not_found' => 'Bahasa tidak ditemukan.',
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Messages
-    |--------------------------------------------------------------------------
-    */
-    'validation' => [
-        'required' => 'Field :attribute wajib diisi.',
-        'email' => 'Format email tidak valid.',
-        'min' => 'Field :attribute minimal :min karakter.',
-        'max' => 'Field :attribute maksimal :max karakter.',
-        'numeric' => 'Field :attribute harus berupa angka.',
-        'unique' => 'Field :attribute sudah digunakan.',
-        'exists' => 'Field :attribute tidak ditemukan.',
-        'date' => 'Format tanggal tidak valid.',
-        'integer' => 'Field :attribute harus berupa bilangan bulat.',
-        'positive' => 'Field :attribute harus bernilai positif.',
-    ],
 ];
