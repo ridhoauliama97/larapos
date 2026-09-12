@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm, usePage, Link } from "@inertiajs/react";
+import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
 import Input from "@/Components/Dashboard/Input";
 import Textarea from "@/Components/Dashboard/TextArea";
 import InputSelect from "@/Components/Dashboard/InputSelect";
@@ -18,13 +19,18 @@ import {
 } from "@tabler/icons-react";
 import { getProductImageUrl } from "@/Utils/imageUrl";
 
-export default function Edit({ categories, product, products = [], units = [] }) {
+export default function Edit({
+    categories,
+    product,
+    products = [],
+    units = [],
+}) {
     const { errors } = usePage().props;
 
     const { data, setData, post, processing } = useForm({
         image: "",
         barcode: product.barcode,
-        sku: product.sku,
+        sku: product.sku ?? "",
         title: product.title,
         category_id: product.category_id,
         description: product.description,
@@ -50,14 +56,25 @@ export default function Edit({ categories, product, products = [], units = [] })
     });
 
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [imagePreview, setImagePreview] = useState(
-        product.image ? getProductImageUrl(product.image) : null
+    const originalImage = product.image
+        ? getProductImageUrl(product.image)
+        : null;
+    const [imagePreview, setImagePreview] = useState(originalImage);
+    const objectUrlRef = useRef(null);
+
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        },
+        [],
     );
 
     useEffect(() => {
         if (product.category_id) {
             setSelectedCategory(
-                categories.find((cat) => cat.id === product.category_id)
+                categories.find((cat) => cat.id === product.category_id),
             );
         }
     }, [product.category_id]);
@@ -74,7 +91,7 @@ export default function Edit({ categories, product, products = [], units = [] })
 
     const addUnitRow = () => {
         const firstUnused = units.find(
-            (u) => !data.units.some((row) => row.unit_id === u.id)
+            (u) => !data.units.some((row) => row.unit_id === u.id),
         );
         if (!firstUnused) return;
         setData("units", [
@@ -91,7 +108,7 @@ export default function Edit({ categories, product, products = [], units = [] })
 
     const updateUnitRow = (index, field, value) => {
         const rows = data.units.map((r, i) =>
-            i === index ? { ...r, [field]: value } : r
+            i === index ? { ...r, [field]: value } : r,
         );
         if (field === "is_base" && value) {
             rows.forEach((r, i) => {
@@ -102,15 +119,18 @@ export default function Edit({ categories, product, products = [], units = [] })
     };
 
     const removeUnitRow = (index) => {
-        setData("units", data.units.filter((_, i) => i !== index));
+        setData(
+            "units",
+            data.units.filter((_, i) => i !== index),
+        );
     };
 
     const availableUnits = (selectedIndex) =>
         units.filter(
             (u) =>
                 !data.units.some(
-                    (r, i) => i !== selectedIndex && r.unit_id === u.id
-                )
+                    (r, i) => i !== selectedIndex && r.unit_id === u.id,
+                ),
         );
 
     const addComponent = () => {
@@ -122,7 +142,7 @@ export default function Edit({ categories, product, products = [], units = [] })
 
     const updateComponent = (index, field, value) => {
         const components = data.components.map((c, i) =>
-            i === index ? { ...c, [field]: value } : c
+            i === index ? { ...c, [field]: value } : c,
         );
         setData("components", components);
     };
@@ -130,7 +150,7 @@ export default function Edit({ categories, product, products = [], units = [] })
     const removeComponent = (index) => {
         setData(
             "components",
-            data.components.filter((_, i) => i !== index)
+            data.components.filter((_, i) => i !== index),
         );
     };
 
@@ -141,15 +161,14 @@ export default function Edit({ categories, product, products = [], units = [] })
                 p.id !== product.id &&
                 !data.components.some(
                     (c, i) =>
-                        i !== selectedIndex &&
-                        c.component_product_id === p.id
-                )
+                        i !== selectedIndex && c.component_product_id === p.id,
+                ),
         );
 
     const estimatedSellPrice = data.is_composite
         ? data.components.reduce((total, c) => {
               const product = products.find(
-                  (p) => p.id === Number(c.component_product_id)
+                  (p) => p.id === Number(c.component_product_id),
               );
               return product
                   ? total + product.sell_price * (Number(c.qty) || 0)
@@ -157,12 +176,24 @@ export default function Edit({ categories, product, products = [], units = [] })
           }, 0)
         : data.sell_price;
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData("image", file);
-            setImagePreview(URL.createObjectURL(file));
+    const handleSelect = (file) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
         }
+
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData("image", file);
+        setImagePreview(objectUrlRef.current);
+    };
+
+    const handleReset = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setData("image", "");
+        setImagePreview(originalImage);
     };
 
     // ponytail: zero-out stock/sell_price for composite; collapse if Inertia ever accepts pre-send transforms
@@ -205,31 +236,14 @@ export default function Edit({ categories, product, products = [], units = [] })
                                 <IconPhoto size={18} />
                                 Gambar Produk
                             </h3>
-                            <div className="aspect-square rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center overflow-hidden mb-4">
-                                {imagePreview ? (
-                                    <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="text-center p-6">
-                                        <IconPhoto
-                                            size={48}
-                                            className="mx-auto text-slate-400 mb-2"
-                                        />
-                                        <p className="text-sm text-slate-500">
-                                            Belum ada gambar
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                            <Input
-                                type="file"
-                                label="Ganti Gambar"
-                                onChange={handleImageChange}
-                                errors={errors.image}
-                                accept="image/*"
+                            <ImageDropzone
+                                preview={imagePreview}
+                                original={originalImage}
+                                onSelect={handleSelect}
+                                onReset={handleReset}
+                                error={errors.image}
+                                aspect="aspect-square"
+                                hint="JPG, PNG, atau WebP. Maksimal 2 MB."
                             />
                         </div>
                     </div>
@@ -254,24 +268,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                         displayKey="name"
                                     />
                                 </div>
-                                <Input
-                                    type="text"
-                                    label="Barcode"
-                                    value={data.barcode}
-                                    onChange={(e) =>
-                                        setData("barcode", e.target.value)
-                                    }
-                                    errors={errors.barcode}
-                                    placeholder="Kode produk"
-                                />
-                                <Input
-                                    type="text"
-                                    label="SKU"
-                                    value={data.sku}
-                                    onChange={(e) => setData("sku", e.target.value)}
-                                    errors={errors.sku}
-                                    placeholder="SKU unik"
-                                />
+
                                 <Input
                                     type="text"
                                     label="Nama Produk"
@@ -282,6 +279,30 @@ export default function Edit({ categories, product, products = [], units = [] })
                                     errors={errors.title}
                                     placeholder="Nama produk"
                                 />
+                                <Input
+                                    type="text"
+                                    label="SKU"
+                                    value={data.sku}
+                                    onChange={(e) =>
+                                        setData("sku", e.target.value)
+                                    }
+                                    errors={errors.sku}
+                                    placeholder="SKU unik"
+                                />
+                                <div className="md:col-span-2">
+                                    <Input
+                                        type="text"
+                                        label="Barcode"
+                                        value={data.barcode}
+                                        errors={errors.barcode}
+                                        disabled
+                                        className="cursor-not-allowed opacity-70"
+                                    />
+                                    <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+                                        Dibuat otomatis: PROD01 + tanggal
+                                        (DDMMYY).
+                                    </p>
+                                </div>
                                 <div className="md:col-span-2">
                                     <Textarea
                                         label="Deskripsi"
@@ -290,7 +311,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                         onChange={(e) =>
                                             setData(
                                                 "description",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         value={data.description}
@@ -344,14 +365,14 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                         units.find(
                                                             (u) =>
                                                                 u.id ===
-                                                                row.unit_id
+                                                                row.unit_id,
                                                         ) || null
                                                     }
                                                     setSelected={(value) =>
                                                         updateUnitRow(
                                                             index,
                                                             "unit_id",
-                                                            value?.id ?? ""
+                                                            value?.id ?? "",
                                                         )
                                                     }
                                                     placeholder="Pilih satuan"
@@ -376,7 +397,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                         updateUnitRow(
                                                             index,
                                                             "conversion_factor",
-                                                            e.target.value
+                                                            e.target.value,
                                                         )
                                                     }
                                                     errors={
@@ -397,7 +418,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                         updateUnitRow(
                                                             index,
                                                             "sell_price",
-                                                            e.target.value
+                                                            e.target.value,
                                                         )
                                                     }
                                                     errors={
@@ -416,7 +437,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                         updateUnitRow(
                                                             index,
                                                             "barcode",
-                                                            e.target.value
+                                                            e.target.value,
                                                         )
                                                     }
                                                     errors={
@@ -435,7 +456,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                         updateUnitRow(
                                                             index,
                                                             "is_base",
-                                                            e.target.checked
+                                                            e.target.checked,
                                                         )
                                                     }
                                                     className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
@@ -473,8 +494,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                 />
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
                                     <IconPackages size={16} />
-                                    Produk Komposit (bundling /
-                                    paket)
+                                    Produk Komposit (bundling / paket)
                                 </span>
                             </label>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -548,8 +568,8 @@ export default function Edit({ categories, product, products = [], units = [] })
                                 <p className="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400">
                                     Dipakai untuk reorder point: saat stok
                                     menyentuh minimum, draft purchase order
-                                    otomatis dibuat oleh sistem (reorder:generate
-                                    harian).
+                                    otomatis dibuat oleh sistem
+                                    (reorder:generate harian).
                                 </p>
                             </div>
 
@@ -571,7 +591,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                 onChange={(e) =>
                                                     setData(
                                                         "tax_type",
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                             />
@@ -589,7 +609,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                 onChange={(e) =>
                                                     setData(
                                                         "tax_type",
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                             />
@@ -618,37 +638,37 @@ export default function Edit({ categories, product, products = [], units = [] })
                             {!data.is_composite &&
                                 data.buy_price > 0 &&
                                 data.sell_price > 0 && (
-                                <div className="mt-4 p-4 rounded-xl bg-success-50 dark:bg-success-950/30 border border-success-200 dark:border-success-900">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm text-success-700 dark:text-success-400 font-medium">
-                                                Estimasi Profit per Item
-                                            </p>
-                                            <p className="text-2xl font-bold text-success-600 dark:text-success-500 mt-1">
-                                                + Rp{" "}
-                                                {(
-                                                    data.sell_price -
-                                                    data.buy_price
-                                                ).toLocaleString("id-ID")}
-                                            </p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-success-700 dark:text-success-400 font-medium">
-                                                Margin
-                                            </p>
-                                            <p className="text-xl font-bold text-success-600 dark:text-success-500 mt-1">
-                                                {(
-                                                    ((data.sell_price -
-                                                        data.buy_price) /
-                                                        data.buy_price) *
-                                                    100
-                                                ).toFixed(1)}
-                                                %
-                                            </p>
+                                    <div className="mt-4 p-4 rounded-xl bg-success-50 dark:bg-success-950/30 border border-success-200 dark:border-success-900">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm text-success-700 dark:text-success-400 font-medium">
+                                                    Estimasi Profit per Item
+                                                </p>
+                                                <p className="text-2xl font-bold text-success-600 dark:text-success-500 mt-1">
+                                                    + Rp{" "}
+                                                    {(
+                                                        data.sell_price -
+                                                        data.buy_price
+                                                    ).toLocaleString("id-ID")}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-success-700 dark:text-success-400 font-medium">
+                                                    Margin
+                                                </p>
+                                                <p className="text-xl font-bold text-success-600 dark:text-success-500 mt-1">
+                                                    {(
+                                                        ((data.sell_price -
+                                                            data.buy_price) /
+                                                            data.buy_price) *
+                                                        100
+                                                    ).toFixed(1)}
+                                                    %
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
                             {/* Composite Components */}
                             {data.is_composite && (
@@ -673,8 +693,9 @@ export default function Edit({ categories, product, products = [], units = [] })
                                     )}
                                     {data.components.length === 0 && (
                                         <p className="text-sm text-slate-500">
-                                            Belum ada komponen. Stok dan harga jual
-                                            dihitung otomatis dari komponen.
+                                            Belum ada komponen. Stok dan harga
+                                            jual dihitung otomatis dari
+                                            komponen.
                                         </p>
                                     )}
                                     <div className="space-y-3">
@@ -687,24 +708,25 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                     <div className="flex-1">
                                                         <InputSelect
                                                             data={availableProducts(
-                                                                index
+                                                                index,
                                                             )}
                                                             selected={
                                                                 products.find(
                                                                     (p) =>
                                                                         p.id ===
                                                                         Number(
-                                                                            component.component_product_id
-                                                                        )
+                                                                            component.component_product_id,
+                                                                        ),
                                                                 ) || null
                                                             }
                                                             setSelected={(
-                                                                value
+                                                                value,
                                                             ) =>
                                                                 updateComponent(
                                                                     index,
                                                                     "component_product_id",
-                                                                    value?.id ?? ""
+                                                                    value?.id ??
+                                                                        "",
                                                                 )
                                                             }
                                                             placeholder="Pilih produk komponen"
@@ -728,7 +750,8 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                                 updateComponent(
                                                                     index,
                                                                     "qty",
-                                                                    e.target.value
+                                                                    e.target
+                                                                        .value,
                                                                 )
                                                             }
                                                             errors={
@@ -743,7 +766,7 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                         type="button"
                                                         onClick={() =>
                                                             removeComponent(
-                                                                index
+                                                                index,
                                                             )
                                                         }
                                                         className="p-2.5 rounded-xl text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-950/30 transition-colors"
@@ -751,17 +774,18 @@ export default function Edit({ categories, product, products = [], units = [] })
                                                         <IconTrash size={18} />
                                                     </button>
                                                 </div>
-                                            )
+                                            ),
                                         )}
                                     </div>
                                     {data.is_composite &&
                                         estimatedSellPrice > 0 && (
                                             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-                                                Estimasi harga jual dari komponen:{" "}
+                                                Estimasi harga jual dari
+                                                komponen:{" "}
                                                 <span className="font-semibold text-slate-700 dark:text-slate-200">
                                                     Rp{" "}
                                                     {estimatedSellPrice.toLocaleString(
-                                                        "id-ID"
+                                                        "id-ID",
                                                     )}
                                                 </span>
                                             </p>

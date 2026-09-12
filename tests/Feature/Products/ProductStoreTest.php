@@ -159,4 +159,93 @@ class ProductStoreTest extends TestCase
         $this->post(route('products.store'), $payload)
             ->assertSessionHasErrors('image');
     }
+
+    public function test_store_generates_barcode_from_product_id(): void
+    {
+        $payload = $this->validPayload();
+        unset($payload['barcode']);
+
+        $this->post(route('products.store'), $payload)
+            ->assertRedirect(route('products.index'))
+            ->assertSessionHasNoErrors();
+
+        $product = Product::latest('id')->first();
+
+        $this->assertSame(
+            'PROD'.str_pad((string) $product->id, 4, '0', STR_PAD_LEFT).now()->format('dmy'),
+            $product->barcode
+        );
+    }
+
+    public function test_store_uses_the_new_product_id_for_each_barcode(): void
+    {
+        Product::create([
+            'barcode' => 'BRCD-EXISTING',
+            'sku' => 'SKU-EXISTING',
+            'title' => 'Produk Existing',
+            'description' => 'Produk existing.',
+            'category_id' => $this->category->id,
+            'buy_price' => 1000,
+            'sell_price' => 2000,
+            'stock' => 0,
+            'tax_rate' => 0,
+        ]);
+
+        $payload = $this->validPayload();
+        unset($payload['barcode']);
+
+        $this->post(route('products.store'), $payload)
+            ->assertRedirect(route('products.index'))
+            ->assertSessionHasNoErrors();
+
+        $product = Product::latest('id')->first();
+
+        $this->assertSame(
+            'PROD'.str_pad((string) $product->id, 4, '0', STR_PAD_LEFT).now()->format('dmy'),
+            $product->barcode
+        );
+        $this->assertNotSame('PROD0001'.now()->format('dmy'), $product->barcode);
+    }
+
+    public function test_store_generates_sku_slug_from_title_when_omitted(): void
+    {
+        $payload = $this->validPayload([
+            'title' => 'Parfum Mykonos - California 50ml',
+        ]);
+        unset($payload['sku']);
+
+        $this->post(route('products.store'), $payload)
+            ->assertRedirect(route('products.index'))
+            ->assertSessionHasNoErrors();
+
+        $product = Product::latest('id')->first();
+
+        $this->assertSame('parfum-mykonos-california-50ml', $product->sku);
+    }
+
+    public function test_store_sequences_duplicate_generated_skus(): void
+    {
+        Product::create([
+            'barcode' => 'BRCD-EXISTING',
+            'sku' => 'produk-uji',
+            'title' => 'Produk Uji',
+            'description' => 'Produk existing.',
+            'category_id' => $this->category->id,
+            'buy_price' => 1000,
+            'sell_price' => 2000,
+            'stock' => 0,
+            'tax_rate' => 0,
+        ]);
+
+        $payload = $this->validPayload(['title' => 'Produk Uji']);
+        unset($payload['sku']);
+
+        $this->post(route('products.store'), $payload)
+            ->assertRedirect(route('products.index'))
+            ->assertSessionHasNoErrors();
+
+        $product = Product::latest('id')->first();
+
+        $this->assertSame('produk-uji-2', $product->sku);
+    }
 }

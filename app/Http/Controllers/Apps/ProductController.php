@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -62,6 +63,7 @@ class ProductController extends Controller
             'categories' => $categories,
             'products' => $products,
             'units' => Unit::orderBy('code')->get(['id', 'code', 'symbol']),
+            'existingSkus' => Product::query()->whereNotNull('sku')->pluck('sku')->values(),
         ]);
     }
 
@@ -72,12 +74,17 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // SKU mirrors the product name as a slug; fall back to the server when it is missing
+        $request->merge([
+            'sku' => $request->filled('sku') ? $request->sku : $this->generateSku((string) $request->title),
+        ]);
+
         /**
          * validate
          */
         $request->validate([
             'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
-            'barcode' => 'required|unique:products,barcode',
+            'barcode' => 'nullable|string|max:255|unique:products,barcode',
             'sku' => 'required|unique:products,sku',
             'title' => 'required',
             'description' => 'required',
@@ -90,7 +97,7 @@ class ProductController extends Controller
             'max_stock' => 'nullable|integer|min:0',
             'tax_type' => 'nullable|in:exclusive,inclusive',
             'tax_rate' => 'nullable|numeric|min:0|max:100',
-            ...$this->compositeRules(),
+            ...$this->compositeRules($request),
             ...$this->unitRules(),
         ]);
         // upload image
@@ -102,7 +109,7 @@ class ProductController extends Controller
             // create product
             $product = Product::create([
                 'image' => $image->hashName(),
-                'barcode' => $request->barcode,
+                'barcode' => $request->filled('barcode') ? $request->barcode : 'PENDING-'.Str::uuid(),
                 'sku' => $request->sku,
                 'title' => $request->title,
                 'description' => $request->description,
@@ -116,6 +123,11 @@ class ProductController extends Controller
                 'tax_rate' => $request->input('tax_rate', 11.00),
                 'is_composite' => $request->boolean('is_composite'),
             ]);
+
+            // ponytail: the product ID only exists after insert, so the barcode is stamped right after
+            if (! $request->filled('barcode')) {
+                $product->update(['barcode' => $this->barcodeFor($product)]);
+            }
 
             if ($request->boolean('is_composite')) {
                 $this->validateComponentProducts($request);
@@ -186,6 +198,16 @@ class ProductController extends Controller
     {
         $before = $this->productAuditPayload($product);
 
+        // a non-file value (empty string, stale filename) must never hit the image rule
+        if (! $request->hasFile('image')) {
+            $request->request->remove('image');
+        }
+
+        // legacy products may have no SKU yet; fill it from the title instead of blocking the update
+        $request->merge([
+            'sku' => $request->filled('sku') ? $request->sku : $this->generateSku((string) $request->title),
+        ]);
+
         /**
          * validate
          */
@@ -202,7 +224,7 @@ class ProductController extends Controller
             'max_stock' => 'nullable|integer|min:0',
             'tax_type' => 'nullable|in:exclusive,inclusive',
             'tax_rate' => 'nullable|numeric|min:0|max:100',
-            ...$this->compositeRules(),
+            ...$this->compositeRules($request),
             ...$this->unitRules(),
         ]);
 
@@ -315,11 +337,33 @@ class ProductController extends Controller
         return back();
     }
 
-    private function compositeRules(): array
+    private function barcodeFor(Product $product): string
+    {
+        return 'PROD'.str_pad((string) $product->id, 4, '0', STR_PAD_LEFT).now()->format('dmy');
+    }
+
+    private function generateSku(string $title): string
+    {
+        $base = Str::slug($title) ?: 'produk';
+        $sku = $base;
+        $sequence = 1;
+
+        while (Product::where('sku', $sku)->exists()) {
+            $sequence++;
+            $sku = $base.'-'.$sequence;
+        }
+
+        return $sku;
+    }
+
+    private function compositeRules(Request $request): array
     {
         return [
             'is_composite' => 'nullable|boolean',
-            'components' => 'required_if:is_composite,1,true|array|min:1',
+            // components only apply to composite products; a plain product posts an empty array
+            'components' => $request->boolean('is_composite')
+                ? 'required|array|min:1'
+                : 'nullable|array',
             'components.*.component_product_id' => 'required|integer|distinct|exists:products,id',
             'components.*.qty' => 'required|integer|min:1',
         ];

@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm, usePage, Link } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
 import Input from "@/Components/Dashboard/Input";
 import Textarea from "@/Components/Dashboard/TextArea";
 import InputSelect from "@/Components/Dashboard/InputSelect";
 import toast from "react-hot-toast";
+import { slugify, uniqueSlug } from "@/Utils/slug";
 import {
     IconPackage,
     IconDeviceFloppy,
@@ -18,7 +20,12 @@ import {
     IconRulerMeasure,
 } from "@tabler/icons-react";
 
-export default function Create({ categories, products, units = [] }) {
+export default function Create({
+    categories,
+    products,
+    units = [],
+    existingSkus = [],
+}) {
     const { errors } = usePage().props;
 
     const { data, setData, post, processing } = useForm({
@@ -42,6 +49,22 @@ export default function Create({ categories, products, units = [] }) {
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const objectUrlRef = useRef(null);
+    const takenSkus = new Set(existingSkus);
+
+    const handleTitleChange = (value) => {
+        setData("title", value);
+        setData("sku", uniqueSlug(slugify(value), takenSkus));
+    };
+
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        },
+        [],
+    );
 
     const setSelectedCategoryHandler = (value) => {
         setSelectedCategory(value);
@@ -139,12 +162,24 @@ export default function Create({ categories, products, units = [] }) {
           }, 0)
         : data.sell_price;
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData("image", file);
-            setImagePreview(URL.createObjectURL(file));
+    const handleSelect = (file) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
         }
+
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData("image", file);
+        setImagePreview(objectUrlRef.current);
+    };
+
+    const handleReset = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setData("image", "");
+        setImagePreview(null);
     };
 
     // ponytail: zero-out stock/sell_price for composite; collapse if Inertia ever accepts pre-send transforms
@@ -188,31 +223,13 @@ export default function Create({ categories, products, units = [] }) {
                                 <IconPhoto size={18} />
                                 Gambar Produk
                             </h3>
-                            <div className="aspect-square rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center overflow-hidden mb-4">
-                                {imagePreview ? (
-                                    <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="text-center p-6">
-                                        <IconPhoto
-                                            size={48}
-                                            className="mx-auto text-slate-400 mb-2"
-                                        />
-                                        <p className="text-sm text-slate-500">
-                                            Belum ada gambar
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                            <Input
-                                type="file"
-                                label="Upload Gambar"
-                                onChange={handleImageChange}
-                                errors={errors.image}
-                                accept="image/*"
+                            <ImageDropzone
+                                preview={imagePreview}
+                                onSelect={handleSelect}
+                                onReset={handleReset}
+                                error={errors.image}
+                                aspect="aspect-square"
+                                hint="JPG, PNG, atau WebP. Maksimal 2 MB."
                             />
                         </div>
                     </div>
@@ -238,37 +255,41 @@ export default function Create({ categories, products, units = [] }) {
                                         displayKey="name"
                                     />
                                 </div>
+
                                 <Input
                                     type="text"
-                                    label="Barcode"
-                                    value={data.barcode}
+                                    label="Nama Produk"
+                                    value={data.title}
                                     onChange={(e) =>
-                                        setData("barcode", e.target.value)
+                                        handleTitleChange(e.target.value)
                                     }
-                                    errors={errors.barcode}
-                                    placeholder="Masukkan kode produk"
+                                    errors={errors.title}
+                                    placeholder="Masukkan nama produk"
                                 />
                                 <Input
                                     type="text"
                                     label="SKU"
                                     value={data.sku}
-                                    onChange={(e) =>
-                                        setData("sku", e.target.value)
-                                    }
                                     errors={errors.sku}
-                                    placeholder="Masukkan SKU unik"
+                                    disabled
+                                    className="cursor-not-allowed opacity-70"
                                 />
+                                <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+                                    Dibuat otomatis dari nama produk.
+                                </p>
                                 <div className="md:col-span-2">
                                     <Input
                                         type="text"
-                                        label="Nama Produk"
-                                        value={data.title}
-                                        onChange={(e) =>
-                                            setData("title", e.target.value)
-                                        }
-                                        errors={errors.title}
-                                        placeholder="Masukkan nama produk"
+                                        label="Barcode"
+                                        value={data.barcode}
+                                        errors={errors.barcode}
+                                        disabled
+                                        className="cursor-not-allowed opacity-70"
                                     />
+                                    <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+                                        Dibuat otomatis setelah disimpan: PROD +
+                                        ID produk (4 digit) + tanggal.
+                                    </p>
                                 </div>
                                 <div className="md:col-span-2">
                                     <Textarea
