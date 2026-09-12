@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Input from "@/Components/Dashboard/Input";
-import ListBox from "@/Components/Dashboard/ListBox";
 import Modal from "@/Components/Dashboard/Modal";
 import Search from "@/Components/Dashboard/Search";
 import Pagination from "@/Components/Dashboard/Pagination";
@@ -15,21 +14,164 @@ import {
     IconUserShield,
     IconPencilCog,
     IconPencilCheck,
-    IconShield,
 } from "@tabler/icons-react";
+import Swal from "sweetalert2";
 
-// Role Card Component
+function permissionModule(name) {
+    const index = name.lastIndexOf("-");
+
+    return index === -1 ? name : name.slice(0, index);
+}
+
+function PermissionPicker({ permissions, selected, onChange, error }) {
+    const [search, setSearch] = useState("");
+
+    const selectedIds = useMemo(
+        () => new Set(selected.map((permission) => permission.id)),
+        [selected],
+    );
+
+    const groups = useMemo(() => {
+        const term = search.trim().toLowerCase();
+        const map = new Map();
+
+        permissions
+            .filter((permission) =>
+                permission.name.toLowerCase().includes(term),
+            )
+            .forEach((permission) => {
+                const module = permissionModule(permission.name);
+
+                if (!map.has(module)) {
+                    map.set(module, []);
+                }
+
+                map.get(module).push(permission);
+            });
+
+        return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+    }, [permissions, search]);
+
+    const toggle = (permission) => {
+        onChange(
+            selectedIds.has(permission.id)
+                ? selected.filter((item) => item.id !== permission.id)
+                : [...selected, permission],
+        );
+    };
+
+    const toggleGroup = (items) => {
+        const ids = items.map((item) => item.id);
+        const allSelected = ids.every((id) => selectedIds.has(id));
+
+        onChange(
+            allSelected
+                ? selected.filter((item) => !ids.includes(item.id))
+                : [
+                      ...selected.filter((item) => !ids.includes(item.id)),
+                      ...items,
+                  ],
+        );
+    };
+
+    return (
+        <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-3">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Pilih hak akses
+                </label>
+                <span className="text-xs text-slate-400 dark:text-slate-500">
+                    {selected.length} dipilih
+                </span>
+            </div>
+
+            <input
+                type="text"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Cari hak akses..."
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
+            />
+
+            <div className="max-h-72 divide-y divide-slate-100 overflow-y-auto rounded-xl border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
+                {groups.length ? (
+                    groups.map(([module, items]) => {
+                        const allSelected = items.every((item) =>
+                            selectedIds.has(item.id),
+                        );
+
+                        return (
+                            <div key={module}>
+                                <div className="flex items-center justify-between gap-3 bg-slate-50 px-3 py-2 dark:bg-slate-800/60">
+                                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                                        {module.replace(/-/g, " ")}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleGroup(items)}
+                                        className="text-xs font-medium text-primary-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-primary-400"
+                                    >
+                                        {allSelected
+                                            ? "Batal pilih"
+                                            : "Pilih semua"}
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2">
+                                    {items.map((permission) => (
+                                        <label
+                                            key={permission.id}
+                                            className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/40"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(
+                                                    permission.id,
+                                                )}
+                                                onChange={() =>
+                                                    toggle(permission)
+                                                }
+                                                className="h-4 w-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500/40"
+                                            />
+                                            <span className="truncate">
+                                                {permission.name}
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p className="px-3 py-6 text-center text-sm text-slate-400">
+                        Hak akses tidak ditemukan.
+                    </p>
+                )}
+            </div>
+
+            {error && <p className="text-xs text-danger-500">{error}</p>}
+        </div>
+    );
+}
+
 function RoleCard({ role, onEdit, onDelete, canUpdate, canDelete }) {
+    const modules = Array.from(
+        new Set(
+            role.permissions.map((permission) =>
+                permissionModule(permission.name),
+            ),
+        ),
+    );
+    const shown = modules.slice(0, 4);
+
     return (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-lg transition-all">
-            {/* Header */}
-            <div className="p-5 border-b border-slate-100 dark:border-slate-800">
+            <div className="p-5">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white">
-                        <IconUserShield size={24} />
+                    <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-300 flex items-center justify-center flex-shrink-0">
+                        <IconUserShield size={24} strokeWidth={1.5} />
                     </div>
-                    <div>
-                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 capitalize">
+                    <div className="min-w-0">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate">
                             {role.name}
                         </h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -37,29 +179,29 @@ function RoleCard({ role, onEdit, onDelete, canUpdate, canDelete }) {
                         </p>
                     </div>
                 </div>
-            </div>
 
-            {/* Permissions */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/50">
-                <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto scrollbar-thin">
-                    {role.permissions.slice(0, 8).map((permission, index) => (
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                    {shown.map((module) => (
                         <span
-                            key={index}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-accent-100 dark:bg-accent-900/50 text-accent-700 dark:text-accent-400"
+                            key={module}
+                            className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
                         >
-                            <IconShield size={10} />
-                            {permission.name}
+                            {module.replace(/-/g, " ")}
                         </span>
                     ))}
-                    {role.permissions.length > 8 && (
-                        <span className="px-2 py-0.5 text-xs font-medium text-slate-500">
-                            +{role.permissions.length - 8} lainnya
+                    {modules.length > shown.length && (
+                        <span className="px-2 py-0.5 text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                            +{modules.length - shown.length} modul
+                        </span>
+                    )}
+                    {!modules.length && (
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
+                            Belum ada hak akses
                         </span>
                     )}
                 </div>
             </div>
 
-            {/* Actions */}
             {(canUpdate || canDelete) && (
                 <div className="flex border-t border-slate-100 dark:border-slate-800">
                     {canUpdate && (
@@ -96,13 +238,7 @@ export default function Index() {
     const canUpdateRoles = can("roles-update");
     const canDeleteRoles = can("roles-delete");
 
-    const {
-        data,
-        setData,
-        transform,
-        post,
-        delete: destroy,
-    } = useForm({
+    const { data, setData, transform, post, delete: destroy } = useForm({
         id: "",
         name: "",
         selectedPermission: [],
@@ -116,30 +252,31 @@ export default function Index() {
     transform((data) => ({
         ...data,
         selectedPermission: data.selectedPermission.map(
-            (permission) => permission.id
+            (permission) => permission.id,
         ),
         _method: data.isUpdate === true ? "put" : "post",
     }));
 
+    const closeModal = () =>
+        setData({
+            isOpen: false,
+            id: "",
+            name: "",
+            selectedPermission: [],
+            isUpdate: false,
+        });
+
     const saveRole = async (e) => {
         e.preventDefault();
         post(route("roles.store"), {
-            onSuccess: () =>
-                setData({ selectedPermission: [], name: "", isOpen: false }),
+            onSuccess: () => closeModal(),
         });
     };
 
     const updateRole = async (e) => {
         e.preventDefault();
         post(route("roles.update", data.id), {
-            onSuccess: () =>
-                setData({
-                    id: "",
-                    name: "",
-                    selectedPermission: [],
-                    isUpdate: false,
-                    isOpen: false,
-                }),
+            onSuccess: () => closeModal(),
         });
     };
 
@@ -154,9 +291,20 @@ export default function Index() {
     };
 
     const handleDelete = (roleId) => {
-        if (confirm("Hapus role ini?")) {
-            destroy(route("roles.destroy", roleId));
-        }
+        Swal.fire({
+            title: "Hapus Akses Group?",
+            text: "Group yang dihapus tidak dapat dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#6366f1",
+            cancelButtonColor: "#64748b",
+            confirmButtonText: "Ya, Hapus!",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                destroy(route("roles.destroy", roleId));
+            }
+        });
     };
 
     return (
@@ -209,19 +357,9 @@ export default function Index() {
             {/* Modal */}
             <Modal
                 show={data.isOpen}
-                onClose={() =>
-                    setData({
-                        isOpen: false,
-                        id: "",
-                        name: "",
-                        selectedPermission: [],
-                        isUpdate: false,
-                    })
-                }
-                title={
-                    data.isUpdate ? "Ubah Akses Group" : "Tambah Akses Group"
-                }
-                icon={<IconUserShield size={20} strokeWidth={1.5} />}
+                onClose={closeModal}
+                title={data.isUpdate ? "Ubah Akses Group" : "Tambah Akses Group"}
+                maxWidth="lg"
             >
                 <form onSubmit={data.isUpdate ? updateRole : saveRole}>
                     <div className="mb-4">
@@ -235,22 +373,30 @@ export default function Index() {
                         />
                     </div>
                     <div className="mb-4">
-                        <ListBox
-                            label={"Pilih hak akses"}
-                            data={permissions}
+                        <PermissionPicker
+                            permissions={permissions}
                             selected={data.selectedPermission}
-                            setSelected={setSelectedPermission}
-                            errors={errors.selectedPermission}
+                            onChange={setSelectedPermission}
+                            error={errors.selectedPermission}
                         />
                     </div>
-                    <Button
-                        type={"submit"}
-                        icon={<IconPencilCheck size={18} />}
-                        className={
-                            "bg-primary-500 hover:bg-primary-600 text-white w-full justify-center"
-                        }
-                        label={"Simpan"}
-                    />
+                    <div className="flex justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
+                        <button
+                            type="button"
+                            onClick={closeModal}
+                            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                        >
+                            Batal
+                        </button>
+                        <Button
+                            type={"submit"}
+                            icon={<IconPencilCheck size={18} />}
+                            className={
+                                "bg-primary-500 hover:bg-primary-600 text-white"
+                            }
+                            label={data.isUpdate ? "Simpan Perubahan" : "Simpan"}
+                        />
+                    </div>
                 </form>
             </Modal>
 
