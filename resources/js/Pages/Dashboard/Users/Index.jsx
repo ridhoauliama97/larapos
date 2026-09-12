@@ -7,9 +7,6 @@ import {
     IconCirclePlus,
     IconTrash,
     IconPencilCog,
-    IconUser,
-    IconShield,
-    IconMail,
     IconLayoutGrid,
     IconList,
 } from "@tabler/icons-react";
@@ -29,98 +26,115 @@ function UserCard({
     canUpdate,
     canDelete,
 }) {
-    const avatarUrl = user.avatar;
     const initial =
         user.name?.charAt(0)?.toUpperCase() ||
         user.email?.charAt(0)?.toUpperCase() ||
         "?";
+    const roles = user.roles ?? [];
+    const primaryRole = roles[0]?.name;
+    const roleNames = roles.map((role) => role.name).join(", ");
 
     return (
         <div
-            className={`
-            group bg-white dark:bg-slate-900 rounded-2xl border-2
-            ${
+            className={`group bg-white dark:bg-slate-900 rounded-2xl border overflow-hidden hover:shadow-lg transition-all duration-200 ${
                 isSelected
-                    ? "border-primary-500 dark:border-primary-600"
-                    : "border-slate-200 dark:border-slate-800"
-            }
-            overflow-hidden hover:shadow-lg hover:border-primary-300 dark:hover:border-primary-700 transition-all duration-200
-        `}
+                    ? "border-primary-500 ring-2 ring-primary-500/20"
+                    : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+            }`}
         >
-            {/* Header with checkbox */}
-            <div className="p-4 flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-lg font-bold overflow-hidden">
-                        {avatarUrl ? (
-                            <img
-                                src={avatarUrl}
-                                alt={user.name}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            initial
+            {/* Avatar 1:1 */}
+            <div className="relative aspect-square bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                {canDelete && (
+                    <div className="absolute top-2 left-2 z-10">
+                        <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => onSelect(user)}
+                            className="w-5 h-5 rounded border-2 border-white bg-white/80 text-primary-500 focus:ring-primary-500 cursor-pointer shadow-sm"
+                        />
+                    </div>
+                )}
+
+                {user.avatar ? (
+                    <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-5xl font-bold text-slate-300 dark:text-slate-600">
+                            {initial}
+                        </span>
+                    </div>
+                )}
+
+                {/* Access badge */}
+                <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
+                    {primaryRole ? (
+                        <span className="px-2 py-1 text-xs font-medium bg-slate-900/60 text-white rounded-full capitalize truncate max-w-[10rem]">
+                            {primaryRole}
+                        </span>
+                    ) : (
+                        <span className="px-2 py-1 text-xs font-semibold bg-danger-500 text-white rounded-full">
+                            Tanpa akses
+                        </span>
+                    )}
+                </div>
+
+                {/* Action Buttons Overlay */}
+                {(canUpdate || canDelete) && (
+                    <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                        {canUpdate && (
+                            <Link
+                                href={route("users.edit", user.id)}
+                                className="p-2.5 rounded-xl bg-white text-warning-600 hover:bg-warning-50 shadow-lg transition-colors"
+                            >
+                                <IconPencilCog size={18} />
+                            </Link>
+                        )}
+                        {canDelete && (
+                            <button
+                                onClick={() => onDelete(user.id)}
+                                className="p-2.5 rounded-xl bg-white text-danger-600 hover:bg-danger-50 shadow-lg transition-colors"
+                            >
+                                <IconTrash size={18} />
+                            </button>
                         )}
                     </div>
-                    <div>
-                        <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
-                            {user.name}
-                        </h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                            <IconMail size={14} />
-                            {user.email}
-                        </p>
-                    </div>
-                </div>
-                {canDelete && (
-                    <Checkbox
-                        value={user.id}
-                        onChange={onSelect}
-                        checked={isSelected}
-                    />
                 )}
             </div>
 
-            {/* Roles */}
-            <div className="px-4 pb-3">
-                <div className="flex flex-wrap gap-1.5">
-                    {user.roles.map((role, index) => (
-                        <span
-                            key={index}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-accent-100 dark:bg-accent-900/50 text-accent-700 dark:text-accent-400"
-                        >
-                            <IconShield size={12} />
-                            {role.name}
-                        </span>
-                    ))}
+            {/* User Info */}
+            <div className="p-3 sm:p-4">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                    <span
+                        className={`px-2 py-0.5 text-xs font-medium rounded-md truncate capitalize ${
+                            primaryRole
+                                ? "bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-400"
+                                : "bg-danger-100 dark:bg-danger-900/50 text-danger-600 dark:text-danger-400"
+                        }`}
+                    >
+                        {primaryRole || "Tanpa group"}
+                    </span>
+                </div>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 line-clamp-2 mb-1">
+                    {user.name}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                    {user.email}
+                </p>
+
+                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <p className="text-base sm:text-lg font-bold text-primary-600 dark:text-primary-400">
+                        {roles.length} group akses
+                    </p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 line-clamp-1 mt-1">
+                        {roleNames || "Belum memiliki akses"}
+                    </p>
                 </div>
             </div>
-
-            {/* Actions */}
-            {(canUpdate || canDelete) && (
-                <div className="flex border-t border-slate-100 dark:border-slate-800">
-                    {canUpdate && (
-                        <Link
-                            href={route("users.edit", user.id)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-3 text-warning-600 hover:bg-warning-50 dark:hover:bg-warning-950/50 text-sm font-medium transition-colors"
-                        >
-                            <IconPencilCog size={16} />
-                            <span>Edit</span>
-                        </Link>
-                    )}
-                    {canUpdate && canDelete && (
-                        <div className="w-px bg-slate-100 dark:bg-slate-800" />
-                    )}
-                    {canDelete && (
-                        <button
-                            onClick={() => onDelete(user.id)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-3 text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-950/50 text-sm font-medium transition-colors"
-                        >
-                            <IconTrash size={16} />
-                            <span>Hapus</span>
-                        </button>
-                    )}
-                </div>
-            )}
         </div>
     );
 }
@@ -147,6 +161,14 @@ export default function Index() {
         if (items.some((id) => id === e.target.value))
             items = items.filter((id) => id !== e.target.value);
         else items.push(e.target.value);
+        setData("selectedUser", items);
+    };
+
+    const toggleUserSelection = (user) => {
+        const id = user.id.toString();
+        const items = data.selectedUser.includes(id)
+            ? data.selectedUser.filter((item) => item !== id)
+            : [...data.selectedUser, id];
         setData("selectedUser", items);
     };
 
@@ -258,15 +280,15 @@ export default function Index() {
             {/* Content */}
             {users.data.length > 0 ? (
                 viewMode === "grid" ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                         {users.data.map((user) => (
                             <UserCard
                                 key={user.id}
                                 user={user}
                                 isSelected={data.selectedUser.includes(
-                                    user.id.toString()
+                                    user.id.toString(),
                                 )}
-                                onSelect={setSelectedUser}
+                                onSelect={toggleUserSelection}
                                 onDelete={deleteData}
                                 canUpdate={canUpdateUsers}
                                 canDelete={canDeleteUsers}
@@ -284,13 +306,13 @@ export default function Index() {
                                                 onChange={(e) => {
                                                     const allUserIds =
                                                         users.data.map((user) =>
-                                                            user.id.toString()
+                                                            user.id.toString(),
                                                         );
                                                     setData(
                                                         "selectedUser",
                                                         e.target.checked
                                                             ? allUserIds
-                                                            : []
+                                                            : [],
                                                     );
                                                 }}
                                                 checked={
@@ -318,7 +340,7 @@ export default function Index() {
                                                     value={user.id}
                                                     onChange={setSelectedUser}
                                                     checked={data.selectedUser.includes(
-                                                        user.id.toString()
+                                                        user.id.toString(),
                                                     )}
                                                 />
                                             )}
@@ -328,7 +350,7 @@ export default function Index() {
                                                 (users.current_page - 1) *
                                                     users.per_page}
                                         </Table.Td>
-                                    <Table.Td>
+                                        <Table.Td>
                                             <div className="flex items-center gap-3">
                                                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
                                                     {user.avatar ? (
@@ -363,7 +385,7 @@ export default function Index() {
                                                         >
                                                             {role.name}
                                                         </span>
-                                                    )
+                                                    ),
                                                 )}
                                             </div>
                                         </Table.Td>
@@ -385,7 +407,7 @@ export default function Index() {
                                                         }
                                                         href={route(
                                                             "users.edit",
-                                                            user.id
+                                                            user.id,
                                                         )}
                                                     />
                                                 )}
@@ -405,7 +427,7 @@ export default function Index() {
                                                         }
                                                         url={route(
                                                             "users.destroy",
-                                                            user.id
+                                                            user.id,
                                                         )}
                                                     />
                                                 )}
