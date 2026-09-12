@@ -185,6 +185,7 @@ class ProductController extends Controller
          * validate
          */
         $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
             'barcode' => 'required|unique:products,barcode,'.$product->id,
             'sku' => 'required|unique:products,sku,'.$product->id,
             'title' => 'required',
@@ -285,9 +286,7 @@ class ProductController extends Controller
         // find by ID
         $product = Product::findOrFail($id);
         $before = $this->productAuditPayload($product);
-
-        // remove image
-        Storage::disk('local')->delete('public/products/'.basename($product->image));
+        $image = $product->getRawOriginal('image');
 
         // delete
         $product->delete();
@@ -299,6 +298,11 @@ class ProductController extends Controller
             description: 'Produk dihapus.',
             before: $before
         );
+
+        // remove image only after the record is deleted successfully
+        if ($image) {
+            Storage::disk('local')->delete('public/products/'.basename($image));
+        }
 
         // redirect
         return back();

@@ -95,6 +95,7 @@ class CategoryController extends Controller
          * validate
          */
         $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'name' => 'required',
             'description' => 'required',
         ]);
@@ -103,7 +104,9 @@ class CategoryController extends Controller
         if ($request->file('image')) {
 
             // remove old image
-            Storage::disk('local')->delete('public/category/'.basename($category->image));
+            if ($category->getRawOriginal('image')) {
+                Storage::disk('local')->delete('public/category/'.basename($category->getRawOriginal('image')));
+            }
 
             // upload new image
             $image = $request->file('image');
@@ -137,12 +140,15 @@ class CategoryController extends Controller
     {
         // find by ID
         $category = Category::findOrFail($id);
-
-        // remove image
-        Storage::disk('local')->delete('public/category/'.basename($category->image));
+        $image = $category->getRawOriginal('image');
 
         // delete
         $category->delete();
+
+        // remove image only after the record is deleted successfully
+        if ($image) {
+            Storage::disk('local')->delete('public/category/'.basename($image));
+        }
 
         // redirect
         return to_route('categories.index');
