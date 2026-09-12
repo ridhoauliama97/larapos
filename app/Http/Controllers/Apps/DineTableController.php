@@ -76,6 +76,10 @@ class DineTableController extends Controller
 
     public function destroy(DiningTable $dineTable)
     {
+        if ($dineTable->orders()->exists()) {
+            return back()->with('error', 'Meja tidak dapat dihapus karena masih memiliki pesanan.');
+        }
+
         $dineTable->delete();
 
         return back()->with('success', 'Meja berhasil dihapus.');

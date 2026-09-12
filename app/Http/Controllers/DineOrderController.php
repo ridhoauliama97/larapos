@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Services\PricingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -19,6 +20,8 @@ class DineOrderController extends Controller
 
     public function store(Request $request, string $token)
     {
+        abort_unless(Setting::getBool('dine_in_self_order_enabled', true), 422, 'Pemesanan mandiri sedang dinonaktifkan.');
+
         $table = DiningTable::where('token', $token)->where('is_active', true)->firstOrFail();
 
         $validated = $request->validate([
@@ -72,21 +75,25 @@ class DineOrderController extends Controller
             ];
         }
 
-        $order = DineOrder::create([
-            'dine_table_id' => $table->id,
-            'access_token' => (string) Str::uuid(),
-            'status' => DineOrder::STATUS_SUBMITTED,
-            'submitted_at' => now(),
-            'payment_option' => $validated['payment_option'],
-            'notes' => $validated['notes'] ?? null,
-            'subtotal' => $subtotal,
-            'item_count' => $items->sum('qty'),
-            'cashier_id' => null,
-        ]);
+        $order = DB::transaction(function () use ($table, $validated, $items, $subtotal, $orderItems) {
+            $order = DineOrder::create([
+                'dine_table_id' => $table->id,
+                'access_token' => (string) Str::uuid(),
+                'status' => DineOrder::STATUS_SUBMITTED,
+                'submitted_at' => now(),
+                'payment_option' => $validated['payment_option'],
+                'notes' => $validated['notes'] ?? null,
+                'subtotal' => $subtotal,
+                'item_count' => $items->sum('qty'),
+                'cashier_id' => null,
+            ]);
 
-        foreach ($orderItems as $item) {
-            $order->items()->create($item);
-        }
+            foreach ($orderItems as $item) {
+                $order->items()->create($item);
+            }
+
+            return $order;
+        });
 
         return redirect()
             ->route('dine-order.status', $order->access_token)

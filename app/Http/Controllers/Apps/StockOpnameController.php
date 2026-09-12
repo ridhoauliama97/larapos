@@ -220,6 +220,10 @@ class StockOpnameController extends Controller
         }
 
         DB::transaction(function () use ($request, $stockOpname) {
+            // ponytail: lock + re-check inside the transaction to close the check-then-act race on finalize.
+            $stockOpname = StockOpname::whereKey($stockOpname->id)->lockForUpdate()->firstOrFail();
+            $this->ensureDraft($stockOpname);
+
             foreach ($stockOpname->items as $item) {
                 if ($item->physical_stock === null) {
                     continue;

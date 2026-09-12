@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -70,6 +71,26 @@ class WarehouseController extends Controller
         $totalStock = $warehouse->products()->sum('product_warehouse.stock');
         if ($totalStock > 0) {
             return back()->with('error', 'Gudang masih memiliki stok. Pindahkan stok terlebih dahulu.');
+        }
+
+        // prevent deleting warehouses that are still referenced by other data (FK restrict)
+        $isReferenced =
+            DB::table('stock_transfers')
+                ->where('source_warehouse_id', $warehouse->id)
+                ->orWhere('destination_warehouse_id', $warehouse->id)
+                ->exists()
+            || DB::table('stock_mutations')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('transactions')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('carts')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('cashier_shifts')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('purchase_orders')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('goods_receivings')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('supplier_returns')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('stock_opnames')->where('warehouse_id', $warehouse->id)->exists()
+            || DB::table('sales_returns')->where('warehouse_id', $warehouse->id)->exists();
+
+        if ($isReferenced) {
+            return back()->with('error', 'Gudang tidak dapat dihapus karena masih dipakai data lain.');
         }
 
         $warehouse->delete();

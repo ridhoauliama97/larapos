@@ -33,7 +33,10 @@ class NotificationController extends Controller
      */
     public function markAllLowStockRead(Request $request)
     {
-        $productIds = Product::where('stock', '<=', 0)->pluck('id')->all();
+        $productIds = Product::where('min_stock', '>', 0)
+            ->whereColumn('stock', '<=', 'min_stock')
+            ->pluck('id')
+            ->all();
 
         if (count($productIds) === 0) {
             return back();

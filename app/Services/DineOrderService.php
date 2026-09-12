@@ -32,6 +32,12 @@ class DineOrderService
             // ponytail: lock the order row so accept cannot race with a second accept/reject
             $order = DineOrder::with('items.product.components')->whereKey($order->id)->lockForUpdate()->firstOrFail();
 
+            if ($order->status !== DineOrder::STATUS_SUBMITTED) {
+                throw ValidationException::withMessages([
+                    'status' => 'Pesanan sudah diproses.',
+                ]);
+            }
+
             foreach ($order->items as $item) {
                 $product = $item->product;
 
@@ -80,6 +86,12 @@ class DineOrderService
 
     public function reject(DineOrder $order, ?string $reason = null): void
     {
+        if ($order->status !== DineOrder::STATUS_SUBMITTED) {
+            throw ValidationException::withMessages([
+                'status' => 'Pesanan sudah diproses.',
+            ]);
+        }
+
         $order->update([
             'status' => DineOrder::STATUS_REJECTED,
             'notes' => $order->notes

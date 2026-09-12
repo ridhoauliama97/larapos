@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apps;
 use App\Http\Controllers\Controller;
 use App\Models\PriceList;
 use App\Models\Product;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -69,6 +70,10 @@ class PriceListController extends Controller
 
     public function destroy(PriceList $priceList)
     {
+        if (Transaction::where('price_list_id', $priceList->id)->exists()) {
+            return back()->with('error', 'Price list tidak dapat dihapus karena sudah dipakai di transaksi.');
+        }
+
         $priceList->delete();
 
         return back()->with('success', 'Price list dihapus.');

@@ -326,6 +326,11 @@ class CustomerController extends Controller
         // find customer by ID
         $customer = Customer::findOrFail($id);
 
+        // prevent deleting customers that still have transactions (FK restrict)
+        if ($customer->transactions()->exists()) {
+            return back()->with('error', 'Pelanggan tidak dapat dihapus karena memiliki transaksi.');
+        }
+
         // delete customer
         $customer->delete();
 

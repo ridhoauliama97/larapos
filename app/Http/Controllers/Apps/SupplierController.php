@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apps;
 use App\Http\Controllers\Controller;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class SupplierController extends Controller
@@ -51,6 +52,16 @@ class SupplierController extends Controller
         if ($supplier->payables()->exists()) {
             return back()->with('error', 'Supplier memiliki hutang, tidak dapat dihapus.');
         }
+
+        // prevent deleting suppliers that are still referenced by purchasing documents (FK restrict)
+        if (
+            DB::table('purchase_orders')->where('supplier_id', $supplier->id)->exists()
+            || DB::table('goods_receivings')->where('supplier_id', $supplier->id)->exists()
+            || DB::table('supplier_returns')->where('supplier_id', $supplier->id)->exists()
+        ) {
+            return back()->with('error', 'Supplier tidak dapat dihapus karena masih memiliki dokumen terkait.');
+        }
+
         $supplier->delete();
 
         return back()->with('success', 'Supplier dihapus.');

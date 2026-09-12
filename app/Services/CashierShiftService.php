@@ -47,27 +47,32 @@ class CashierShiftService
 
     public function openShift(User $cashier, User $actor, int $openingCash, ?string $notes = null, ?int $warehouseId = null): CashierShift
     {
-        $existing = CashierShift::query()
-            ->open()
-            ->where('user_id', $cashier->id)
-            ->exists();
+        return DB::transaction(function () use ($cashier, $actor, $openingCash, $notes, $warehouseId) {
+            // ponytail: lock the user row so concurrent opens for the same cashier cannot both pass the exists check.
+            User::whereKey($cashier->id)->lockForUpdate()->first();
 
-        if ($existing) {
-            throw ValidationException::withMessages([
-                'opening_cash' => 'Kasir ini masih memiliki shift aktif.',
+            $existing = CashierShift::query()
+                ->open()
+                ->where('user_id', $cashier->id)
+                ->exists();
+
+            if ($existing) {
+                throw ValidationException::withMessages([
+                    'opening_cash' => 'Kasir ini masih memiliki shift aktif.',
+                ]);
+            }
+
+            return CashierShift::create([
+                'user_id' => $cashier->id,
+                'opened_by' => $actor->id,
+                'opened_at' => now(),
+                'opening_cash' => $openingCash,
+                'expected_cash' => $openingCash,
+                'notes' => $notes,
+                'warehouse_id' => $warehouseId,
+                'status' => CashierShift::STATUS_OPEN,
             ]);
-        }
-
-        return CashierShift::create([
-            'user_id' => $cashier->id,
-            'opened_by' => $actor->id,
-            'opened_at' => now(),
-            'opening_cash' => $openingCash,
-            'expected_cash' => $openingCash,
-            'notes' => $notes,
-            'warehouse_id' => $warehouseId,
-            'status' => CashierShift::STATUS_OPEN,
-        ]);
+        });
     }
 
     public function calculateSummary(CashierShift $shift): array
@@ -123,31 +128,36 @@ class CashierShiftService
 
     public function recordCashMovement(CashierShift $shift, User $actor, string $type, int $amount, ?string $note = null): ShiftCashMovement
     {
-        if (! $shift->isOpen()) {
-            throw ValidationException::withMessages([
-                'shift' => 'Shift sudah ditutup, tidak dapat mencatat pergerakan kas.',
-            ]);
-        }
+        return DB::transaction(function () use ($shift, $actor, $type, $amount, $note) {
+            // ponytail: reload under lock so a movement cannot be recorded after the shift was closed concurrently.
+            $shift = CashierShift::whereKey($shift->id)->lockForUpdate()->firstOrFail();
 
-        if ($amount <= 0) {
-            throw ValidationException::withMessages([
-                'amount' => 'Nominal harus lebih besar dari nol.',
-            ]);
-        }
+            if (! $shift->isOpen()) {
+                throw ValidationException::withMessages([
+                    'shift' => 'Shift sudah ditutup, tidak dapat mencatat pergerakan kas.',
+                ]);
+            }
 
-        if (! in_array($type, [ShiftCashMovement::TYPE_IN, ShiftCashMovement::TYPE_OUT], true)) {
-            throw ValidationException::withMessages([
-                'type' => 'Tipe pergerakan kas tidak valid.',
-            ]);
-        }
+            if ($amount <= 0) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Nominal harus lebih besar dari nol.',
+                ]);
+            }
 
-        return ShiftCashMovement::create([
-            'cashier_shift_id' => $shift->id,
-            'type' => $type,
-            'amount' => $amount,
-            'note' => $note,
-            'user_id' => $actor->id,
-        ]);
+            if (! in_array($type, [ShiftCashMovement::TYPE_IN, ShiftCashMovement::TYPE_OUT], true)) {
+                throw ValidationException::withMessages([
+                    'type' => 'Tipe pergerakan kas tidak valid.',
+                ]);
+            }
+
+            return ShiftCashMovement::create([
+                'cashier_shift_id' => $shift->id,
+                'type' => $type,
+                'amount' => $amount,
+                'note' => $note,
+                'user_id' => $actor->id,
+            ]);
+        });
     }
 
     public function closeShift(

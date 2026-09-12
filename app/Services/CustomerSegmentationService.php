@@ -70,7 +70,7 @@ class CustomerSegmentationService
     public function ensureDefaultAutoSegments(): void
     {
         foreach ($this->defaultAutoSegments() as $segment) {
-            CustomerSegment::query()->updateOrCreate(
+            CustomerSegment::query()->firstOrCreate(
                 ['slug' => $segment['slug']],
                 [
                     ...$segment,

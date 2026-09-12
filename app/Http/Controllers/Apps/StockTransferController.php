@@ -9,6 +9,7 @@ use App\Models\Warehouse;
 use App\Services\StockTransferService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -50,7 +51,7 @@ class StockTransferController extends Controller
         $data = $request->validate([
             'source_warehouse_id' => ['required', 'exists:warehouses,id'],
             'destination_warehouse_id' => ['required', 'exists:warehouses,id', 'different:source_warehouse_id'],
-            'document_number' => ['nullable', 'string', 'max:30'],
+            'document_number' => ['nullable', 'string', 'max:30', Rule::unique('stock_transfers', 'document_number')],
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],

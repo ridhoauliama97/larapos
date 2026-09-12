@@ -57,6 +57,10 @@ class DiscountApprovalController extends Controller
     private function logAndUpdate(Transaction $transaction, string $status, ?string $notes = null): void
     {
         \DB::transaction(function () use ($transaction, $status, $notes) {
+            // ponytail: lock + re-check inside the transaction so a concurrent decision cannot double-apply.
+            $transaction = Transaction::whereKey($transaction->id)->lockForUpdate()->firstOrFail();
+            abort_if($transaction->discount_approval_status !== 'pending', 404);
+
             // ponytail: approval only settles the approval state — payment stays tied to the actual method.
             // grand_total already excludes the manual discount (LoyaltyService), so denying re-adds it.
             $paymentStatus = match ($transaction->payment_method) {
@@ -75,7 +79,7 @@ class DiscountApprovalController extends Controller
 
             if ($status === 'denied') {
                 $updates['discount'] = 0;
-                $updates['payment_status'] = 'unpaid';
+                $updates['payment_status'] = $transaction->payment_status === 'paid' ? 'paid' : 'unpaid';
             } else {
                 $updates['payment_status'] = $paymentStatus;
             }
@@ -84,6 +88,11 @@ class DiscountApprovalController extends Controller
 
             if ($status === 'denied' && $deniedDiscount > 0) {
                 $transaction->increment('grand_total', $deniedDiscount);
+
+                // ponytail: denying re-adds the discount, so the linked receivable must grow back too.
+                if ($transaction->receivable) {
+                    $transaction->receivable()->increment('total', $deniedDiscount);
+                }
             }
 
             DiscountApprovalLog::where('transaction_id', $transaction->id)

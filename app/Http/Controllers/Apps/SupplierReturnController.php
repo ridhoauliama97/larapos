@@ -9,6 +9,7 @@ use App\Models\Supplier;
 use App\Models\SupplierReturn;
 use App\Services\SupplierReturnService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class SupplierReturnController extends Controller
@@ -72,13 +73,21 @@ class SupplierReturnController extends Controller
 
     public function store(Request $request)
     {
+        $supplierId = $request->input('supplier_id') ?: null;
+
         $data = $request->validate([
             'supplier_id' => ['nullable', 'exists:suppliers,id'],
-            'goods_receiving_id' => ['nullable', 'exists:goods_receivings,id'],
-            'payable_id' => ['nullable', 'exists:payables,id'],
+            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+            'goods_receiving_id' => $supplierId
+                ? ['nullable', Rule::exists('goods_receivings', 'id')->where('supplier_id', $supplierId)]
+                : ['nullable', 'exists:goods_receivings,id'],
+            'payable_id' => $supplierId
+                ? ['nullable', Rule::exists('payables', 'id')->where('supplier_id', $supplierId)]
+                : ['nullable', 'exists:payables,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.goods_receiving_item_id' => ['nullable', 'integer', 'exists:goods_receiving_items,id'],
             'items.*.qty_returned' => ['required', 'integer', 'min:1'],
             'items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
             'items.*.reason' => ['nullable', 'string', 'max:100'],

@@ -159,26 +159,41 @@ class GoodsReceivingService
 
     private function createOrUpdatePayable(PurchaseOrder $order, GoodsReceiving $receiving, int $userId): void
     {
-        $total = $receiving->items()->sum(\DB::raw('qty_received * (SELECT unit_price FROM purchase_order_items WHERE id = goods_receiving_items.purchase_order_item_id)'));
+        // ponytail: total is the sum across ALL receivings of this PO so partial receipts accumulate.
+        $total = (float) DB::table('goods_receiving_items')
+            ->join('goods_receivings', 'goods_receivings.id', '=', 'goods_receiving_items.goods_receiving_id')
+            ->leftJoin('purchase_order_items', 'purchase_order_items.id', '=', 'goods_receiving_items.purchase_order_item_id')
+            ->where('goods_receivings.purchase_order_id', $order->id)
+            ->sum(DB::raw('goods_receiving_items.qty_received * COALESCE(purchase_order_items.unit_price, 0)'));
 
-        if ($total <= 0) {
-            $total = $order->items()->sum(\DB::raw('qty_ordered * unit_price'));
+        $payable = Payable::firstOrNew(['purchase_order_id' => $order->id]);
+        $wasNew = ! $payable->exists;
+
+        // Fallback only for a first-time payable, otherwise later receivings would double-count ordered qty.
+        if ($wasNew && $total <= 0) {
+            $total = (float) $order->items()->sum(DB::raw('qty_ordered * unit_price'));
         }
 
-        $payable = Payable::updateOrCreate(
-            ['purchase_order_id' => $order->id],
-            [
-                'supplier_id' => $order->supplier_id,
-                'document_number' => $receiving->document_number,
-                'total' => $total,
-                'paid' => 0,
-                'due_date' => now()->addDays(30),
-                'status' => 'unpaid',
-                'note' => 'Otomatis dari penerimaan PO '.$order->document_number,
-            ]
-        );
+        $payable->fill([
+            'supplier_id' => $order->supplier_id,
+            'document_number' => $receiving->document_number,
+            'total' => $total,
+            'note' => 'Otomatis dari penerimaan PO '.$order->document_number,
+        ]);
 
-        if ($payable->wasRecentlyCreated) {
+        if ($wasNew) {
+            $payable->paid = 0;
+            $payable->due_date = now()->addDays(30);
+            $payable->status = 'unpaid';
+        } else {
+            // Preserve existing paid/due_date and only derive the status from the new total.
+            $paid = (float) $payable->paid;
+            $payable->status = $paid <= 0 ? 'unpaid' : ($paid >= $total ? 'paid' : 'partial');
+        }
+
+        $payable->save();
+
+        if ($wasNew) {
             $this->auditLogService->log(
                 event: 'payable.created_from_receiving',
                 module: 'payable',

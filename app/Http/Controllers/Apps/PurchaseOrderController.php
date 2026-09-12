@@ -9,6 +9,7 @@ use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Services\PurchaseOrderService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class PurchaseOrderController extends Controller
@@ -64,7 +65,7 @@ class PurchaseOrderController extends Controller
         $data = $request->validate([
             'supplier_id' => ['nullable', 'exists:suppliers,id'],
             'warehouse_id' => ['nullable', 'exists:warehouses,id'],
-            'document_number' => ['nullable', 'string', 'max:100'],
+            'document_number' => ['nullable', 'string', 'max:100', Rule::unique('purchase_orders', 'document_number')],
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],

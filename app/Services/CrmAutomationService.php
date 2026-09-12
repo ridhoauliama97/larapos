@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Transaction;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class CrmAutomationService
 {
@@ -117,18 +118,28 @@ class CrmAutomationService
 
     public function updateCampaign(CustomerCampaign $campaign, array $payload): CustomerCampaign
     {
-        $campaign->update([
+        $attributes = [
             'name' => $payload['name'],
             'channel' => $payload['channel'] ?? CustomerCampaign::CHANNEL_INTERNAL,
             'audience_filters' => $payload['audience_filters'] ?? [],
             'message_template' => $payload['message_template'] ?? null,
-        ]);
+        ];
+
+        if (array_key_exists('type', $payload)) {
+            $attributes['type'] = $payload['type'];
+        }
+
+        $campaign->update($attributes);
 
         return $campaign->fresh();
     }
 
     public function processCampaign(CustomerCampaign $campaign, ?CarbonInterface $at = null): CustomerCampaign
     {
+        if (! in_array($campaign->status, [CustomerCampaign::STATUS_DRAFT, CustomerCampaign::STATUS_READY], true)) {
+            throw ValidationException::withMessages(['status' => 'Kampanye sudah diproses atau dibatalkan.']);
+        }
+
         $at = $at ?? now();
         $campaign->logs()->delete();
 
@@ -174,6 +185,10 @@ class CrmAutomationService
 
     public function cancelCampaign(CustomerCampaign $campaign): CustomerCampaign
     {
+        if (in_array($campaign->status, [CustomerCampaign::STATUS_PROCESSED, CustomerCampaign::STATUS_CANCELLED], true)) {
+            throw ValidationException::withMessages(['status' => 'Kampanye sudah diproses atau dibatalkan.']);
+        }
+
         $campaign->update(['status' => CustomerCampaign::STATUS_CANCELLED]);
 
         return $campaign->fresh();

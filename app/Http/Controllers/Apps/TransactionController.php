@@ -584,6 +584,13 @@ class TransactionController extends Controller
      */
     public function store(Request $request, PaymentGatewayManager $paymentGatewayManager)
     {
+        $request->validate([
+            'customer_id' => ['nullable', 'integer', 'exists:customers,id'],
+            'bank_account_id' => ['nullable', 'integer', 'exists:bank_accounts,id'],
+            'due_date' => ['nullable', 'date'],
+            'customer_npwp' => ['nullable', 'string', 'max:20'],
+        ]);
+
         $isPayLater = $request->boolean('pay_later');
         $paymentGateway = $isPayLater ? null : $request->input('payment_gateway');
         if ($paymentGateway) {

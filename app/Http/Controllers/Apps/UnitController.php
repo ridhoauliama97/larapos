@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -49,6 +51,14 @@ class UnitController extends Controller
     {
         if ($unit->products()->exists()) {
             return back()->with('error', 'Satuan masih dipakai produk. Lepaskan dari produk terlebih dahulu.');
+        }
+
+        // prevent deleting units that are still referenced by carts or transactions (FK restrict)
+        if (
+            Cart::where('unit_id', $unit->id)->exists()
+            || DB::table('transaction_details')->where('unit_id', $unit->id)->exists()
+        ) {
+            return back()->with('error', 'Satuan tidak dapat dihapus karena sudah dipakai di keranjang atau transaksi.');
         }
 
         $unit->delete();
