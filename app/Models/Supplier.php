@@ -14,6 +14,14 @@ class Supplier extends Model
         'phone',
         'email',
         'address',
+        'province_id',
+        'province_name',
+        'regency_id',
+        'regency_name',
+        'district_id',
+        'district_name',
+        'village_id',
+        'village_name',
     ];
 
     public function payables()

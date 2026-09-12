@@ -302,6 +302,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::post('/receivables/{receivable}/share-campaign', [CrmCampaignController::class, 'shareReceivable'])->middleware('permission:crm-campaigns-create')->name('receivables.share-campaign');
     // suppliers & payables
     Route::get('/suppliers', [SupplierController::class, 'index'])->middleware('permission:suppliers-access')->name('suppliers.index');
+    Route::get('/suppliers/create', [SupplierController::class, 'create'])->middleware('permission:suppliers-access')->name('suppliers.create');
+    Route::get('/suppliers/{supplier}/edit', [SupplierController::class, 'edit'])->middleware('permission:suppliers-access')->name('suppliers.edit');
     Route::post('/suppliers', [SupplierController::class, 'store'])->middleware('permission:suppliers-access')->name('suppliers.store');
     Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->middleware('permission:suppliers-access')->name('suppliers.update');
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->middleware('permission:suppliers-access')->name('suppliers.destroy');
