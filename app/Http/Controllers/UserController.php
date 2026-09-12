@@ -121,6 +121,7 @@ class UserController extends Controller
         $before = $this->userPayload($user, $beforeRoles, false);
         $avatarPath = $user->getRawOriginal('avatar');
         $avatarChanged = false;
+        $emailChanged = $request->email !== $user->email;
 
         if ($request->file('avatar')) {
             if ($avatarPath) {
@@ -145,6 +146,12 @@ class UserController extends Controller
             'email' => $request->email,
             'avatar' => $avatarPath,
         ]);
+
+        // changing the email invalidates the previous verification
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+            $user->save();
+        }
 
         // assign role to user
         $user->syncRoles($request->selectedRoles);

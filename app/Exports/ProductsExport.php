@@ -23,16 +23,16 @@ class ProductsExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     public function map($product): array
     {
         return [
-            $product->barcode,
-            $product->sku,
-            $product->title,
-            $product->category?->name ?? '',
+            SpreadsheetSanitizer::sanitize($product->barcode),
+            SpreadsheetSanitizer::sanitize($product->sku),
+            SpreadsheetSanitizer::sanitize($product->title),
+            SpreadsheetSanitizer::sanitize($product->category?->name ?? ''),
             (int) $product->buy_price,
             (int) $product->sell_price,
             (int) $product->stock,
             (int) ($product->min_stock ?? 0),
             (int) ($product->max_stock ?? 0),
-            $product->tax_type ?? 'exclusive',
+            SpreadsheetSanitizer::sanitize($product->tax_type ?? 'exclusive'),
             (float) ($product->tax_rate ?? 11.00),
         ];
     }

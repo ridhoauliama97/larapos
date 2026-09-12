@@ -94,7 +94,7 @@ class CategoryController extends Controller
         /**
          * validate
          */
-        $request->validate([
+        $validated = $request->validate([
             'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'name' => 'required',
             'description' => 'required',
@@ -112,19 +112,13 @@ class CategoryController extends Controller
             $image = $request->file('image');
             $image->storeAs('public/category', $image->hashName());
 
-            // update category with new image
-            $category->update([
-                'image' => $image->hashName(),
-                'name' => $request->name,
-                'description' => $request->description,
-            ]);
+            $validated['image'] = $image->hashName();
+        } else {
+            unset($validated['image']);
         }
 
-        // update category without image
-        $category->update([
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
+        // update category
+        $category->update($validated);
 
         // redirect
         return to_route('categories.index');

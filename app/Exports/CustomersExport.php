@@ -23,15 +23,15 @@ class CustomersExport implements FromCollection, ShouldAutoSize, WithHeadings, W
     public function map($customer): array
     {
         return [
-            $customer->name,
-            $customer->no_telp ?? '',
-            $customer->address ?? '',
-            $customer->province_name ?? '',
-            $customer->regency_name ?? '',
-            $customer->district_name ?? '',
-            $customer->village_name ?? '',
+            SpreadsheetSanitizer::sanitize($customer->name),
+            SpreadsheetSanitizer::sanitize($customer->no_telp ?? ''),
+            SpreadsheetSanitizer::sanitize($customer->address ?? ''),
+            SpreadsheetSanitizer::sanitize($customer->province_name ?? ''),
+            SpreadsheetSanitizer::sanitize($customer->regency_name ?? ''),
+            SpreadsheetSanitizer::sanitize($customer->district_name ?? ''),
+            SpreadsheetSanitizer::sanitize($customer->village_name ?? ''),
             $customer->is_loyalty_member ? 'Ya' : 'Tidak',
-            $customer->loyalty_tier ?? 'regular',
+            SpreadsheetSanitizer::sanitize($customer->loyalty_tier ?? 'regular'),
             (int) ($customer->loyalty_points ?? 0),
         ];
     }

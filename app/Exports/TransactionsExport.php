@@ -36,12 +36,12 @@ class TransactionsExport implements FromCollection, ShouldAutoSize, WithHeadings
     public function map($transaction): array
     {
         return [
-            $transaction->invoice,
+            SpreadsheetSanitizer::sanitize($transaction->invoice),
             $transaction->created_at->format('Y-m-d H:i:s'),
-            $transaction->cashier?->name ?? '',
-            $transaction->customer?->name ?? 'Umum',
-            $transaction->payment_method ?? '',
-            $transaction->payment_status ?? '',
+            SpreadsheetSanitizer::sanitize($transaction->cashier?->name ?? ''),
+            SpreadsheetSanitizer::sanitize($transaction->customer?->name ?? 'Umum'),
+            SpreadsheetSanitizer::sanitize($transaction->payment_method ?? ''),
+            SpreadsheetSanitizer::sanitize($transaction->payment_status ?? ''),
             (int) ($transaction->grand_total - $transaction->discount + ($transaction->shipping_cost ?? 0) - ($transaction->tax_total ?? 0)),
             (int) ($transaction->discount ?? 0),
             (int) ($transaction->shipping_cost ?? 0),

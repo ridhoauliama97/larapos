@@ -94,53 +94,57 @@ class ProductController extends Controller
         ]);
         // upload image
         $image = $request->file('image');
-        $image->storeAs('public/products', $image->hashName());
 
-        // create product
-        $product = Product::create([
-            'image' => $image->hashName(),
-            'barcode' => $request->barcode,
-            'sku' => $request->sku,
-            'title' => $request->title,
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'buy_price' => $request->buy_price,
-            'sell_price' => $request->sell_price,
-            'stock' => $request->stock,
-            'min_stock' => $request->min_stock ?? 0,
-            'max_stock' => $request->max_stock ?? 0,
-            'tax_type' => $request->input('tax_type', 'exclusive'),
-            'tax_rate' => $request->input('tax_rate', 11.00),
-            'is_composite' => $request->boolean('is_composite'),
-        ]);
+        DB::transaction(function () use ($request, $image) {
+            $image->storeAs('public/products', $image->hashName());
 
-        if ($request->boolean('is_composite')) {
-            $this->validateComponentProducts($request);
-            $this->syncComponents($product, $request->input('components'));
-        } else {
-            $this->syncUnits($product, $request->input('units'));
+            // create product
+            $product = Product::create([
+                'image' => $image->hashName(),
+                'barcode' => $request->barcode,
+                'sku' => $request->sku,
+                'title' => $request->title,
+                'description' => $request->description,
+                'category_id' => $request->category_id,
+                'buy_price' => $request->buy_price,
+                'sell_price' => $request->sell_price,
+                'stock' => $request->stock,
+                'min_stock' => $request->min_stock ?? 0,
+                'max_stock' => $request->max_stock ?? 0,
+                'tax_type' => $request->input('tax_type', 'exclusive'),
+                'tax_rate' => $request->input('tax_rate', 11.00),
+                'is_composite' => $request->boolean('is_composite'),
+            ]);
 
-            // ponytail: keep global products.stock and per-warehouse pivot in sync; PUSAT (first active main) is the default warehouse
-            $warehouse = Warehouse::find($request->warehouse_id)
-                ?? Warehouse::active()->where('type', 'main')->orderBy('sort_order')->orderBy('code')->first()
-                ?? Warehouse::active()->orderBy('sort_order')->orderBy('code')->first();
+            if ($request->boolean('is_composite')) {
+                $this->validateComponentProducts($request);
+                $this->syncComponents($product, $request->input('components'));
+            } else {
+                $this->syncUnits($product, $request->input('units'));
 
-            if ($warehouse) {
-                ProductWarehouse::updateOrCreate(
-                    ['product_id' => $product->id, 'warehouse_id' => $warehouse->id],
-                    ['stock' => (int) $request->stock]
-                );
+                // ponytail: keep global products.stock and per-warehouse pivot in sync; PUSAT (first active main) is the default warehouse
+                $warehouse = Warehouse::find($request->warehouse_id)
+                    ?? Warehouse::active()->where('type', 'main')->orderBy('sort_order')->orderBy('code')->first()
+                    ?? Warehouse::active()->orderBy('sort_order')->orderBy('code')->first();
+
+                if ($warehouse) {
+                    ProductWarehouse::updateOrCreate(
+                        ['product_id' => $product->id, 'warehouse_id' => $warehouse->id],
+                        ['stock' => (int) $request->stock]
+                    );
+                }
+
+                $this->stockMutationService->recordInitialStock($product, $request->user()?->id, $warehouse?->id);
             }
 
-            $this->stockMutationService->recordInitialStock($product, $request->user()?->id, $warehouse?->id);
-        }
-        $this->auditLogService->log(
-            event: 'product.created',
-            module: 'products',
-            auditable: $product,
-            description: 'Produk baru dibuat.',
-            after: $this->productAuditPayload($product->fresh())
-        );
+            $this->auditLogService->log(
+                event: 'product.created',
+                module: 'products',
+                auditable: $product,
+                description: 'Produk baru dibuat.',
+                after: $this->productAuditPayload($product->fresh())
+            );
+        });
 
         // redirect
         return to_route('products.index');
@@ -213,7 +217,9 @@ class ProductController extends Controller
         if ($request->file('image')) {
 
             // remove old image
-            Storage::disk('local')->delete('public/products/'.basename($product->image));
+            if ($product->getRawOriginal('image')) {
+                Storage::disk('local')->delete('public/products/'.basename($product->getRawOriginal('image')));
+            }
 
             // upload new image
             $image = $request->file('image');
