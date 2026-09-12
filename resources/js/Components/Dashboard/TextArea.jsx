@@ -5,6 +5,7 @@ export default function Textarea({
     className,
     errors,
     rows = 4,
+    value,
     ...props
 }) {
     return (
@@ -16,6 +17,7 @@ export default function Textarea({
             )}
             <textarea
                 rows={rows}
+                value={value ?? ""}
                 className={`
                     w-full px-4 py-3 text-sm rounded-xl
                     border border-slate-200 dark:border-slate-700

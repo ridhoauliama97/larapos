@@ -50,7 +50,7 @@ class CategoryController extends Controller
          * validate
          */
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
             'name' => 'required',
             'description' => 'required',
         ]);
@@ -94,8 +94,13 @@ class CategoryController extends Controller
         /**
          * validate
          */
+        // a non-file value (empty string, stale filename) must never hit the image rule
+        if (! $request->hasFile('image')) {
+            $request->request->remove('image');
+        }
+
         $validated = $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
             'name' => 'required',
             'description' => 'required',
         ]);

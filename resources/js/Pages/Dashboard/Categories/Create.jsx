@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm, usePage, Link } from "@inertiajs/react";
 import Input from "@/Components/Dashboard/Input";
+import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
 import Textarea from "@/Components/Dashboard/TextArea";
 import toast from "react-hot-toast";
 import {
@@ -14,24 +15,53 @@ import {
 export default function Create() {
     const { errors } = usePage().props;
 
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, post, processing, transform } = useForm({
         name: "",
         description: "",
         image: "",
     });
 
     const [imagePreview, setImagePreview] = useState(null);
+    const objectUrlRef = useRef(null);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData("image", file);
-            setImagePreview(URL.createObjectURL(file));
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        },
+        [],
+    );
+
+    const handleSelect = (file) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
         }
+
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData("image", file);
+        setImagePreview(objectUrlRef.current);
+    };
+
+    const handleReset = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setData("image", "");
+        setImagePreview(null);
     };
 
     const submit = (e) => {
         e.preventDefault();
+
+        transform((data) => {
+            const { image, ...rest } = data;
+
+            return image ? { ...rest, image } : rest;
+        });
+
         post(route("categories.store"), {
             onSuccess: () => toast.success("Kategori berhasil ditambahkan"),
             onError: () => toast.error("Gagal menyimpan kategori"),
@@ -57,38 +87,23 @@ export default function Create() {
             </div>
 
             <form onSubmit={submit}>
-                <div className="max-w-2xl">
+                <div className="max-w-3xl">
                     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Image */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
                                     <IconPhoto size={16} />
                                     Gambar
                                 </h3>
-                                <div className="aspect-video rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center overflow-hidden mb-3">
-                                    {imagePreview ? (
-                                        <img
-                                            src={imagePreview}
-                                            alt="Preview"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <IconPhoto
-                                            size={32}
-                                            className="text-slate-400"
-                                        />
-                                    )}
-                                </div>
-                                <Input
-                                    type="file"
-                                    onChange={handleImageChange}
-                                    errors={errors.image}
-                                    accept="image/*"
+                                <ImageDropzone
+                                    preview={imagePreview}
+                                    onSelect={handleSelect}
+                                    onReset={handleReset}
+                                    error={errors.image}
+                                    hint="JPG, PNG, atau WebP. Maksimal 2 MB. Rasio 4:3 disarankan."
                                 />
                             </div>
 
-                            {/* Info */}
                             <div className="space-y-4">
                                 <Input
                                     type="text"
@@ -108,7 +123,7 @@ export default function Create() {
                                         setData("description", e.target.value)
                                     }
                                     value={data.description}
-                                    rows={4}
+                                    rows={5}
                                 />
                             </div>
                         </div>

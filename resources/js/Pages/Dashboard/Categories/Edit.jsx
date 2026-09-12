@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm, usePage, Link } from "@inertiajs/react";
 import Input from "@/Components/Dashboard/Input";
+import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
 import Textarea from "@/Components/Dashboard/TextArea";
 import toast from "react-hot-toast";
 import {
@@ -13,27 +14,56 @@ import {
 
 export default function Edit({ category }) {
     const { errors } = usePage().props;
+    const originalImage = category.image || null;
 
-    const { data, setData, post, processing } = useForm({
-        id: category.id,
+    const { data, setData, post, processing, transform } = useForm({
         name: category.name,
-        description: category.description,
+        description: category.description ?? "",
         image: "",
         _method: "PUT",
     });
 
-    const [imagePreview, setImagePreview] = useState(category.image || null);
+    const [imagePreview, setImagePreview] = useState(originalImage);
+    const objectUrlRef = useRef(null);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData("image", file);
-            setImagePreview(URL.createObjectURL(file));
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        },
+        [],
+    );
+
+    const handleSelect = (file) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
         }
+
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData("image", file);
+        setImagePreview(objectUrlRef.current);
+    };
+
+    const handleReset = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setData("image", "");
+        setImagePreview(originalImage);
     };
 
     const submit = (e) => {
         e.preventDefault();
+
+        transform((data) => {
+            const { image, ...rest } = data;
+
+            return image ? { ...rest, image } : rest;
+        });
+
         post(route("categories.update", category.id), {
             onSuccess: () => toast.success("Kategori berhasil diperbarui"),
             onError: () => toast.error("Gagal memperbarui kategori"),
@@ -60,33 +90,21 @@ export default function Edit({ category }) {
             </div>
 
             <form onSubmit={submit}>
-                <div className="max-w-2xl">
+                <div className="max-w-3xl">
                     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
                                     <IconPhoto size={16} />
                                     Gambar
                                 </h3>
-                                <div className="aspect-video rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center overflow-hidden mb-3">
-                                    {imagePreview ? (
-                                        <img
-                                            src={imagePreview}
-                                            alt="Preview"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <IconPhoto
-                                            size={32}
-                                            className="text-slate-400"
-                                        />
-                                    )}
-                                </div>
-                                <Input
-                                    type="file"
-                                    onChange={handleImageChange}
-                                    errors={errors.image}
-                                    accept="image/*"
+                                <ImageDropzone
+                                    preview={imagePreview}
+                                    original={originalImage}
+                                    onSelect={handleSelect}
+                                    onReset={handleReset}
+                                    error={errors.image}
+                                    hint="JPG, PNG, atau WebP. Maksimal 2 MB. Rasio 4:3 disarankan."
                                 />
                             </div>
 
@@ -109,7 +127,7 @@ export default function Edit({ category }) {
                                         setData("description", e.target.value)
                                     }
                                     value={data.description}
-                                    rows={4}
+                                    rows={5}
                                 />
                             </div>
                         </div>
