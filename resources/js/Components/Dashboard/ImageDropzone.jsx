@@ -1,7 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { IconPhoto, IconReplace, IconX } from "@tabler/icons-react";
 
-const ACCEPTED_TYPES = "image/jpeg,image/png,image/webp";
+const DEFAULT_ACCEPT = "image/jpeg,image/png,image/webp";
 
 export default function ImageDropzone({
     preview,
@@ -11,6 +11,8 @@ export default function ImageDropzone({
     error,
     hint = "JPG, PNG, atau WebP. Maksimal 2 MB.",
     aspect = "aspect-[4/3]",
+    accept = DEFAULT_ACCEPT,
+    shape = "rounded",
 }) {
     const inputId = useId();
     const inputRef = useRef(null);
@@ -51,7 +53,9 @@ export default function ImageDropzone({
                 onDragLeave={() => setDragging(false)}
                 onDrop={handleDrop}
                 aria-describedby={descriptionIds}
-                className={`relative block ${aspect} w-full overflow-hidden rounded-xl border text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 motion-reduce:transition-none ${
+                className={`relative block ${aspect} w-full overflow-hidden border text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 motion-reduce:transition-none ${
+                    shape === "circle" ? "rounded-full" : "rounded-xl"
+                } ${
                     error
                         ? "border-danger-400 bg-danger-50 dark:border-danger-500/60 dark:bg-danger-500/10"
                         : dragging
@@ -62,7 +66,7 @@ export default function ImageDropzone({
                 {hasPreview ? (
                     <img
                         src={preview}
-                        alt="Pratinjau gambar kategori"
+                        alt="Pratinjau gambar"
                         className="h-full w-full object-cover"
                     />
                 ) : (
@@ -127,7 +131,7 @@ export default function ImageDropzone({
                 ref={inputRef}
                 id={inputId}
                 type="file"
-                accept={ACCEPTED_TYPES}
+                accept={accept}
                 className="sr-only"
                 onChange={(event) => {
                     handleFiles(event.target.files);

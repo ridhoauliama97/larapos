@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Head, usePage, useForm, Link } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import {
@@ -7,10 +7,11 @@ import {
     IconArrowLeft,
     IconShield,
 } from "@tabler/icons-react";
+import ImageCropper from "@/Components/Dashboard/ImageCropper";
+import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
 import Input from "@/Components/Dashboard/Input";
 import Checkbox from "@/Components/Dashboard/Checkbox";
 import toast from "react-hot-toast";
-import { useState } from "react";
 
 export default function Edit() {
     const { roles, user } = usePage().props;
@@ -25,7 +26,42 @@ export default function Edit() {
         _method: "PUT",
     });
 
-    const [avatarPreview, setAvatarPreview] = useState(user.avatar || null);
+    const originalAvatar = user.avatar || null;
+    const [avatarPreview, setAvatarPreview] = useState(originalAvatar);
+    const [cropperFile, setCropperFile] = useState(null);
+    const objectUrlRef = useRef(null);
+
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        },
+        [],
+    );
+
+    const handleSelect = (file) => setCropperFile(file);
+
+    const commitAvatar = (file) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+        }
+
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData("avatar", file);
+        setAvatarPreview(objectUrlRef.current);
+        setCropperFile(null);
+    };
+
+    const handleReset = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setData("avatar", null);
+        setAvatarPreview(originalAvatar);
+    };
 
     const setSelectedRoles = (e) => {
         let items = [...data.selectedRoles];
@@ -78,37 +114,17 @@ export default function Edit() {
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                     Avatar
                                 </label>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-14 h-14 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden flex items-center justify-center text-slate-600 font-semibold">
-                                        {avatarPreview ? (
-                                            <img
-                                                src={avatarPreview}
-                                                alt="Preview"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <span>
-                                                {user.name
-                                                    ? user.name
-                                                          .charAt(0)
-                                                          .toUpperCase()
-                                                    : "?"}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <Input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                setData("avatar", file);
-                                                setAvatarPreview(
-                                                    URL.createObjectURL(file)
-                                                );
-                                            }
-                                        }}
-                                        errors={errors.avatar}
+                                <div className="max-w-[168px]">
+                                    <ImageDropzone
+                                        preview={avatarPreview}
+                                        original={originalAvatar}
+                                        onSelect={handleSelect}
+                                        onReset={handleReset}
+                                        error={errors.avatar}
+                                        aspect="aspect-square"
+                                        shape="circle"
+                                        accept="image/jpeg,image/png,image/webp,image/gif"
+                                        hint="JPG, PNG, WebP, atau GIF. Maks 2 MB. Bisa di-crop 1:1."
                                     />
                                 </div>
                             </div>
@@ -214,6 +230,14 @@ export default function Edit() {
                     </div>
                 </div>
             </form>
+
+            <ImageCropper
+                file={cropperFile}
+                open={Boolean(cropperFile)}
+                onApply={commitAvatar}
+                onUseOriginal={commitAvatar}
+                onCancel={() => setCropperFile(null)}
+            />
         </>
     );
 }

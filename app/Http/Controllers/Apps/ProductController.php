@@ -83,7 +83,7 @@ class ProductController extends Controller
          * validate
          */
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,jpg,png,webp,gif|max:2048',
             'barcode' => 'nullable|string|max:255|unique:products,barcode',
             'sku' => 'required|unique:products,sku',
             'title' => 'required',
@@ -212,7 +212,7 @@ class ProductController extends Controller
          * validate
          */
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp,gif|max:2048',
             'barcode' => 'required|unique:products,barcode,'.$product->id,
             'sku' => 'required|unique:products,sku,'.$product->id,
             'title' => 'required',

@@ -160,6 +160,17 @@ class ProductStoreTest extends TestCase
             ->assertSessionHasErrors('image');
     }
 
+    public function test_store_accepts_gif_images(): void
+    {
+        $payload = $this->validPayload([
+            'image' => UploadedFile::fake()->image('animasi.gif', 100, 100),
+        ]);
+
+        $this->post(route('products.store'), $payload)
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('products.index'));
+    }
+
     public function test_store_generates_barcode_from_product_id(): void
     {
         $payload = $this->validPayload();
