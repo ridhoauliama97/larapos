@@ -101,6 +101,18 @@ class SupplierReturnService
                     ]);
                 }
 
+                // ponytail: cap each item at the qty received on the linked receiving item.
+                if ($item->goods_receiving_item_id) {
+                    $receivedItem = $item->goodsReceivingItem;
+                    $received = (int) $receivedItem->qty_received;
+
+                    if ($item->qty_returned > $received) {
+                        throw ValidationException::withMessages([
+                            'stock' => "Qty retur {$product->title} melebihi qty yang diterima ({$received}).",
+                        ]);
+                    }
+                }
+
                 $stockBefore = $available;
                 $product->decrement('stock', $item->qty_returned);
 

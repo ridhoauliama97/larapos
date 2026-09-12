@@ -484,6 +484,11 @@ class CrmAutomationService
             return;
         }
 
+        // ponytail: a cancelled campaign is terminal — never flip it back to ready/processed
+        if ($campaign->status === CustomerCampaign::STATUS_CANCELLED) {
+            return;
+        }
+
         $hasPending = $campaign->logs()
             ->whereIn('status', [
                 CustomerCampaignLog::STATUS_PENDING,

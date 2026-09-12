@@ -88,22 +88,41 @@ class GoodsReceivingService
                     $product->increment('stock', $qtyReceived);
                     // Increment warehouse pivot stock
                     if ($order->warehouse_id) {
-                        ProductWarehouse::firstOrCreate(
-                            ['product_id' => $product->id, 'warehouse_id' => $order->warehouse_id],
-                            ['stock' => 0]
-                        )->increment('stock', $qtyReceived);
-                    }
-
-                    // Create batch record
-                    if (! empty($item['batch_number']) && $order->warehouse_id) {
-                        ProductBatch::create([
+                        // ponytail: lock the pivot row first, only create when missing to avoid a firstOrCreate race.
+                        $pw = ProductWarehouse::where([
                             'product_id' => $product->id,
                             'warehouse_id' => $order->warehouse_id,
-                            'batch_number' => $item['batch_number'],
-                            'expired_at' => $item['expired_at'] ?? null,
-                            'received_at' => now(),
-                            'stock' => $qtyReceived,
-                        ]);
+                        ])->lockForUpdate()->first();
+
+                        if (! $pw) {
+                            $pw = ProductWarehouse::firstOrCreate([
+                                'product_id' => $product->id,
+                                'warehouse_id' => $order->warehouse_id,
+                            ], ['stock' => 0]);
+                        }
+
+                        $pw->increment('stock', $qtyReceived);
+                    }
+
+                    // Create or top up the batch record (same batch may arrive across receipts)
+                    if (! empty($item['batch_number']) && $order->warehouse_id) {
+                        $batch = ProductBatch::firstOrCreate(
+                            [
+                                'product_id' => $product->id,
+                                'warehouse_id' => $order->warehouse_id,
+                                'batch_number' => $item['batch_number'],
+                            ],
+                            [
+                                'expired_at' => $item['expired_at'] ?? null,
+                                'received_at' => now(),
+                                'stock' => 0,
+                            ]
+                        );
+
+                        $batch->fill([
+                            'expired_at' => $item['expired_at'] ?? $batch->expired_at,
+                            'stock' => (int) $batch->stock + $qtyReceived,
+                        ])->save();
                     }
 
                     $this->stockMutationService->recordPurchaseInbound(

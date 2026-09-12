@@ -183,6 +183,9 @@ class SalesReturnController extends Controller
         $before = $this->salesReturnAuditPayload($salesReturn);
 
         DB::transaction(function () use ($request, $salesReturn) {
+            $salesReturn = SalesReturn::whereKey($salesReturn->id)->lockForUpdate()->firstOrFail();
+            $this->ensureDraft($salesReturn);
+
             $activeShift = $this->cashierShiftService->requireActiveShiftForUser(
                 $request->user()->id,
                 lockForUpdate: true
@@ -213,11 +216,14 @@ class SalesReturnController extends Controller
                         'sales_return' => 'Seluruh item retur harus memiliki kuantitas minimal 1.',
                     ]);
                 }
+            }
 
-                $returnedBefore = (int) ($returnedQtyMap[$detail->id] ?? 0);
+            foreach ($salesReturn->items->groupBy('transaction_detail_id') as $detailId => $detailItems) {
+                $detail = $detailItems->first()->transactionDetail;
+                $returnedBefore = (int) ($returnedQtyMap[$detailId] ?? 0);
                 $remainingQty = (int) $detail->qty - $returnedBefore;
 
-                if ($item->qty_return > $remainingQty) {
+                if ((int) $detailItems->sum('qty_return') > $remainingQty) {
                     throw ValidationException::withMessages([
                         'sales_return' => 'Ada item retur yang melebihi sisa qty yang bisa diretur.',
                     ]);
@@ -226,33 +232,65 @@ class SalesReturnController extends Controller
 
             foreach ($salesReturn->items as $item) {
                 if ($item->restock_to_inventory && $item->product) {
-                    $product = $item->product()->lockForUpdate()->first();
-
-                    if ($product) {
-                        $stockBefore = (int) $product->stock;
-                        $stockAfter = $stockBefore + (int) $item->qty_return;
-
-                        $product->update([
-                            'stock' => $stockAfter,
-                        ]);
-
-                        // Restock to transaction warehouse
+                    if ($item->product->is_composite) {
+                        $item->product->loadMissing('components');
                         $transactionWarehouseId = $salesReturn->transaction->warehouse_id;
-                        if ($transactionWarehouseId) {
-                            ProductWarehouse::where([
-                                'product_id' => $product->id,
-                                'warehouse_id' => $transactionWarehouseId,
-                            ])->increment('stock', (int) $item->qty_return);
-                        }
 
-                        $this->stockMutationService->recordSalesReturnRestock(
-                            product: $product,
-                            salesReturn: $salesReturn,
-                            stockBefore: $stockBefore,
-                            stockAfter: $stockAfter,
-                            reason: $item->return_reason,
-                            userId: $request->user()?->id,
-                        );
+                        foreach ($item->product->components as $component) {
+                            $componentQty = (int) round((float) $component->pivot->qty * (int) $item->qty_return);
+                            $stockBefore = (int) $component->stock;
+
+                            $component->increment('stock', $componentQty);
+
+                            if ($transactionWarehouseId) {
+                                $componentPivot = ProductWarehouse::where([
+                                    'product_id' => $component->id,
+                                    'warehouse_id' => $transactionWarehouseId,
+                                ])->lockForUpdate()->first();
+
+                                if ($componentPivot) {
+                                    $componentPivot->increment('stock', $componentQty);
+                                }
+                            }
+
+                            $this->stockMutationService->recordSalesReturnRestock(
+                                product: $component,
+                                salesReturn: $salesReturn,
+                                stockBefore: $stockBefore,
+                                stockAfter: $stockBefore + $componentQty,
+                                reason: $item->return_reason,
+                                userId: $request->user()?->id,
+                            );
+                        }
+                    } else {
+                        $product = $item->product()->lockForUpdate()->first();
+
+                        if ($product) {
+                            $stockBefore = (int) $product->stock;
+                            $stockAfter = $stockBefore + (int) $item->qty_return;
+
+                            $product->update([
+                                'stock' => $stockAfter,
+                            ]);
+
+                            // Restock to transaction warehouse
+                            $transactionWarehouseId = $salesReturn->transaction->warehouse_id;
+                            if ($transactionWarehouseId) {
+                                ProductWarehouse::where([
+                                    'product_id' => $product->id,
+                                    'warehouse_id' => $transactionWarehouseId,
+                                ])->increment('stock', (int) $item->qty_return);
+                            }
+
+                            $this->stockMutationService->recordSalesReturnRestock(
+                                product: $product,
+                                salesReturn: $salesReturn,
+                                stockBefore: $stockBefore,
+                                stockAfter: $stockAfter,
+                                reason: $item->return_reason,
+                                userId: $request->user()?->id,
+                            );
+                        }
                     }
                 }
 

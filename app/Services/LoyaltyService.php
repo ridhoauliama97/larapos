@@ -314,7 +314,8 @@ class LoyaltyService
         }
 
         $settings = $this->settings();
-        $customer = $customer->fresh();
+        // ponytail: lock the customer row so concurrent checkouts cannot lose loyalty counter updates
+        $customer = Customer::whereKey($customer->id)->lockForUpdate()->firstOrFail();
 
         if ($customer->is_loyalty_member) {
             $customer = $this->ensureMembership($customer);

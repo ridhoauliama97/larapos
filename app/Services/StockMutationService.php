@@ -75,7 +75,8 @@ class StockMutationService
         int $stockBefore,
         int $stockAfter,
         ?string $reason,
-        ?int $userId = null
+        ?int $userId = null,
+        ?int $warehouseId = null
     ): ?StockMutation {
         if ($stockBefore === $stockAfter) {
             return null;
@@ -83,6 +84,7 @@ class StockMutationService
 
         $mutation = StockMutation::create([
             'product_id' => $product->id,
+            'warehouse_id' => $warehouseId,
             'reference_type' => 'stock_opname',
             'reference_id' => $stockOpname->id,
             'mutation_type' => 'adjustment',

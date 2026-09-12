@@ -264,6 +264,7 @@ class StockOpnameController extends Controller
                     stockAfter: $stockAfter,
                     reason: $item->adjustment_reason,
                     userId: $request->user()?->id,
+                    warehouseId: $stockOpname->warehouse_id,
                 );
             }
 

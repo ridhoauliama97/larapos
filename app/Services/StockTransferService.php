@@ -205,7 +205,7 @@ class StockTransferService
 
     public function cancel(StockTransfer $transfer, int $userId): void
     {
-        DB::transaction(function () use ($transfer) {
+        DB::transaction(function () use ($transfer, $userId) {
             // ponytail: lock the transfer row and re-check status inside the transaction (prevents cancel-after-complete races)
             $transfer = StockTransfer::whereKey($transfer->id)->lockForUpdate()->firstOrFail();
 
@@ -224,6 +224,7 @@ class StockTransferService
 
                 foreach ($transfer->items as $item) {
                     $product = $item->product;
+                    $stockBefore = (int) $product->stock;
 
                     // ponytail: firstOrCreate (NOT updateOrCreate with stock=0, which would reset an existing row)
                     ProductWarehouse::firstOrCreate(
@@ -232,6 +233,19 @@ class StockTransferService
                     )->increment('stock', $item->qty);
 
                     $product->increment('stock', $item->qty);
+
+                    StockMutation::create([
+                        'product_id' => $product->id,
+                        'warehouse_id' => $transfer->source_warehouse_id,
+                        'reference_type' => 'stock_transfer',
+                        'reference_id' => $transfer->id,
+                        'mutation_type' => 'in',
+                        'qty' => $item->qty,
+                        'stock_before' => $stockBefore,
+                        'stock_after' => (int) $product->stock,
+                        'notes' => 'Transfer dibatalkan',
+                        'created_by' => $userId,
+                    ]);
                 }
             }
 

@@ -6,6 +6,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class PurchaseOrderService
 {
@@ -68,6 +69,13 @@ class PurchaseOrderService
     public function placeOrder(PurchaseOrder $order): void
     {
         DB::transaction(function () use ($order) {
+            // ponytail: lock + re-check inside the transaction so a concurrent place/cancel cannot race.
+            $order = PurchaseOrder::whereKey($order->id)->lockForUpdate()->firstOrFail();
+
+            if ($order->status !== 'draft') {
+                throw ValidationException::withMessages(['status' => 'PO tidak dapat dipesan.']);
+            }
+
             $before = $order->replicate();
 
             $order->update([
@@ -90,6 +98,13 @@ class PurchaseOrderService
     public function cancelOrder(PurchaseOrder $order): void
     {
         DB::transaction(function () use ($order) {
+            // ponytail: lock + re-check inside the transaction so a concurrent cancel/receive cannot race.
+            $order = PurchaseOrder::whereKey($order->id)->lockForUpdate()->firstOrFail();
+
+            if (! in_array($order->status, ['draft', 'ordered', 'partial_received'])) {
+                throw ValidationException::withMessages(['status' => 'PO tidak dapat dibatalkan.']);
+            }
+
             $before = $order->replicate();
 
             $order->update([
