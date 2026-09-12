@@ -29,7 +29,7 @@ class DashboardChecklistTest extends TestCase
 
     public function test_checklist_all_false_on_empty_database(): void
     {
-        $admin = User::where('email', 'arya@gmail.com')->first();
+        $admin = User::where('email', 'admin.nelsha@gmail.com')->first();
         $admin->markEmailAsVerified();
 
         $response = $this->actingAs($admin)->get(route('dashboard'));
@@ -47,7 +47,7 @@ class DashboardChecklistTest extends TestCase
 
     public function test_checklist_flags_completed_steps(): void
     {
-        $admin = User::where('email', 'arya@gmail.com')->first();
+        $admin = User::where('email', 'admin.nelsha@gmail.com')->first();
         $admin->markEmailAsVerified();
 
         Setting::set('app_setup_completed', '1');

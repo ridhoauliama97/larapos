@@ -12,6 +12,7 @@ use App\Services\AuditLogService;
 use App\Services\StockMutationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 

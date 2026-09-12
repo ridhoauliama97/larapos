@@ -20,7 +20,7 @@ class DemoSeeder extends Seeder
         ]);
 
         $this->command?->info('Demo data seeder completed.');
-        $this->command?->info('Admin: arya@gmail.com / password');
-        $this->command?->info('Kasir: cashier@gmail.com / password');
+        $this->command?->info('Admin: admin.nelsha@gmail.com / password');
+        $this->command?->info('Kasir: cashier.nelsha@gmail.com / password');
     }
 }

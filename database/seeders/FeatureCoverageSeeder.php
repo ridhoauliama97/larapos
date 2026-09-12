@@ -41,8 +41,8 @@ class FeatureCoverageSeeder extends Seeder
             return;
         }
 
-        $admin = User::where('email', 'arya@gmail.com')->first() ?? User::first();
-        $cashier = User::where('email', 'cashier@gmail.com')->first() ?? $admin;
+        $admin = User::where('email', 'admin.nelsha@gmail.com')->first() ?? User::first();
+        $cashier = User::where('email', 'cashier.nelsha@gmail.com')->first() ?? $admin;
 
         if (! $admin || ! $cashier) {
             $this->command?->warn('Skipping FeatureCoverageSeeder because sample users are missing.');

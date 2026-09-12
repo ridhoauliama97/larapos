@@ -31,8 +31,8 @@ class OperationalCoreSeeder extends Seeder
             return;
         }
 
-        $cashier = User::where('email', 'cashier@gmail.com')->first() ?? User::first();
-        $supervisor = User::where('email', 'arya@gmail.com')->first() ?? $cashier;
+        $cashier = User::where('email', 'cashier.nelsha@gmail.com')->first() ?? User::first();
+        $supervisor = User::where('email', 'admin.nelsha@gmail.com')->first() ?? $cashier;
 
         if (! $cashier || ! $supervisor) {
             $this->command?->warn('Skipping OperationalCoreSeeder because seed users are missing.');

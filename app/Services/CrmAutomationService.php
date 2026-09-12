@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Transaction;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CrmAutomationService
@@ -49,6 +50,28 @@ class CrmAutomationService
         $query = Customer::query()
             ->with(['segments', 'receivables', 'vouchers'])
             ->orderBy('name');
+
+        // ponytail: share campaigns carry the source document; restrict the audience to its customer.
+        $transactionId = $filters['transaction_id'] ?? null;
+        $receivableId = $filters['receivable_id'] ?? null;
+
+        if ($transactionId) {
+            $customerId = Transaction::whereKey($transactionId)->value('customer_id');
+
+            if (! $customerId) {
+                return collect();
+            }
+
+            $query->whereKey($customerId);
+        } elseif ($receivableId) {
+            $customerId = Receivable::whereKey($receivableId)->value('customer_id');
+
+            if (! $customerId) {
+                return collect();
+            }
+
+            $query->whereKey($customerId);
+        }
 
         $segmentIds = collect($filters['segment_ids'] ?? [])
             ->filter()

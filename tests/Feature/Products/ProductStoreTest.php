@@ -26,7 +26,7 @@ class ProductStoreTest extends TestCase
 
         $this->seed([PermissionSeeder::class, RoleSeeder::class, UserSeeder::class]);
 
-        $this->admin = User::where('email', 'arya@gmail.com')->first();
+        $this->admin = User::where('email', 'admin.nelsha@gmail.com')->first();
         $this->admin->markEmailAsVerified();
         $this->actingAs($this->admin);
 

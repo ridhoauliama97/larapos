@@ -27,7 +27,7 @@ class CashPaymentValidationTest extends TestCase
 
         $this->seed([PermissionSeeder::class, RoleSeeder::class, UserSeeder::class]);
 
-        $cashier = User::where('email', 'cashier@gmail.com')->first();
+        $cashier = User::where('email', 'cashier.nelsha@gmail.com')->first();
         $cashier->markEmailAsVerified();
         $this->actingAs($cashier);
 

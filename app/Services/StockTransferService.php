@@ -226,11 +226,20 @@ class StockTransferService
                     $product = $item->product;
                     $stockBefore = (int) $product->stock;
 
-                    // ponytail: firstOrCreate (NOT updateOrCreate with stock=0, which would reset an existing row)
-                    ProductWarehouse::firstOrCreate(
-                        ['product_id' => $item->product_id, 'warehouse_id' => $transfer->source_warehouse_id],
-                        ['stock' => 0]
-                    )->increment('stock', $item->qty);
+                    // ponytail: lock the pivot row; only create when missing to avoid a firstOrCreate race
+                    $pivot = ProductWarehouse::where([
+                        'product_id' => $item->product_id,
+                        'warehouse_id' => $transfer->source_warehouse_id,
+                    ])->lockForUpdate()->first();
+
+                    if (! $pivot) {
+                        $pivot = ProductWarehouse::firstOrCreate(
+                            ['product_id' => $item->product_id, 'warehouse_id' => $transfer->source_warehouse_id],
+                            ['stock' => 0]
+                        );
+                    }
+
+                    $pivot->increment('stock', $item->qty);
 
                     $product->increment('stock', $item->qty);
 

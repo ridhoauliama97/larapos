@@ -33,7 +33,7 @@ class CompositeProductTest extends TestCase
         parent::setUp();
 
         $this->seed([PermissionSeeder::class, RoleSeeder::class, UserSeeder::class]);
-        $this->admin = User::where('email', 'arya@gmail.com')->first();
+        $this->admin = User::where('email', 'admin.nelsha@gmail.com')->first();
         $this->admin->markEmailAsVerified();
 
         $this->pusat = Warehouse::create([

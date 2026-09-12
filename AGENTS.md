@@ -169,7 +169,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 
 - Use `RefreshDatabase` trait on every test class
 - Seed: `PermissionSeeder → RoleSeeder → UserSeeder` before every test
-- Tests + demo seeders hardcode `arya@gmail.com` (super-admin) / `cashier@gmail.com` — this fork's `UserSeeder` uses `*.nelsha@gmail.com` instead, so realign those references before running `php artisan test`
+- Test users: `admin.nelsha@gmail.com` (super-admin) / `cashier.nelsha@gmail.com` (cashier), password `password`, pre-verified by `UserSeeder`
 - **Always call `markEmailAsVerified()`** before `actingAs()` for HTTP controller tests
 - `PUSAT` warehouse: `type='main'`, `is_active=true`, `sort_order=0`
 - Product needs: `image`, `barcode`, `sku`, `title`, `description`, `category_id`, `buy_price`, `sell_price`, `stock`, `tax_rate=0`

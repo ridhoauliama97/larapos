@@ -26,7 +26,7 @@ class CartValidationTest extends TestCase
 
         $this->seed([PermissionSeeder::class, RoleSeeder::class, UserSeeder::class]);
 
-        $this->cashier = User::where('email', 'cashier@gmail.com')->first();
+        $this->cashier = User::where('email', 'cashier.nelsha@gmail.com')->first();
         $this->cashier->markEmailAsVerified();
         $this->actingAs($this->cashier);
 

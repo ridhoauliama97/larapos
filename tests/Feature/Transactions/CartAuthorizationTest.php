@@ -25,7 +25,7 @@ class CartAuthorizationTest extends TestCase
 
         $this->seed([PermissionSeeder::class, RoleSeeder::class, UserSeeder::class]);
 
-        $this->cashierA = User::where('email', 'cashier@gmail.com')->first();
+        $this->cashierA = User::where('email', 'cashier.nelsha@gmail.com')->first();
         $this->cashierA->markEmailAsVerified();
 
         $this->cashierB = User::factory()->create();

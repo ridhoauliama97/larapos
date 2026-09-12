@@ -23,7 +23,7 @@ class ReorderPointTest extends TestCase
 
         $this->seed([PermissionSeeder::class, RoleSeeder::class, UserSeeder::class]);
 
-        $this->actingAs(User::where('email', 'arya@gmail.com')->first());
+        $this->actingAs(User::where('email', 'admin.nelsha@gmail.com')->first());
 
         $this->category = Category::create([
             'name' => 'Kategori Test',

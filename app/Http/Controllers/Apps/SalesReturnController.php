@@ -186,6 +186,9 @@ class SalesReturnController extends Controller
             $salesReturn = SalesReturn::whereKey($salesReturn->id)->lockForUpdate()->firstOrFail();
             $this->ensureDraft($salesReturn);
 
+            // ponytail: lock the source transaction so different drafts on the same sale cannot over-return concurrently
+            Transaction::whereKey($salesReturn->transaction_id)->lockForUpdate()->first();
+
             $activeShift = $this->cashierShiftService->requireActiveShiftForUser(
                 $request->user()->id,
                 lockForUpdate: true

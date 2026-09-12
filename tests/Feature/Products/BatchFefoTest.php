@@ -42,9 +42,9 @@ class BatchFefoTest extends TestCase
             UserSeeder::class,
         ]);
 
-        $this->admin = User::where('email', 'arya@gmail.com')->first();
+        $this->admin = User::where('email', 'admin.nelsha@gmail.com')->first();
         $this->admin->markEmailAsVerified();
-        $this->cashier = User::where('email', 'cashier@gmail.com')->first();
+        $this->cashier = User::where('email', 'cashier.nelsha@gmail.com')->first();
         $this->cashier->markEmailAsVerified();
 
         $this->cashierShiftService = app(CashierShiftService::class);
