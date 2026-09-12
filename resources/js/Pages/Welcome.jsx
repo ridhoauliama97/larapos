@@ -20,7 +20,7 @@ import {
     IconApi,
 } from "@tabler/icons-react";
 
-const GITHUB_URL = "https://github.com/aryadwiputra/point-of-sales";
+const GITHUB_URL = "https://github.com/ridhoauliama97/larapos";
 const DOCS_URL = `${GITHUB_URL}/blob/main/docs/getting-started.md`;
 const GALLERY_URL = `${GITHUB_URL}/blob/main/docs/screenshots.md`;
 
@@ -104,7 +104,11 @@ const techStack = [
 ];
 
 const screenshots = [
-    { src: "/screenshots/01-dashboard.png", title: "Dashboard", span: "col-span-2 row-span-2" },
+    {
+        src: "/screenshots/01-dashboard.png",
+        title: "Dashboard",
+        span: "col-span-2 row-span-2",
+    },
     { src: "/screenshots/02-pos-checkout.png", title: "POS Checkout" },
     { src: "/screenshots/06-stock-opnames.png", title: "Stock Opname" },
     { src: "/screenshots/12-receivables.png", title: "Receivables" },
@@ -113,12 +117,12 @@ const screenshots = [
 
 const faqs = [
     {
-        q: "Apakah Dikasir benar-benar gratis?",
-        a: "Ya. Dikasir dirilis di bawah lisensi MIT, sehingga bebas digunakan, dimodifikasi, dan didistribusikan. Hosting, hardware, biaya payment gateway, dan layanan pihak ketiga tetap menjadi tanggung jawab pengguna.",
+        q: "Apakah Larapos benar-benar gratis?",
+        a: "Ya. Larapos dirilis di bawah lisensi MIT, sehingga bebas digunakan, dimodifikasi, dan didistribusikan. Hosting, hardware, biaya payment gateway, dan layanan pihak ketiga tetap menjadi tanggung jawab pengguna.",
     },
     {
         q: "Bisakah dipakai untuk bisnis multi-cabang?",
-        a: "Bisa. Dikasir mendukung multi-warehouse dengan stok terpisah per gudang/cabang, transfer stok antar gudang, dan laporan per gudang.",
+        a: "Bisa. Larapos mendukung multi-warehouse dengan stok terpisah per gudang/cabang, transfer stok antar gudang, dan laporan per gudang.",
     },
     {
         q: "Bagaimana kalau internet di toko mati?",
@@ -134,7 +138,7 @@ const faqs = [
     },
 ];
 
-const quickStart = `git clone https://github.com/aryadwiputra/point-of-sales
+const quickStart = `git clone https://github.com/ridhoauliama97/larapos
 cd point-of-sales
 composer install
 PUPPETEER_SKIP_DOWNLOAD=true npm install
@@ -151,7 +155,7 @@ composer run dev
 export default function Welcome() {
     return (
         <PublicLayout>
-            <Head title="Dikasir — Sistem Kasir Open Source untuk UMKM" />
+            <Head title="Larapos — Sistem Kasir Open Source untuk UMKM" />
 
             {/* ============ HERO ============ */}
             <section className="pt-28 pb-16 px-6">
@@ -159,7 +163,7 @@ export default function Welcome() {
                     <div className="text-center max-w-4xl mx-auto">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400 text-sm font-medium mb-6 border border-primary-100 dark:border-primary-900">
                             <IconBrandGithub size={16} />
-                            Open Source · MIT License · 200+ Stars
+                            Open Source · MIT License
                         </div>
 
                         <h1 className="text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight">
@@ -170,9 +174,10 @@ export default function Welcome() {
                         </h1>
 
                         <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                            Dikasir adalah aplikasi point of sale lengkap untuk warung, toko, dan
-                            UMKM Indonesia — multi-warehouse, PPN, loyalty &amp; CRM, WhatsApp
-                            gateway, hingga offline mode. Self-hosted, data 100% milik Anda.
+                            Larapos adalah aplikasi point of sale lengkap untuk
+                            warung, toko, dan UMKM Indonesia — multi-warehouse,
+                            PPN, loyalty &amp; CRM, WhatsApp gateway, hingga
+                            offline mode. Self-hosted, data 100% milik Anda.
                         </p>
 
                         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -207,12 +212,12 @@ export default function Welcome() {
                                     <div className="w-3 h-3 rounded-full bg-green-400" />
                                 </div>
                                 <div className="flex-1 text-center text-xs text-slate-500">
-                                    dikasir.web.id
+                                    Larapos.web.id
                                 </div>
                             </div>
                             <img
                                 src="/media/revamp-pos.png"
-                                alt="Preview POS Dikasir"
+                                alt="Preview POS Larapos"
                                 className="w-full"
                                 loading="lazy"
                             />
@@ -245,8 +250,8 @@ export default function Welcome() {
                             Tampilan Aplikasi
                         </h2>
                         <p className="mt-4 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                            Dari kasir harian hingga laporan manajemen — semua dalam satu aplikasi
-                            yang rapi dan cepat.
+                            Dari kasir harian hingga laporan manajemen — semua
+                            dalam satu aplikasi yang rapi dan cepat.
                         </p>
                     </div>
 
@@ -286,15 +291,19 @@ export default function Welcome() {
             </section>
 
             {/* ============ FEATURES ============ */}
-            <section id="fitur" className="py-20 px-6 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+            <section
+                id="fitur"
+                className="py-20 px-6 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800"
+            >
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
                             Fitur Lengkap untuk Bisnis Nyata
                         </h2>
                         <p className="mt-4 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                            44+ modul terintegrasi — dari transaksi harian sampai analitik
-                            lanjutan, dirancang untuk kebutuhan UMKM Indonesia.
+                            44+ modul terintegrasi — dari transaksi harian
+                            sampai analitik lanjutan, dirancang untuk kebutuhan
+                            UMKM Indonesia.
                         </p>
                     </div>
 
@@ -305,7 +314,10 @@ export default function Welcome() {
                                 className="group p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-lg hover:shadow-primary-500/5 transition-all"
                             >
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <feature.icon size={24} className="text-white" />
+                                    <feature.icon
+                                        size={24}
+                                        className="text-white"
+                                    />
                                 </div>
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
                                     {feature.title}
@@ -336,7 +348,8 @@ export default function Welcome() {
                         Tech Stack Modern
                     </h2>
                     <p className="text-slate-600 dark:text-slate-400 mb-10">
-                        Dibangun dengan teknologi yang teruji, cepat, dan mudah dikembangkan
+                        Dibangun dengan teknologi yang teruji, cepat, dan mudah
+                        dikembangkan
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
                         {techStack.map((tech) => (
@@ -344,7 +357,9 @@ export default function Welcome() {
                                 key={tech.name}
                                 className="flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700"
                             >
-                                <div className={`w-3 h-3 rounded-full ${tech.color}`} />
+                                <div
+                                    className={`w-3 h-3 rounded-full ${tech.color}`}
+                                />
                                 <span className="font-medium text-slate-700 dark:text-slate-300">
                                     {tech.name}
                                 </span>
@@ -355,22 +370,30 @@ export default function Welcome() {
             </section>
 
             {/* ============ INSTALLATION ============ */}
-            <section id="instalasi" className="py-20 px-6 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+            <section
+                id="instalasi"
+                className="py-20 px-6 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800"
+            >
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
                             Instalasi dalam Hitungan Menit
                         </h2>
                         <p className="mt-4 text-slate-600 dark:text-slate-400">
-                             Clone, install, lalu buka wizard setup untuk membuat akun admin,
-                             profil toko, kategori, dan gudang utama.
+                            Clone, install, lalu buka wizard setup untuk membuat
+                            akun admin, profil toko, kategori, dan gudang utama.
                         </p>
                     </div>
 
                     <div className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-6 overflow-hidden">
                         <div className="flex items-center gap-2 mb-4">
-                            <IconTerminal2 size={16} className="text-slate-500" />
-                            <span className="text-xs font-mono text-slate-500">bash</span>
+                            <IconTerminal2
+                                size={16}
+                                className="text-slate-500"
+                            />
+                            <span className="text-xs font-mono text-slate-500">
+                                bash
+                            </span>
                         </div>
                         <pre className="text-sm text-slate-300 font-mono overflow-x-auto leading-relaxed">
                             {quickStart}
@@ -399,8 +422,9 @@ export default function Welcome() {
                             Ingin Coba Langsung?
                         </h2>
                         <p className="text-slate-600 dark:text-slate-400 mb-6">
-                             Untuk mencoba aplikasi, jalankan instalasi lokal dan selesaikan
-                             wizard setup. Seeder utama tidak membuat akun demo atau sample data.
+                            Untuk mencoba aplikasi, jalankan instalasi lokal dan
+                            selesaikan wizard setup. Seeder utama tidak membuat
+                            akun demo atau sample data.
                         </p>
                         <Link
                             href="/setup"
@@ -414,7 +438,10 @@ export default function Welcome() {
             </section>
 
             {/* ============ FAQ ============ */}
-            <section id="faq" className="py-20 px-6 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+            <section
+                id="faq"
+                className="py-20 px-6 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800"
+            >
                 <div className="max-w-3xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
@@ -449,11 +476,11 @@ export default function Welcome() {
                 <div className="max-w-4xl mx-auto">
                     <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-3xl p-12 text-center text-white">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                            Siap Kelola Bisnis dengan Dikasir?
+                            Siap Kelola Bisnis dengan Larapos?
                         </h2>
                         <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
-                             Gratis digunakan dan dimodifikasi di bawah lisensi MIT, dengan data
-                             tetap berada di infrastruktur Anda.
+                            Gratis digunakan dan dimodifikasi di bawah lisensi
+                            MIT, dengan data tetap berada di infrastruktur Anda.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <a

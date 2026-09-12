@@ -1,12 +1,13 @@
 # AGENTS.md — Point of Sales
 
-Open-source POS system (200+ stars). Laravel 13 + Inertia 3.0 + React 19.
+Open-source POS system. Laravel 13 + Inertia 3.0 + React 19.
 
 ## Important: This Repo
 
 **Remote:** `git@github.com:aryadwiputra/point-of-sales.git`
 
 **Branch structure:**
+
 - `main` — production. Protected. PR only from `development`.
 - `development` — integration branch. Feature branches merge here via PR.
 - `release/*` — release candidates. Created from `development`, merged to `main` + tagged.
@@ -31,7 +32,7 @@ Open-source POS system (200+ stars). Laravel 13 + Inertia 3.0 + React 19.
 ## CI / Deploy
 
 - **CI is build-only** — `.github/workflows/deploy.yml` validates composer + `npm run build` (PHP 8.4, Node 22). It does **NOT run tests**. Run `php artisan test` locally before every PR.
-- **Push to `main` auto-deploys to production** (`dikasir.web.id` via SSH). Never push directly to `main` — use the release process below.
+- **Push to `main` auto-deploys to production** (`Larapos.web.id` via SSH). Never push directly to `main` — use the release process below.
 - Deploy VPS uses Node 24.15 + PHP 8.4 (`php8.4 artisan migrate --force`).
 - npm is the package manager of record (`package-lock.json` committed, `bun.lock` gitignored). CI/deploy run `npm ci`. Don't switch to bun/yarn lockfiles.
 
@@ -91,7 +92,7 @@ Production must trigger `php artisan schedule:run` every minute for the schedule
 ## Middleware
 
 | Alias | Class | Applied to |
-|-------|-------|------------|
+| ------- | ------- | ------------ |
 | `permission` | Spatie PermissionMiddleware | Every dashboard route |
 | `step_up` | EnsureRecentPasswordConfirmation | Sensitive create/update/delete: roles, users, payment settings, bank accounts, payment confirm |
 | `active_shift` | EnsureActiveCashierShift | All POS transaction actions (cart CRUD, hold/resume, checkout) |
@@ -182,7 +183,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 Master-data API routes (`/api/v1/products`, `/customers`, `/categories`, `/warehouses`, `/suppliers`) enforce Sanctum abilities matching Spatie permission names:
 
 | Route | Ability |
-|-------|---------|
+| ------- | --------- |
 | index, show | `{module}-access` |
 | store | `{module}-create` |
 | update | `{module}-edit` (products/customers/categories) or `{module}-update` (warehouses) |

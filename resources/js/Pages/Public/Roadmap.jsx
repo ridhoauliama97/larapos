@@ -10,7 +10,7 @@ import {
     IconBulb,
 } from "@tabler/icons-react";
 
-const GITHUB_URL = "https://github.com/aryadwiputra/point-of-sales";
+const GITHUB_URL = "https://github.com/ridhoauliama97/larapos";
 
 const releases = [
     {
@@ -163,7 +163,7 @@ const directions = [
 export default function Roadmap() {
     return (
         <PublicLayout active="/roadmap">
-            <Head title="Roadmap — Dikasir" />
+            <Head title="Roadmap — Larapos" />
 
             {/* Header */}
             <section className="pt-20 pb-14 px-6 bg-gradient-to-b from-primary-50 dark:from-primary-950/40 to-transparent">
@@ -173,11 +173,11 @@ export default function Roadmap() {
                         Roadmap
                     </div>
                     <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white">
-                        Perjalanan Dikasir
+                        Perjalanan Larapos
                     </h1>
                     <p className="mt-5 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                        Dari kasir sederhana menjadi ekosistem POS lengkap — dan masih terus
-                        berkembang bersama komunitas.
+                        Dari kasir sederhana menjadi ekosistem POS lengkap — dan
+                        masih terus berkembang bersama komunitas.
                     </p>
                 </div>
             </section>
@@ -196,12 +196,20 @@ export default function Roadmap() {
                                     <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-900">
                                         {rel.tag}
                                     </span>
-                                    <span className="text-sm text-slate-400">{rel.date}</span>
+                                    <span className="text-sm text-slate-400">
+                                        {rel.date}
+                                    </span>
                                 </div>
                                 <ul className="mt-3 space-y-2">
                                     {rel.items.map((item) => (
-                                        <li key={item} className="flex items-start gap-2.5">
-                                            <IconCheck size={16} className="text-emerald-500 mt-1 shrink-0" />
+                                        <li
+                                            key={item}
+                                            className="flex items-start gap-2.5"
+                                        >
+                                            <IconCheck
+                                                size={16}
+                                                className="text-emerald-500 mt-1 shrink-0"
+                                            />
                                             <span className="text-sm text-slate-600 dark:text-slate-300">
                                                 {item}
                                             </span>
@@ -222,8 +230,8 @@ export default function Roadmap() {
                             Arah ke Depan
                         </h2>
                         <p className="mt-4 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                            Prioritas dibentuk bersama komunitas — dari feedback pengguna dan
-                            kontributor.
+                            Prioritas dibentuk bersama komunitas — dari feedback
+                            pengguna dan kontributor.
                         </p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-6">
@@ -233,7 +241,10 @@ export default function Roadmap() {
                                 className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
                             >
                                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mb-4">
-                                    <dir.icon size={22} className="text-white" />
+                                    <dir.icon
+                                        size={22}
+                                        className="text-white"
+                                    />
                                 </div>
                                 <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
                                     {dir.title}
@@ -255,8 +266,9 @@ export default function Roadmap() {
                             Roadmap dibentuk oleh komunitas
                         </h2>
                         <p className="text-slate-400 mb-7">
-                            Punya ide fitur? Laporkan bug? Atau ingin mengerjakan salah satu arah
-                            di atas? Semua dimulai dari GitHub.
+                            Punya ide fitur? Laporkan bug? Atau ingin
+                            mengerjakan salah satu arah di atas? Semua dimulai
+                            dari GitHub.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                             <a

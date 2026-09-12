@@ -9,7 +9,7 @@ Sistem kasir berbasis Laravel + Inertia + React untuk transaksi penjualan, inven
 ## Cuplikan Layar
 
 | POS Checkout | Dashboard | Stock Opname |
-|:---:|:---:|:---:|
+| :---: | :---: | :---: |
 | ![POS](public/screenshots/02-pos-checkout.png) | ![Dashboard](public/screenshots/01-dashboard.png) | ![Stock Opname](public/screenshots/06-stock-opnames.png) |
 | **Sales Report** | **Receivables** | **Multi-Warehouse** |
 | ![Sales Report](public/screenshots/15-sales-report.png) | ![Receivables](public/screenshots/12-receivables.png) | ![Warehouses](public/screenshots/07-warehouses.png) |
@@ -21,6 +21,7 @@ Sistem kasir berbasis Laravel + Inertia + React untuk transaksi penjualan, inven
 ## Fitur Utama
 
 ### POS & Transaksi
+
 - Pencarian produk via barcode / keyword
 - Barcode scanner via kamera (PWA)
 - Cart multi-item dengan hold/resume
@@ -34,6 +35,7 @@ Sistem kasir berbasis Laravel + Inertia + React untuk transaksi penjualan, inven
 - Offline mode (queue transaksi saat offline, sync saat online)
 
 ### Inventory & Multi-Warehouse
+
 - Manajemen produk + kategori + barcode
 - Stok terpisah per gudang/cabang
 - Transfer stok antar warehouse (draft → send → receive)
@@ -45,18 +47,21 @@ Sistem kasir berbasis Laravel + Inertia + React untuk transaksi penjualan, inven
 - Low stock notification
 
 ### Purchasing
+
 - Purchase Order (draft → ordered → partial → completed)
 - Goods Receiving (dengan input batch)
 - Supplier Returns
 - Payables (hutang supplier) dengan aging
 
 ### Finance
+
 - Receivables (piutang pelanggan) dengan partial payment
 - Aging analysis + collection notes
 - PPN/PPh tax management
 - Customer portal: lihat invoice + bayar piutang online
 
 ### CRM & Loyalty
+
 - Customer management + wilayah Indonesia
 - Member tiers (regular, silver, gold, platinum)
 - Poin loyalty (earn/redeem)
@@ -66,6 +71,7 @@ Sistem kasir berbasis Laravel + Inertia + React untuk transaksi penjualan, inven
 - **WhatsApp Gateway** — kirim pesan otomatis via whatsapp-web.js (QR scan, session persistent)
 
 ### Reports & Documents
+
 - Sales report + filter + summary
 - Profit report + margin analysis
 - Advanced sales insights (hourly, cashier performance, repeat customer)
@@ -74,12 +80,14 @@ Sistem kasir berbasis Laravel + Inertia + React untuk transaksi penjualan, inven
 - Export ke Excel (produk, customer, transaksi)
 
 ### Admin
+
 - Full RBAC (users, roles, permissions)
 - Audit log (before/after snapshot)
 - Import produk & customer dari Excel
 - **App Versioning** — versi aplikasi terpusat (`APP_VERSION`), tampil di sidebar + POS navbar
 
 ### Integrasi
+
 - **WhatsApp Gateway** — terhubung via Node.js service (`whatsapp-service/`)
 - **Payment Gateways** — Midtrans, Xendit
 
@@ -88,7 +96,7 @@ Sistem kasir berbasis Laravel + Inertia + React untuk transaksi penjualan, inven
 ## Quick Start
 
 ```bash
-git clone https://github.com/aryadwiputra/point-of-sales.git
+git clone https://github.com/ridhoauliama97/larapos.git
 cd point-of-sales
 cp .env.example .env
 composer install && PUPPETEER_SKIP_DOWNLOAD=true npm install
@@ -113,7 +121,7 @@ Seeder demo bersifat opt-in: `UserSeeder` lalu `SampleDataSeeder`.
 ## Dokumentasi Detail
 
 | Dokumen | Isi |
-|---------|-----|
+| --------- | ----- |
 | `docs/getting-started.md` | Setup lengkap |
 | `docs/configuration.md` | Konfigurasi environment, payment, pajak, printer, WhatsApp |
 | `docs/architecture-overview.md` | Arsitektur, middleware, service layer, Node service |
@@ -121,7 +129,7 @@ Seeder demo bersifat opt-in: `UserSeeder` lalu `SampleDataSeeder`.
 
 ## REST API (OpenAPI)
 
-Dikasir menyediakan REST API untuk integrasi mobile app / pihak ketiga. Dokumentasi interaktif otomatis (Scramble) tersedia di:
+Larapos menyediakan REST API untuk integrasi mobile app / pihak ketiga. Dokumentasi interaktif otomatis (Scramble) tersedia di:
 
 - **UI docs:** `/docs/api` — coba endpoint langsung dari browser (Try It)
 - **OpenAPI spec:** `/docs/api.json` — untuk generate client (Postman, OpenAPI Generator, Swagger Codegen)
@@ -130,20 +138,20 @@ Semua endpoint (kecuali `auth/login`, `auth/register`, webhooks) memerlukan **Be
 
 ```bash
 # 1. Login → dapat token
-curl -X POST https://dikasir.web.id/api/v1/auth/login \
+curl -X POST https://Larapos.web.id/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@example.com","password":"password"}'
 # → {"token": "1|abc123...", "user": {...}}
 
 # 2. Panggil API dengan token
-curl https://dikasir.web.id/api/v1/products \
+curl https://Larapos.web.id/api/v1/products \
   -H "Authorization: Bearer 1|abc123..."
 ```
 
 **Modul yang tersedia** (`/api/v1/`):
 
 | Modul | Endpoint | Keterangan |
-|-------|----------|------------|
+| ------- | ---------- | ------------ |
 | Auth | `auth/login`, `auth/logout`, `auth/me`, `auth/register` | Token-based (Sanctum) |
 | Produk | `products` | CRUD + search + kategori |
 | Pelanggan | `customers` | CRUD + loyalty member |
@@ -152,7 +160,7 @@ curl https://dikasir.web.id/api/v1/products \
 | Supplier | `suppliers` | CRUD |
 | POS | `pos/shift`, `pos/products`, `pos/cart`, `pos/hold`, `pos/checkout`, `pos/transactions` | Alur kasir lengkap (mobile) |
 
-Base URL: `https://dikasir.web.id/api/v1` (dev: `http://localhost:8000/api/v1`)
+Base URL: `https://Larapos.web.id/api/v1` (dev: `http://localhost:8000/api/v1`)
 
 ### Per Modul
 

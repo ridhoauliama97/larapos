@@ -15,13 +15,13 @@ import {
     IconApi,
 } from "@tabler/icons-react";
 
-const GITHUB_URL = "https://github.com/aryadwiputra/point-of-sales";
+const GITHUB_URL = "https://github.com/ridhoauliama97/larapos";
 
 const modules = [
     {
         icon: IconShoppingCart,
         title: "POS & Transaksi",
-        desc: "Inti dari Dikasir — kasir yang cepat, fleksibel, dan bisa diandalkan setiap hari.",
+        desc: "Inti dari Larapos — kasir yang cepat, fleksibel, dan bisa diandalkan setiap hari.",
         screenshot: "/screenshots/02-pos-checkout.png",
         features: [
             "Pencarian produk via barcode / keyword",
@@ -167,7 +167,7 @@ const modules = [
 export default function Features() {
     return (
         <PublicLayout active="/fitur">
-            <Head title="Fitur Lengkap — Dikasir" />
+            <Head title="Fitur Lengkap — Larapos" />
 
             {/* Header */}
             <section className="pt-20 pb-14 px-6 bg-gradient-to-b from-primary-50 dark:from-primary-950/40 to-transparent">
@@ -176,8 +176,9 @@ export default function Features() {
                         Fitur Lengkap untuk Bisnis Nyata
                     </h1>
                     <p className="mt-5 text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-                        Fitur terintegrasi dari kasir harian sampai analitik lanjutan, gratis
-                        digunakan dan open source di bawah lisensi MIT.
+                        Fitur terintegrasi dari kasir harian sampai analitik
+                        lanjutan, gratis digunakan dan open source di bawah
+                        lisensi MIT.
                     </p>
                     <div className="mt-8 flex flex-wrap justify-center gap-3">
                         {modules.map((m) => (
@@ -199,14 +200,19 @@ export default function Features() {
                     {modules.map((mod, idx) => (
                         <div
                             key={mod.title}
-                            id={mod.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
+                            id={mod.title
+                                .toLowerCase()
+                                .replace(/[^a-z0-9]+/g, "-")}
                             className={`flex flex-col ${idx % 2 === 1 ? "lg:flex-row-reverse" : "lg:flex-row"} gap-10 items-center`}
                         >
                             {/* Text */}
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                                        <mod.icon size={22} className="text-white" />
+                                        <mod.icon
+                                            size={22}
+                                            className="text-white"
+                                        />
                                     </div>
                                     <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
                                         {mod.title}
@@ -217,7 +223,10 @@ export default function Features() {
                                 </p>
                                 <ul className="space-y-2.5">
                                     {mod.features.map((f) => (
-                                        <li key={f} className="flex items-start gap-2.5">
+                                        <li
+                                            key={f}
+                                            className="flex items-start gap-2.5"
+                                        >
                                             <IconCheck
                                                 size={18}
                                                 className="text-emerald-500 mt-0.5 shrink-0"
@@ -254,8 +263,8 @@ export default function Features() {
                             Ada fitur yang kamu butuhkan?
                         </h2>
                         <p className="text-slate-400 mb-6">
-                            Karena open source, fitur baru bisa datang dari siapa saja —
-                            termasuk kamu.
+                            Karena open source, fitur baru bisa datang dari
+                            siapa saja — termasuk kamu.
                         </p>
                         <a
                             href={`${GITHUB_URL}/issues`}

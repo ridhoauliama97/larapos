@@ -7,7 +7,7 @@ Terima kasih sudah tertarik untuk berkontribusi! 🎉
 Repo ini menggunakan **Git Flow** dengan branch sebagai berikut:
 
 | Branch | Fungsi |
-|--------|--------|
+| -------- | -------- |
 | `main` | Production. Hanya diisi dari PR `development` |
 | `development` | Integrasi. Feature branch merge via PR |
 | `feature/*` | Kerja fitur. Branch dari `development`, PR ke `development` |
@@ -19,7 +19,7 @@ Repo ini menggunakan **Git Flow** dengan branch sebagai berikut:
 ### 1. Clone & Setup
 
 ```bash
-git clone https://github.com/aryadwiputra/point-of-sales.git
+git clone https://github.com/ridhoauliama97/larapos.git
 cd point-of-sales
 cp .env.example .env
 composer install && PUPPETEER_SKIP_DOWNLOAD=true npm install
@@ -42,7 +42,7 @@ git checkout -b feature/nama-fitur-anda
 
 Gunakan **Conventional Commits**:
 
-```
+```text
 feat: tambah fitur X
 fix: perbaiki bug Y
 docs: update dokumentasi Z

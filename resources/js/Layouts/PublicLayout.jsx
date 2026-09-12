@@ -6,7 +6,7 @@ import {
     IconArrowRight,
 } from "@tabler/icons-react";
 
-const GITHUB_URL = "https://github.com/aryadwiputra/point-of-sales";
+const GITHUB_URL = "https://github.com/ridhoauliama97/larapos";
 const DOCS_URL = `${GITHUB_URL}/blob/main/docs/getting-started.md`;
 
 export const NAV_LINKS = [
@@ -24,10 +24,13 @@ export default function PublicLayout({ children, active = "" }) {
                 <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2.5">
                         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                            <IconShoppingCart size={20} className="text-white" />
+                            <IconShoppingCart
+                                size={20}
+                                className="text-white"
+                            />
                         </div>
                         <span className="text-lg font-bold text-slate-900 dark:text-white">
-                            Dikasir
+                            Larapos
                         </span>
                     </Link>
 
@@ -83,11 +86,14 @@ export default function PublicLayout({ children, active = "" }) {
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                            <IconShoppingCart size={16} className="text-white" />
+                            <IconShoppingCart
+                                size={16}
+                                className="text-white"
+                            />
                         </div>
                         <div>
                             <div className="font-semibold text-slate-700 dark:text-slate-300">
-                                Dikasir
+                                Larapos
                             </div>
                             <div className="text-xs text-slate-500">
                                 Sistem kasir open source untuk UMKM
@@ -96,29 +102,72 @@ export default function PublicLayout({ children, active = "" }) {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
-                        <Link href="/fitur" className="hover:text-primary-500 transition-colors">
+                        <Link
+                            href="/fitur"
+                            className="hover:text-primary-500 transition-colors"
+                        >
                             Fitur
                         </Link>
-                        <Link href="/dokumentasi" className="hover:text-primary-500 transition-colors">
+                        <Link
+                            href="/dokumentasi"
+                            className="hover:text-primary-500 transition-colors"
+                        >
                             Dokumentasi
                         </Link>
-                        <Link href="/roadmap" className="hover:text-primary-500 transition-colors">
+                        <Link
+                            href="/roadmap"
+                            className="hover:text-primary-500 transition-colors"
+                        >
                             Roadmap
                         </Link>
-                        <Link href="/kontribusi" className="hover:text-primary-500 transition-colors">
+                        <Link
+                            href="/kontribusi"
+                            className="hover:text-primary-500 transition-colors"
+                        >
                             Kontribusi
                         </Link>
-                        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="hover:text-primary-500 transition-colors">
+                        <a
+                            href={GITHUB_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-primary-500 transition-colors"
+                        >
                             GitHub
                         </a>
-                        <a href={`${GITHUB_URL}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer" className="hover:text-primary-500 transition-colors">
+                        <a
+                            href={`${GITHUB_URL}/blob/main/LICENSE`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-primary-500 transition-colors"
+                        >
                             Lisensi MIT
                         </a>
                     </div>
 
-                    <p className="text-sm text-slate-500">
-                        © {new Date().getFullYear()} Dibuat oleh Arya Dwi Putra
-                    </p>
+                    <div>
+                        <p className="text-sm text-slate-500">
+                            &copy; {new Date().getFullYear()} Dibuat oleh{" "}
+                            <a
+                                href="https://github.com/aryadwiputra"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary-500 hover:underline"
+                            >
+                                Arya Dwi Putra
+                            </a>
+                        </p>
+                        <div className="text-xs text-slate-500">
+                            Updated & Maintained by{" "}
+                            <a
+                                href="https://github.com/ridhoauliama97"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary-500 hover:underline"
+                            >
+                                Ridho Aulia Mahqoma Angkat
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </footer>
         </div>

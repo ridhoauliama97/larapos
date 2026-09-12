@@ -17,14 +17,14 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           extensions: mbstring, pdo, pdo_mysql, sqlite3, zip, gd, exif
           coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Validate composer
         run: composer validate --no-check-publish
@@ -53,7 +53,7 @@ jobs:
           port: 22
           script: |
             set -e
-            cd /var/www/dikasir.web.id
+            cd /var/www/Larapos.web.id
             export GIT_SSH_COMMAND="ssh -o ConnectTimeout=20 -o BatchMode=yes"
 
             # Ensure deploy user can modify the web root (fix root-owned dirs from manual ops)
@@ -82,7 +82,7 @@ jobs:
             echo "==> Frontend dependencies + build"
             NPM_OK=0
             for i in 1 2 3; do
-              if sudo -u deploy bash -lc 'export PATH=/home/deploy/.nvm/versions/node/v24.15.0/bin:$PATH; cd /var/www/dikasir.web.id && PUPPETEER_SKIP_DOWNLOAD=true npm ci --no-audit --no-fund && npm run build'; then NPM_OK=1; break; fi
+              if sudo -u deploy bash -lc 'export PATH=/home/deploy/.nvm/versions/node/v24.15.0/bin:$PATH; cd /var/www/Larapos.web.id && PUPPETEER_SKIP_DOWNLOAD=true npm ci --no-audit --no-fund && npm run build'; then NPM_OK=1; break; fi
               echo "npm ci/build failed (attempt $i/3), retrying in 8s..."
               sleep 8
             done
@@ -106,7 +106,7 @@ jobs:
 
             echo "==> Verify"
             sleep 3
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://dikasir.web.id/)
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://Larapos.web.id/)
             if [ "$HTTP_CODE" = "200" ]; then
               echo "✅ Deploy OK (HTTP $HTTP_CODE)"
             else
