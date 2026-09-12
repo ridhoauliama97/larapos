@@ -9,7 +9,6 @@ export default function ImageDropzone({
     onSelect,
     onReset = null,
     error,
-    hint = "JPG, PNG, atau WebP. Maksimal 2 MB.",
     aspect = "aspect-[4/3]",
     accept = DEFAULT_ACCEPT,
     shape = "rounded",
@@ -37,7 +36,10 @@ export default function ImageDropzone({
         handleFiles(event.dataTransfer.files);
     };
 
-    const descriptionIds = [error ? `${inputId}-error` : null, `${inputId}-hint`]
+    const descriptionIds = [
+        error ? `${inputId}-error` : null,
+        `${inputId}-hint`,
+    ]
         .filter(Boolean)
         .join(" ");
 
@@ -87,7 +89,7 @@ export default function ImageDropzone({
             <div className="flex items-start justify-between gap-3">
                 <p
                     id={`${inputId}-hint`}
-                    className="text-xs leading-relaxed text-slate-400 dark:text-slate-500"
+                    className="sr-only"
                 >
                     {hint}
                 </p>

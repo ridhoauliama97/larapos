@@ -29,7 +29,7 @@ import {
     IconUsersPlus,
     IconFileInvoice,
     IconBuildingWarehouse,
-IconRulerMeasure,
+    IconRulerMeasure,
     IconCurrencyDollar,
     IconWallet,
     IconFileSearch,
@@ -109,7 +109,10 @@ export default function Menu() {
                 {
                     title: t("sidebar.items.transactionHistory"),
                     href: route("transactions.history"),
-                    active: url === "/dashboard/transactions/history" ? true : false,
+                    active:
+                        url === "/dashboard/transactions/history"
+                            ? true
+                            : false,
                     icon: <IconClockHour6 size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["transactions-access"]),
                 },
@@ -162,7 +165,9 @@ export default function Menu() {
                     title: t("sidebar.items.stockMutations"),
                     href: route("stock-mutations.index"),
                     active: url.startsWith("/dashboard/stock-mutations"),
-                    icon: <IconChartArrowsVertical size={20} strokeWidth={1.5} />,
+                    icon: (
+                        <IconChartArrowsVertical size={20} strokeWidth={1.5} />
+                    ),
                     permissions: hasAnyPermission(["stock-mutations-access"]),
                 },
                 {
@@ -287,7 +292,9 @@ export default function Menu() {
                     title: t("sidebar.items.salesReport"),
                     href: route("reports.sales.index"),
                     active: url.startsWith("/dashboard/reports/sales"),
-                    icon: <IconChartArrowsVertical size={20} strokeWidth={1.5} />,
+                    icon: (
+                        <IconChartArrowsVertical size={20} strokeWidth={1.5} />
+                    ),
                     permissions: hasAnyPermission(["reports-access"]),
                 },
                 {
@@ -343,26 +350,38 @@ export default function Menu() {
                     permissions: hasAnyPermission(["roles-access"]),
                 },
                 {
-                    title: t("sidebar.items.users"),
+                    title: t("sidebar.items.usersList"),
+                    href: route("users.index"),
                     icon: <IconUsers size={20} strokeWidth={1.5} />,
+                    active: url === "/dashboard/users" ? true : false,
                     permissions: hasAnyPermission(["users-access"]),
-                    subdetails: [
-                        {
-                            title: t("sidebar.items.usersList"),
-                            href: route("users.index"),
-                            icon: <IconTable size={20} strokeWidth={1.5} />,
-                            active: url === "/dashboard/users" ? true : false,
-                            permissions: hasAnyPermission(["users-access"]),
-                        },
-                        {
-                            title: t("sidebar.items.usersCreate"),
-                            href: route("users.create"),
-                            icon: <IconCirclePlus size={20} strokeWidth={1.5} />,
-                            active: url === "/dashboard/users/create" ? true : false,
-                            permissions: hasAnyPermission(["users-create"]),
-                        },
-                    ],
                 },
+                // {
+                //     title: t("sidebar.items.users"),
+                //     icon: <IconUsers size={20} strokeWidth={1.5} />,
+                //     permissions: hasAnyPermission(["users-access"]),
+                //     subdetails: [
+                //         {
+                //             title: t("sidebar.items.usersList"),
+                //             href: route("users.index"),
+                //             icon: <IconTable size={20} strokeWidth={1.5} />,
+                //             active: url === "/dashboard/users" ? true : false,
+                //             permissions: hasAnyPermission(["users-access"]),
+                //         },
+                //         {
+                //             title: t("sidebar.items.usersCreate"),
+                //             href: route("users.create"),
+                //             icon: (
+                //                 <IconCirclePlus size={20} strokeWidth={1.5} />
+                //             ),
+                //             active:
+                //                 url === "/dashboard/users/create"
+                //                     ? true
+                //                     : false,
+                //             permissions: hasAnyPermission(["users-create"]),
+                //         },
+                //     ],
+                // },
             ],
         },
         {

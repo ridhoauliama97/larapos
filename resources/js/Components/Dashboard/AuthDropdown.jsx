@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { usePage, router } from "@inertiajs/react";
-import { IconLogout, IconRotate } from "@tabler/icons-react";
+import { IconLogout, IconRotate, IconUserCircle } from "@tabler/icons-react";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import MenuLink from "@/Utils/Menu";
@@ -57,7 +57,11 @@ export default function AuthDropdown({ auth, isMobile }) {
 
         // ponytail: plain axios — Inertia router rejects the JSON-only response
         axios
-            .post(route("tours.reset"), {}, { headers: { Accept: "application/json" } })
+            .post(
+                route("tours.reset"),
+                {},
+                { headers: { Accept: "application/json" } },
+            )
             .then(() => router.reload({ only: ["auth"] }));
     };
 
@@ -94,7 +98,7 @@ export default function AuthDropdown({ auth, isMobile }) {
                     >
                         <Menu.Items className="absolute rounded-lg w-48 border mt-2 py-2 right-0 z-[100] bg-white dark:bg-gray-950 dark:border-gray-900">
                             <div className="flex flex-col gap-1.5 divide-y divide-gray-100 dark:divide-gray-900">
-                                <Menu.Item>
+                                {/* <Menu.Item>
                                     <button
                                         onClick={resetTours}
                                         className="px-3 py-1.5 text-sm flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
@@ -104,6 +108,20 @@ export default function AuthDropdown({ auth, isMobile }) {
                                             size={"20"}
                                         />
                                         {i18n.t("tour.reset")}
+                                    </button>
+                                </Menu.Item> */}
+                                <Menu.Item>
+                                    <button
+                                        onClick={() =>
+                                            router.visit(route("profile.edit"))
+                                        }
+                                        className="px-3 py-1.5 text-sm flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                                    >
+                                        <IconUserCircle
+                                            strokeWidth={"1.5"}
+                                            size={"20"}
+                                        />
+                                        Profil
                                     </button>
                                 </Menu.Item>
                                 <Menu.Item>

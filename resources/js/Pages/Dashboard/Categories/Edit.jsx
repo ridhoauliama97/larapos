@@ -104,7 +104,7 @@ export default function Edit({ category }) {
                                     onSelect={handleSelect}
                                     onReset={handleReset}
                                     error={errors.image}
-                                    hint="JPG, PNG, atau WebP. Maksimal 2 MB. Rasio 4:3 disarankan."
+                                    hint="Rasio 4:3 disarankan."
                                 />
                             </div>
 

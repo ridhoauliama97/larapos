@@ -243,7 +243,6 @@ export default function Edit({
                                 onReset={handleReset}
                                 error={errors.image}
                                 aspect="aspect-square"
-                                hint="JPG, PNG, atau WebP. Maksimal 2 MB."
                             />
                         </div>
                     </div>

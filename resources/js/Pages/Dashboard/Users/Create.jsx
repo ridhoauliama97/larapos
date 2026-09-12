@@ -118,7 +118,6 @@ export default function Create() {
                                         aspect="aspect-square"
                                         shape="circle"
                                         accept="image/jpeg,image/png,image/webp,image/gif"
-                                        hint="JPG, PNG, WebP, atau GIF. Maks 2 MB. Bisa di-crop 1:1."
                                     />
                                 </div>
                             </div>
@@ -160,7 +159,7 @@ export default function Create() {
                                 onChange={(e) =>
                                     setData(
                                         "password_confirmation",
-                                        e.target.value
+                                        e.target.value,
                                     )
                                 }
                                 errors={errors.password_confirmation}
@@ -188,7 +187,7 @@ export default function Create() {
                                         value={role.name}
                                         onChange={setSelectedRoles}
                                         checked={data.selectedRoles.includes(
-                                            role.name
+                                            role.name,
                                         )}
                                     />
                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize">
