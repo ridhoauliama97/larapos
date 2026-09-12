@@ -44,6 +44,7 @@ cp .env.example .env
 composer install && PUPPETEER_SKIP_DOWNLOAD=true npm install
 php artisan key:generate
 php artisan migrate --seed
+php artisan laravolt:indonesia:seed   # regions: provinces/cities/districts/villages
 php artisan storage:link
 # After the server starts, open the root URL; first install automatically redirects to /setup.
 

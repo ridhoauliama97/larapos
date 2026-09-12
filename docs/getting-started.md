@@ -27,6 +27,7 @@ composer install
 PUPPETEER_SKIP_DOWNLOAD=true npm install
 php artisan key:generate
 php artisan migrate --seed
+php artisan laravolt:indonesia:seed   # data wilayah: provinsi/kota/kecamatan/desa
 php artisan storage:link
 # Start all local processes
 composer run dev
@@ -37,11 +38,12 @@ composer run dev
 
 1. isi konfigurasi database di `.env`
 2. jalankan `php artisan migrate --seed`
-3. jalankan `php artisan storage:link`
-4. jalankan `composer run dev`
-5. buka `http://localhost:8000`; pada instalasi pertama aplikasi otomatis membuka wizard `/setup`
-6. selesaikan wizard untuk membuat akun admin, profil toko, kategori, dan gudang utama
-7. login menggunakan akun yang dibuat pada wizard setup
+3. jalankan `php artisan laravolt:indonesia:seed` untuk mengisi data wilayah Indonesia
+4. jalankan `php artisan storage:link`
+5. jalankan `composer run dev`
+6. buka `http://localhost:8000`; pada instalasi pertama aplikasi otomatis membuka wizard `/setup`
+7. selesaikan wizard untuk membuat akun admin, profil toko, kategori, dan gudang utama
+8. login menggunakan akun yang dibuat pada wizard setup
 
 ## Seed Data
 
@@ -52,6 +54,12 @@ composer run dev
 - payment setting awal
 - pengaturan dine-in
 - warehouse utama `PUSAT`
+
+Data wilayah Indonesia (provinsi, kota, kecamatan, desa) berasal dari paket `laravolt/indonesia` dan **tidak** termasuk `DatabaseSeeder`. Jalankan sekali setelah migrate:
+
+```bash
+php artisan laravolt:indonesia:seed
+```
 
 Tidak ada user default atau sample data pada seeder utama. Pada instalasi pertama, buka root aplikasi dan wizard `/setup` akan terbuka otomatis untuk membuat akun admin.
 
