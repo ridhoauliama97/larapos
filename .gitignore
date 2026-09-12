@@ -30,6 +30,12 @@ planning/
 # dompdf runtime font cache (machine-specific, regenerated at runtime)
 /storage/fonts
 
+# graphify knowledge graph output (machine-generated)
+/graphify-out
+
+# Local dev DB tool config (contains absolute machine paths)
+.devdbrc
+
 # Bun lockfiles (repo uses npm / package-lock.json)
 bun.lock
 whatsapp-service/bun.lock
