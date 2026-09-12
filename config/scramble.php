@@ -2,7 +2,6 @@
 
 use Dedoc\Scramble\Http\Middleware\RestrictedDocsAccess;
 use Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy;
-use Dedoc\Scramble\Support\Generator\SecurityScheme;
 
 return [
     /*
@@ -53,7 +52,7 @@ return [
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
         'description' => 'REST API untuk Larapos — sistem kasir (POS) open source untuk UMKM Indonesia. '
-            . 'Semua endpoint (kecuali login/register/webhooks) memerlukan Bearer token dari POST /api/v1/auth/login.',
+            .'Semua endpoint (kecuali login/register/webhooks) memerlukan Bearer token dari POST /api/v1/auth/login.',
     ],
 
     'ui' => [
@@ -162,22 +161,9 @@ return [
      * Set to `null` explicitly to disable. If you already configure security manually via
      * `afterOpenApiGenerated` / `extendOpenApi`, keep this disabled to avoid duplicate schemes.
      *
-     * Customize with a class-string or [class, options]:
-     *
-     * 'security_strategy' => [
-     *     \Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy::class,
-     *     [
-     *         'middleware' => ['auth', 'auth:*'],
-     *         'scheme' => \Dedoc\Scramble\Support\Generator\SecurityScheme::http('bearer'),
-     *     ],
-     * ],
+     * Customize with a class-string. The [class, options] form is also supported, but every option
+     * must be serializable: passing a SecurityScheme object breaks `php artisan config:cache`.
+     * The class defaults already match this app (middleware `auth`, `auth:*`; bearer scheme).
      */
-    // 'security_strategy' => \Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy::class,
-    'security_strategy' => [
-        MiddlewareAuthSecurityStrategy::class,
-        [
-            'middleware' => ['auth', 'auth:*'],
-            'scheme' => SecurityScheme::http('bearer'),
-        ],
-    ],
+    'security_strategy' => MiddlewareAuthSecurityStrategy::class,
 ];
