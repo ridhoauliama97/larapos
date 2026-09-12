@@ -169,11 +169,14 @@ class CustomerSegmentController extends Controller
             'type' => ['required', Rule::in([CustomerSegment::TYPE_MANUAL, CustomerSegment::TYPE_AUTO])],
             'is_active' => ['nullable', 'boolean'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'auto_rule_type' => ['nullable', Rule::in([
-                CustomerSegment::RULE_SPENDING,
-                CustomerSegment::RULE_PURCHASE_FREQUENCY,
-                CustomerSegment::RULE_RECEIVABLE_BEHAVIOR,
-            ])],
+            'auto_rule_type' => [
+                'required_if:type,'.CustomerSegment::TYPE_AUTO,
+                Rule::in([
+                    CustomerSegment::RULE_SPENDING,
+                    CustomerSegment::RULE_PURCHASE_FREQUENCY,
+                    CustomerSegment::RULE_RECEIVABLE_BEHAVIOR,
+                ]),
+            ],
             'rule_config' => ['nullable', 'array'],
             'rule_config.min_total_spent' => ['nullable', 'integer', 'min:0'],
             'rule_config.min_transaction_count' => ['nullable', 'integer', 'min:0'],

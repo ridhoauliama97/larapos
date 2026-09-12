@@ -141,44 +141,53 @@ class CrmAutomationService
         }
 
         $at = $at ?? now();
-        $campaign->logs()->delete();
-
-        $audience = $this->buildAudience($campaign->audience_filters ?? [], $at);
-        $snapshot = $audience->map(fn (Customer $customer) => [
-            'customer_id' => $customer->id,
-            'name' => $customer->name,
-            'no_telp' => $customer->no_telp,
-            'is_loyalty_member' => (bool) $customer->is_loyalty_member,
-            'segments' => $customer->segments->pluck('name')->values()->all(),
-        ])->values()->all();
 
         $waAvailable = Setting::getBool('wa_enabled', false)
             && Setting::get('wa_service_url')
             && $this->whatsAppService?->status()['connected'] ?? false;
 
-        foreach ($audience as $customer) {
-            $payload = $this->buildCustomerPayload($campaign, $customer);
+        $pendingSends = [];
 
-            $log = $campaign->logs()->create([
+        DB::transaction(function () use ($campaign, $at, $waAvailable, &$pendingSends) {
+            $campaign->logs()->delete();
+
+            $audience = $this->buildAudience($campaign->audience_filters ?? [], $at);
+            $snapshot = $audience->map(fn (Customer $customer) => [
                 'customer_id' => $customer->id,
-                'channel' => CustomerCampaign::CHANNEL_WHATSAPP_LINK,
-                'status' => CustomerCampaignLog::STATUS_READY_TO_SEND,
-                'payload' => $payload,
-            ]);
+                'name' => $customer->name,
+                'no_telp' => $customer->no_telp,
+                'is_loyalty_member' => (bool) $customer->is_loyalty_member,
+                'segments' => $customer->segments->pluck('name')->values()->all(),
+            ])->values()->all();
 
-            if ($waAvailable && $customer->no_telp) {
-                $sent = $this->whatsAppService->send($customer->no_telp, $payload['message']);
-                if ($sent) {
-                    $this->markLog($log, CustomerCampaignLog::STATUS_SENT);
+            foreach ($audience as $customer) {
+                $payload = $this->buildCustomerPayload($campaign, $customer);
+
+                $log = $campaign->logs()->create([
+                    'customer_id' => $customer->id,
+                    'channel' => CustomerCampaign::CHANNEL_WHATSAPP_LINK,
+                    'status' => CustomerCampaignLog::STATUS_READY_TO_SEND,
+                    'payload' => $payload,
+                ]);
+
+                if ($waAvailable && $customer->no_telp) {
+                    $pendingSends[] = [$log, $customer, $payload['message']];
                 }
             }
-        }
 
-        $campaign->update([
-            'status' => CustomerCampaign::STATUS_READY,
-            'audience_snapshot' => $snapshot,
-            'processed_at' => $at,
-        ]);
+            $campaign->update([
+                'status' => CustomerCampaign::STATUS_READY,
+                'audience_snapshot' => $snapshot,
+                'processed_at' => $at,
+            ]);
+        });
+
+        // Send after commit so WhatsApp traffic never runs inside the DB transaction.
+        foreach ($pendingSends as [$log, $customer, $message]) {
+            if ($this->whatsAppService->send($customer->no_telp, $message)) {
+                $this->markLog($log, CustomerCampaignLog::STATUS_SENT);
+            }
+        }
 
         return $campaign->fresh(['logs.customer']);
     }

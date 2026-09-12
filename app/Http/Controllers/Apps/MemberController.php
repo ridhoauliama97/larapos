@@ -8,6 +8,7 @@ use App\Models\CustomerVoucher;
 use App\Models\Transaction;
 use App\Services\CustomerSegmentationService;
 use App\Services\LoyaltyService;
+use App\Support\PhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -203,6 +204,8 @@ class MemberController extends Controller
 
     private function validateMemberRequest(Request $request, ?Customer $customer = null): array
     {
+        $request->merge(['no_telp' => PhoneNumber::normalize($request->input('no_telp'))]);
+
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'no_telp' => ['required', 'string', Rule::unique('customers', 'no_telp')->ignore($customer?->id)],

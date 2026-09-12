@@ -36,7 +36,7 @@ class CashierShiftController extends Controller
         ];
 
         $query = CashierShift::query()
-            ->with(['user:id,name', 'openedBy:id,name', 'closedBy:id,name', 'warehouse:id,code,name'])
+            ->with(['user:id,name', 'openedBy:id,name', 'closedBy:id,name', 'warehouse:id,code,name', 'cashMovements.user:id,name'])
             ->when($filters['cashier_id'], fn (Builder $builder, $cashierId) => $builder->where('user_id', $cashierId))
             ->when($filters['status'], fn (Builder $builder, $status) => $builder->where('status', $status))
             ->when($filters['opened_from'], fn (Builder $builder, $date) => $builder->whereDate('opened_at', '>=', $date))
@@ -211,7 +211,14 @@ class CashierShiftController extends Controller
 
     private function transformShift(CashierShift $shift): array
     {
-        $summary = $this->cashierShiftService->calculateSummary($shift);
+        // closed shifts carry their persisted summary columns — only open shifts need live aggregate queries
+        $summary = $shift->isOpen() ? $this->cashierShiftService->calculateSummary($shift) : null;
+
+        if (! $shift->relationLoaded('cashMovements')) {
+            $shift->load('cashMovements.user:id,name');
+        }
+
+        $cashMovements = $shift->cashMovements->sortByDesc('created_at')->values();
 
         return [
             'id' => $shift->id,
@@ -228,12 +235,13 @@ class CashierShiftController extends Controller
             'non_cash_sales_total' => $shift->isOpen() ? $summary['non_cash_sales_total'] : (int) $shift->non_cash_sales_total,
             'cash_refund_total' => $shift->isOpen() ? $summary['cash_refund_total'] : (int) $shift->cash_refund_total,
             'non_cash_refund_total' => $shift->isOpen() ? $summary['non_cash_refund_total'] : (int) $shift->non_cash_refund_total,
-            'cash_in_total' => $shift->isOpen() ? $summary['cash_in_total'] : ($summary['cash_in_total'] ?: 0),
-            'cash_out_total' => $shift->isOpen() ? $summary['cash_out_total'] : ($summary['cash_out_total'] ?: 0),
-            'cash_movements' => $shift->cashMovements()
-                ->with('user:id,name')
-                ->latest()
-                ->get()
+            'cash_in_total' => $shift->isOpen()
+                ? $summary['cash_in_total']
+                : (int) $cashMovements->where('type', ShiftCashMovement::TYPE_IN)->sum('amount'),
+            'cash_out_total' => $shift->isOpen()
+                ? $summary['cash_out_total']
+                : (int) $cashMovements->where('type', ShiftCashMovement::TYPE_OUT)->sum('amount'),
+            'cash_movements' => $cashMovements
                 ->map(fn (ShiftCashMovement $movement) => [
                     'id' => $movement->id,
                     'type' => $movement->type,
@@ -242,7 +250,6 @@ class CashierShiftController extends Controller
                     'user' => $movement->user?->name,
                     'created_at' => optional($movement->created_at)?->toISOString(),
                 ])
-                ->values()
                 ->all(),
             'transactions_count' => $shift->isOpen() ? $summary['transactions_count'] : (int) $shift->transactions_count,
             'sales_returns_count' => $shift->isOpen() ? $summary['sales_returns_count'] : (int) $shift->sales_returns_count,

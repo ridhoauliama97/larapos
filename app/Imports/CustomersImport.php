@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\Customer;
+use App\Support\PhoneNumber;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -13,7 +14,7 @@ class CustomersImport implements ToModel, WithChunkReading, WithHeadingRow, With
     public function model(array $row)
     {
         return Customer::updateOrCreate(
-            ['no_telp' => (string) $row['telepon']],
+            ['no_telp' => PhoneNumber::normalize((string) ($row['telepon'] ?? ''))],
             [
                 'name' => $row['nama'],
                 'address' => $row['alamat'],

@@ -193,12 +193,31 @@ class CustomerSegmentationService
     ): bool {
         $config = $segment->rule_config ?? [];
 
+        // Seeded defaults keep their slug-specific behavior; user-created auto segments match by rule type.
         return match ($segment->slug) {
             'high_spender' => (int) $customer->loyalty_total_spent >= (int) ($config['min_total_spent'] ?? 1500000),
             'frequent_buyer' => $this->matchesFrequentBuyer($customer, $config, $at),
             'inactive_customer' => $this->matchesInactiveCustomer($customer, $config, $at),
             'credit_customer' => $this->matchesCreditCustomer($customer),
             'overdue_customer' => $this->matchesOverdueCustomer($customer),
+            default => $this->matchesGenericAutoSegment($customer, $segment, $config, $at),
+        };
+    }
+
+    private function matchesGenericAutoSegment(
+        Customer $customer,
+        CustomerSegment $segment,
+        array $config,
+        CarbonInterface $at
+    ): bool {
+        return match ($segment->auto_rule_type) {
+            CustomerSegment::RULE_SPENDING => (int) $customer->loyalty_total_spent >= (int) ($config['min_total_spent'] ?? 0),
+            CustomerSegment::RULE_PURCHASE_FREQUENCY => isset($config['inactivity_days_min']) && ! isset($config['recent_days'])
+                ? $this->matchesInactiveCustomer($customer, $config, $at)
+                : $this->matchesFrequentBuyer($customer, $config, $at),
+            CustomerSegment::RULE_RECEIVABLE_BEHAVIOR => ($config['overdue_only'] ?? false)
+                ? $this->matchesOverdueCustomer($customer)
+                : $this->matchesCreditCustomer($customer),
             default => false,
         };
     }

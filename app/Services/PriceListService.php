@@ -8,32 +8,53 @@ use App\Models\Product;
 
 class PriceListService
 {
+    private ?PriceList $cachedApplicablePriceList = null;
+
+    private bool $applicablePriceListResolved = false;
+
     // ponytail: N+1 per product; eager-load items via priceList->items when pricing whole carts
     public function getApplicablePriceList(?Customer $customer): ?PriceList
     {
+        // ponytail: memoize the customer-less lookup — POS pricing calls this once per product
+        if ($customer === null && $this->applicablePriceListResolved) {
+            return $this->cachedApplicablePriceList;
+        }
+
         $lists = PriceList::active()->orderBy('priority', 'desc')->get();
+
+        $applicable = null;
 
         foreach ($lists as $list) {
             if ($list->customer_scope === 'all') {
-                return $list;
+                $applicable = $list;
+                break;
             }
             if ($list->customer_scope === 'walk_in') {
-                return $list;
+                $applicable = $list;
+                break;
             }
             if ($list->customer_scope === 'registered' && $customer) {
-                return $list;
+                $applicable = $list;
+                break;
             }
             if ($list->customer_scope === 'member' && $customer?->is_loyalty_member) {
-                return $list;
+                $applicable = $list;
+                break;
             }
             if ($list->customer_scope === 'segment' && $customer && $list->customer_segment_id) {
                 if ($customer->segments()->where('customer_segment_id', $list->customer_segment_id)->exists()) {
-                    return $list;
+                    $applicable = $list;
+                    break;
                 }
             }
         }
 
-        return null;
+        if ($customer === null) {
+            $this->cachedApplicablePriceList = $applicable;
+            $this->applicablePriceListResolved = true;
+        }
+
+        return $applicable;
     }
 
     public function getProductPrice(PriceList $priceList, int $productId): ?int

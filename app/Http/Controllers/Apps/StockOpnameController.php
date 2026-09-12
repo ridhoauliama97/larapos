@@ -103,7 +103,10 @@ class StockOpnameController extends Controller
         $availableProducts = blank($productFilters['search'])
             ? collect()
             : Product::query()
-                ->with('category:id,name')
+                ->with([
+                    'category:id,name',
+                    'warehouses' => fn ($query) => $query->where('warehouse_id', $stockOpname->warehouse_id),
+                ])
                 ->where(function ($builder) use ($productFilters) {
                     $builder
                         ->where('title', 'like', '%'.$productFilters['search'].'%')
@@ -114,12 +117,10 @@ class StockOpnameController extends Controller
                 ->orderBy('title')
                 ->limit(20)
                 ->get()
-                ->map(function ($product) use ($stockOpname) {
-                    $pivotStock = 0;
-                    if ($stockOpname->warehouse_id) {
-                        $wh = $product->warehouses()->where('warehouse_id', $stockOpname->warehouse_id)->first();
-                        $pivotStock = $wh?->pivot->stock ?? 0;
-                    }
+                ->map(function ($product) {
+                    $pivotStock = $product->warehouses->first()?->pivot->stock ?? 0;
+                    // keep payload shape unchanged: warehouses was never serialized before eager loading
+                    $product->unsetRelation('warehouses');
 
                     return [
                         ...$product->toArray(),

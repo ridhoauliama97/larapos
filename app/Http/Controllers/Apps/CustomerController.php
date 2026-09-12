@@ -9,6 +9,7 @@ use App\Models\CustomerVoucher;
 use App\Models\Transaction;
 use App\Services\CustomerSegmentationService;
 use App\Services\LoyaltyService;
+use App\Support\PhoneNumber;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -75,6 +76,8 @@ class CustomerController extends Controller
         /**
          * validate
          */
+        $request->merge(['no_telp' => PhoneNumber::normalize($request->input('no_telp'))]);
+
         $request->validate([
             'name' => 'required',
             'no_telp' => 'required|unique:customers',
@@ -119,6 +122,8 @@ class CustomerController extends Controller
      */
     public function storeAjax(Request $request)
     {
+        $request->merge(['no_telp' => PhoneNumber::normalize($request->input('no_telp'))]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'no_telp' => 'required|string|unique:customers,no_telp',
@@ -220,6 +225,8 @@ class CustomerController extends Controller
         /**
          * validate
          */
+        $request->merge(['no_telp' => PhoneNumber::normalize($request->input('no_telp'))]);
+
         $request->validate([
             'name' => 'required',
             'no_telp' => 'required|unique:customers,no_telp,'.$customer->id,

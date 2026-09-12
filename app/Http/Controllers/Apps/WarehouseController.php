@@ -33,14 +33,16 @@ class WarehouseController extends Controller
             'sort_order' => ['integer', 'min:0'],
         ]);
 
-        $warehouse = Warehouse::create($validated);
+        DB::transaction(function () use ($validated) {
+            $warehouse = Warehouse::create($validated);
 
-        // Sync all existing products to this warehouse with 0 stock
-        $productIds = Product::pluck('id');
-        $warehouse->products()->syncWithPivotValues(
-            $productIds,
-            ['stock' => 0]
-        );
+            // Sync all existing products to this warehouse with 0 stock
+            $productIds = Product::pluck('id');
+            $warehouse->products()->syncWithPivotValues(
+                $productIds,
+                ['stock' => 0]
+            );
+        });
 
         return back()->with('success', 'Gudang berhasil ditambahkan.');
     }
