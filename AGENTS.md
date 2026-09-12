@@ -10,7 +10,6 @@ Open-source POS system (200+ stars). Laravel 13 + Inertia 3.0 + React 19.
 - `main` — production. Protected. PR only from `development`.
 - `development` — integration branch. Feature branches merge here via PR.
 - `release/*` — release candidates. Created from `development`, merged to `main` + tagged.
-- `revamp-frontend` — legacy UI overhaul branch (inactive).
 - `feature/*` — individual feature work. Branch from `development`, PR to `development`.
 - `fix/*` — hotfixes. Branch from `main`, PR to `main` + `development`.
 
@@ -18,13 +17,13 @@ Open-source POS system (200+ stars). Laravel 13 + Inertia 3.0 + React 19.
 
 ## Stack
 
-- **Backend**: Laravel 13 (composer.json requires PHP ^8.3; CI tests on PHP 8.4)
+- **Backend**: Laravel 13 (composer.json requires PHP ^8.3; CI build uses PHP 8.4)
 - **Frontend**: Inertia.js 3.0 + React 19, Vite 5
 - **CI**: `.github/workflows/deploy.yml` uses PHP 8.4 + Node 22 for build, Node 24.15 on deploy VPS
 - **Styling**: Tailwind CSS 3 (custom theme in `tailwind.config.js`)
 - **Auth/RBAC**: Spatie Laravel Permission + Laravel Breeze
-- **REST API**: Sanctum token-based at `/api/v1`; Scramble docs at `/docs/api`, spec at `/docs/api.json`; protect with `SCRAMBLE_DOCS_TOKEN`
-- **DB**: MySQL (default); SQLite in-memory for tests
+- **REST API**: Sanctum token-based at `/api/v1`; Scramble docs at `/docs/api`, spec at `/docs/api.json` — public by default (`viewApiDocs` gate in `AppServiceProvider`), lockable via `SCRAMBLE_DOCS_TOKEN` (RestrictedDocsAccess)
+- **DB**: `.env.example` defaults to MySQL; local dev may use SQLite (`database/database.sqlite`, gitignored); tests use in-memory SQLite
 - **i18n**: react-i18next; locales in `resources/js/i18n/locales`; `SetLocale` middleware on web group
 - **Payment gateways**: Midtrans, Xendit (webhooks in `routes/api.php`)
 - **WhatsApp**: whatsapp-web.js via separate Node service (`whatsapp-service/`, port 3001)
@@ -67,7 +66,7 @@ php artisan inventory:reconcile           # report global vs pivot stock mismatc
 php artisan inventory:reconcile --fix     # align global stock to pivot sum
 php artisan reorder:generate              # generate draft PO from low-stock products (daily 02:00)
 php artisan crm:sync-segments             # refresh auto segment memberships (daily 01:00)
-php artisan crm:generate-reminders       # queue campaign reminder messages (daily 01:15)
+php artisan crm:generate-reminders        # queue campaign reminder messages (daily 01:15)
 php artisan scramble:cache               # warm Scramble OpenAPI cache
 php artisan scramble:clear               # invalidate Scramble OpenAPI cache
 
@@ -84,7 +83,7 @@ Production must trigger `php artisan schedule:run` every minute for the schedule
 
 - **Controllers**: `app/Http/Controllers/Apps/` — per-module web controllers (~35)
 - **API Controllers**: `app/Http/Controllers/Api/` — REST API (Sanctum token auth)
-- **Services**: `app/Services/` — ~22 services: AuditLog, BatchService, CashierShiftService, DineOrderService, GoodsReceivingService, LoyaltyService, PaymentGatewayManager, PricingService, PriceListService, PurchaseOrderService, ReorderService, StockMutationService, StockTransferService, UnitConversionService, WhatsAppService, etc.
+- **Services**: `app/Services/` — 21 services: AuditLog, BatchService, CashierShiftService, DineOrderService, GoodsReceivingService, LoyaltyService, PaymentGatewayManager, PricingService, PriceListService, PurchaseOrderService, ReorderService, StockMutationService, StockTransferService, UnitConversionService, WhatsAppService, etc.
 - **Layouts**: `POSLayout.jsx` (POS), `DashboardLayout.jsx` (admin), `AuthenticatedLayout.jsx` (profile), `GuestLayout.jsx` (auth), `PublicLayout.jsx` (public dine-in)
 - **Routes**: `routes/web.php` (~50+ dashboard routes), `routes/api.php` (webhooks + REST API), `routes/auth.php` (Breeze)
 - **Inertia shared props**: `HandleInertiaRequests.php` — auth, permissions, notifications (low stock, receivables, payables aging), active shift, store profile, appVersion
@@ -98,21 +97,26 @@ Production must trigger `php artisan schedule:run` every minute for the schedule
 | `active_shift` | EnsureActiveCashierShift | All POS transaction actions (cart CRUD, hold/resume, checkout) |
 | `bot.guard` | EnsureBotGuard | Login/register/forgot-password (honeypot + timer) |
 | `registration.enabled` | EnsurePublicRegistrationEnabled | Register route (default: off) |
+| `setup.notinstalled` | EnsureNotInstalled | `/setup` only; redirects to login once setup is complete |
 | `abilities` | CheckAbilities (Sanctum) | API master-data resources only; `/pos/*` and `/auth/*` are auth-only |
+
+Web group also appends `SetLocale`, `SecureHeaders`, `EnforceAbsoluteSessionLifetime` (`bootstrap/app.php`).
+
+**Error responses** (`bootstrap/app.php`): API/JSON requests get JSON — `AuthenticationException` → 401, `MissingAbilityException` → 403, validation stays 422. The custom Inertia `Error` page renders only when `APP_DEBUG=false`; with debug on you get Laravel's default error screen.
 
 ## Seeder Chain & First-Install Setup
 
-`DatabaseSeeder` runs only system-essential seeders with permission cache reset before & after:
+`DatabaseSeeder` runs these seeders with permission cache reset before & after (order matters — `UserSeeder` needs roles/permissions to exist):
 
 ```
-PermissionSeeder → RoleSeeder → PaymentSettingSeeder → DineInSettingsSeeder
+PermissionSeeder → RoleSeeder → UserSeeder → PaymentSettingSeeder → DineInSettingsSeeder
 ```
 
 After seeding, a default `PUSAT` warehouse is created and existing product stock is migrated to the `product_warehouse` pivot.
 
-**No default users.** Admin account, store profile, business type, categories, and main warehouse are created via the first-install setup wizard at `/setup`. Open the root URL after migration; it automatically redirects to `/setup` while `Setting::app_setup_completed` is false. The `setup.notinstalled` middleware redirects to login once setup is done.
+**Default users (fork-customized):** `UserSeeder` creates `admin.nelsha@gmail.com` (super-admin) and `cashier.nelsha@gmail.com` (cashier), password `password`, pre-verified (seeders run `Model::unguarded()`, so `email_verified_at` persists despite not being in `$fillable`). The `/setup` wizard is still available while `Setting::app_setup_completed` is false (root redirects there); users it creates — and users created via the admin user form — have **no `email_verified_at`** while dashboard routes require the `verified` middleware: verify via the link logged with `MAIL_MAILER=log` (`storage/logs/laravel.log`) or set it manually.
 
-**Demo seeders are opt-in, not part of `DatabaseSeeder`:** `php artisan db:seed --class=SampleDataSeeder` (needs UserSeeder first: `--class=UserSeeder`), plus `OperationalCoreSeeder`, `FeatureCoverageSeeder`, `FeatureDemoSeeder` for full demo data.
+**Demo seeders are opt-in:** `php artisan db:seed --class=SampleDataSeeder`, plus `OperationalCoreSeeder`, `FeatureCoverageSeeder`, `FeatureDemoSeeder` for full demo data.
 
 ## Inventory Model
 
@@ -153,6 +157,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 
 ## Docs
 
+- Getting started: `docs/getting-started.md`
 - Modules: `docs/features/`
 - Architecture: `docs/architecture-overview.md`
 - Config: `docs/configuration.md`
@@ -163,7 +168,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 
 - Use `RefreshDatabase` trait on every test class
 - Seed: `PermissionSeeder → RoleSeeder → UserSeeder` before every test
-- Admin: `arya@gmail.com` (super-admin, all permissions); cashier: `cashier@gmail.com`
+- Tests + demo seeders hardcode `arya@gmail.com` (super-admin) / `cashier@gmail.com` — this fork's `UserSeeder` uses `*.nelsha@gmail.com` instead, so realign those references before running `php artisan test`
 - **Always call `markEmailAsVerified()`** before `actingAs()` for HTTP controller tests
 - `PUSAT` warehouse: `type='main'`, `is_active=true`, `sort_order=0`
 - Product needs: `image`, `barcode`, `sku`, `title`, `description`, `category_id`, `buy_price`, `sell_price`, `stock`, `tax_rate=0`
@@ -184,7 +189,7 @@ Master-data API routes (`/api/v1/products`, `/customers`, `/categories`, `/wareh
 | destroy | `{module}-delete` |
 | suppliers (all verbs) | `suppliers-access` |
 
-`/api/v1/auth/*` and `/api/v1/pos/*` are auth-only (no abilities). Token abilities are stamped at login from Spatie permissions + `'user:read'`. Public registration creates a token with only `'user:read'`.
+`/api/v1/auth/*` and `/api/v1/pos/*` are auth-only (no abilities). Token abilities are stamped at login from Spatie permissions + `'user:read'`. Public registration creates a token with only `'user:read'`. The `api` rate limiter allows `API_RATE_LIMIT_PER_MINUTE` (default 120) per user/IP.
 
 API tests must use `Sanctum::actingAs($user, ['*'])` or real tokens via `$user->createToken('test', $abilities)->plainTextToken`.
 

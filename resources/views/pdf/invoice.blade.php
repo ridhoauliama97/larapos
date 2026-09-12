@@ -1,5 +1,5 @@
 @php
-    $fontFamily = "'Inter', 'Helvetica', 'Arial', sans-serif";
+    $fontFamily = "'Geist', 'Geist Mono', 'Inter', 'Helvetica', 'Arial', sans-serif";
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -8,31 +8,59 @@
     <meta charset="UTF-8">
     <style>
         @font-face {
-            font-family: 'Inter';
+            font-family: 'Geist';
             font-style: normal;
             font-weight: 400;
-            src: url("{{ public_path('inter/Inter_24pt-Regular.ttf') }}") format('truetype')
+            src: url("{{ public_path('geist/Geist-Regular.ttf') }}") format('truetype')
         }
 
         @font-face {
-            font-family: 'Inter';
+            font-family: 'Geist';
             font-style: normal;
             font-weight: 500;
-            src: url("{{ public_path('inter/Inter_24pt-Medium.ttf') }}") format('truetype')
+            src: url("{{ public_path('geist/Geist-Medium.ttf') }}") format('truetype')
         }
 
         @font-face {
-            font-family: 'Inter';
+            font-family: 'Geist';
             font-style: normal;
             font-weight: 600;
-            src: url("{{ public_path('inter/Inter_24pt-SemiBold.ttf') }}") format('truetype')
+            src: url("{{ public_path('geist/Geist-SemiBold.ttf') }}") format('truetype')
         }
 
         @font-face {
-            font-family: 'Inter';
+            font-family: 'Geist';
             font-style: normal;
             font-weight: 700;
-            src: url("{{ public_path('inter/Inter_24pt-Bold.ttf') }}") format('truetype')
+            src: url("{{ public_path('geist/Geist-Bold.ttf') }}") format('truetype')
+        }
+
+        @font-face {
+            font-family: 'Geist Mono';
+            font-style: normal;
+            font-weight: 400;
+            src: url("{{ public_path('geist_mono/GeistMono-Regular.ttf') }}") format('truetype')
+        }
+
+        @font-face {
+            font-family: 'Geist Mono';
+            font-style: normal;
+            font-weight: 500;
+            src: url("{{ public_path('geist_mono/GeistMono-Medium.ttf') }}") format('truetype')
+        }
+
+        @font-face {
+            font-family: 'Geist Mono';
+            font-style: normal;
+            font-weight: 600;
+            src: url("{{ public_path('geist_mono/GeistMono-SemiBold.ttf') }}") format('truetype')
+        }
+
+        @font-face {
+            font-family: 'Geist Mono';
+            font-style: normal;
+            font-weight: 700;
+            src: url("{{ public_path('geist_mono/GeistMono-Bold.ttf') }}") format('truetype')
         }
 
         * {
@@ -40,7 +68,9 @@
         }
 
         body {
-            font-family: {{ $fontFamily }};
+            font-family:
+                {{ $fontFamily }}
+            ;
             margin: 0;
             padding: 24px;
             color: #0f172a

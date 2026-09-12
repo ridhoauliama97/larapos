@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
+            UserSeeder::class,
             PaymentSettingSeeder::class,
             DineInSettingsSeeder::class,
         ]);
@@ -42,9 +43,21 @@ class DatabaseSeeder extends Seeder
             Setting::set('setup_warehouse_id', $pusat->id);
         }
 
-        DB::statement("
-            INSERT IGNORE INTO product_warehouse (product_id, warehouse_id, stock, created_at, updated_at)
-            SELECT id, {$pusat->id}, stock, NOW(), NOW() FROM products
-        ");
+        DB::table('products')
+            ->select(['id', 'stock'])
+            ->orderBy('id')
+            ->chunkById(500, function ($products) use ($pusat) {
+                $now = now();
+
+                $rows = $products->map(fn ($product) => [
+                    'product_id' => $product->id,
+                    'warehouse_id' => $pusat->id,
+                    'stock' => $product->stock,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])->all();
+
+                DB::table('product_warehouse')->insertOrIgnore($rows);
+            });
     }
 }

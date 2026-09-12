@@ -19,10 +19,11 @@ class UserSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $admin = User::updateOrCreate(
-            ['email' => 'arya@gmail.com'],
+            ['email' => 'admin.nelsha@gmail.com'],
             [
-                'name' => 'Arya Dwi Putra',
+                'name' => 'Admin Nelsha',
                 'password' => Hash::make('password'),
+                'email_verified_at' => now(),
             ]
         );
 
@@ -36,10 +37,11 @@ class UserSeeder extends Seeder
         $admin->syncPermissions($permissions);
 
         $cashier = User::updateOrCreate(
-            ['email' => 'cashier@gmail.com'],
+            ['email' => 'cashier.nelsha@gmail.com'],
             [
-                'name' => 'Cashier',
+                'name' => 'Cashier Nelsha',
                 'password' => Hash::make('password'),
+                'email_verified_at' => now(),
             ]
         );
 
