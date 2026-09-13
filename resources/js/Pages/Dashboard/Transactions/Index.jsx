@@ -67,13 +67,26 @@ export default function Index({
     const { can } = useAuthorization();
     const canOpenShift = can("cashier-shifts-open");
 
+    // Pelanggan default POS adalah customer id 1 (walk-in "Default").
+    const defaultCustomer = useMemo(
+        () => customers.find((customer) => Number(customer.id) === 1) ?? null,
+        [customers]
+    );
+    const sortedCustomers = useMemo(() => {
+        return [...customers].sort((a, b) => {
+            if (Number(a.id) === 1) return -1;
+            if (Number(b.id) === 1) return 1;
+            return 0;
+        });
+    }, [customers]);
+
     // State
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [isSearching, setIsSearching] = useState(false);
     const [addingProductId, setAddingProductId] = useState(null);
     const [removingItemId, setRemovingItemId] = useState(null);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer, setSelectedCustomer] = useState(defaultCustomer);
     const [pricingPreview, setPricingPreview] = useState(initialPricingPreview);
     const [isLoadingPricing, setIsLoadingPricing] = useState(false);
     const [discountInput, setDiscountInput] = useState("");
@@ -655,7 +668,7 @@ export default function Index({
                     setRedeemPointsInput("");
                     setCashInput("");
                     setShippingInput("");
-                    setSelectedCustomer(null);
+                    setSelectedCustomer(defaultCustomer);
                     setSelectedBankAccount(null);
                     setSelectedVoucherId("");
                     setPaymentMethod(defaultPaymentGateway ?? "cash");
@@ -843,7 +856,7 @@ export default function Index({
                         className="min-w-0 p-3 border-b border-slate-200 dark:border-slate-800 flex-shrink-0"
                     >
                         <CustomerSelect
-                            customers={customers}
+                            customers={sortedCustomers}
                             selected={selectedCustomer}
                             onSelect={setSelectedCustomer}
                             placeholder="Pilih pelanggan..."
