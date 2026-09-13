@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Table from "@/Components/Dashboard/Table";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconArrowLeft,
     IconPackage,
@@ -102,29 +103,21 @@ export default function Create({ suppliers, products, warehouses = [] }) {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Supplier</label>
-                                <select
+                                <Select
                                     value={data.supplier_id}
-                                    onChange={(e) => setData("supplier_id", e.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Supplier</option>
-                                    {suppliers.map((s) => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                    ))}
-                                </select>
+                                    onChange={(value) => setData("supplier_id", value)}
+                                    options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
+                                    placeholder="Pilih Supplier"
+                                />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Tujuan Gudang</label>
-                                <select
+                                <Select
                                     value={data.warehouse_id}
-                                    onChange={(e) => setData("warehouse_id", e.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Gudang</option>
-                                    {warehouses.map((w) => (
-                                        <option key={w.id} value={w.id}>{w.code} — {w.name}</option>
-                                    ))}
-                                </select>
+                                    onChange={(value) => setData("warehouse_id", value)}
+                                    options={warehouses.map((w) => ({ value: w.id, label: `${w.code} — ${w.name}` }))}
+                                    placeholder="Pilih Gudang"
+                                />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Nomor Dokumen</label>

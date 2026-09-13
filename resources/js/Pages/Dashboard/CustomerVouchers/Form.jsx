@@ -1,6 +1,7 @@
 import React from "react";
 import { Head, useForm } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconArrowLeft,
     IconCreditCard,
@@ -95,23 +96,24 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Pelanggan
                                 </label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.customer_id}
-                                    onChange={(event) =>
-                                        setData("customer_id", event.target.value)
+                                    onChange={(value) =>
+                                        setData("customer_id", value)
                                     }
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih pelanggan</option>
-                                    {customers.map((customer) => (
-                                        <option key={customer.id} value={customer.id}>
-                                            {customer.name} | {customer.no_telp || "-"} |{" "}
-                                            {customer.is_loyalty_member
+                                    options={customers.map((customer) => ({
+                                        value: customer.id,
+                                        label: `${customer.name} | ${
+                                            customer.no_telp || "-"
+                                        } | ${
+                                            customer.is_loyalty_member
                                                 ? `${customer.loyalty_tier} / ${customer.loyalty_points} poin`
-                                                : "non-member"}
-                                        </option>
-                                    ))}
-                                </select>
+                                                : "non-member"
+                                        }`,
+                                    }))}
+                                    placeholder="Pilih pelanggan"
+                                />
                                 <InputError message={errors.customer_id} />
                             </div>
 
@@ -162,16 +164,23 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Tipe Diskon
                                 </label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.discount_type}
-                                    onChange={(event) =>
-                                        setData("discount_type", event.target.value)
+                                    onChange={(value) =>
+                                        setData("discount_type", value)
                                     }
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="fixed_amount">Potongan Nominal</option>
-                                    <option value="percentage">Persentase (%)</option>
-                                </select>
+                                    options={[
+                                        {
+                                            value: "fixed_amount",
+                                            label: "Potongan Nominal",
+                                        },
+                                        {
+                                            value: "percentage",
+                                            label: "Persentase (%)",
+                                        },
+                                    ]}
+                                />
                                 <InputError message={errors.discount_type} />
                             </div>
 

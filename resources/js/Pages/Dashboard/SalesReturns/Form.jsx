@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Head, Link, router, useForm } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import Table from "@/Components/Dashboard/Table";
 import { IconArrowLeft, IconCheck, IconDeviceFloppy } from "@tabler/icons-react";
 import toast from "react-hot-toast";
@@ -383,26 +384,28 @@ export default function SalesReturnForm({
                                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Metode Penyelesaian
                                     </label>
-                                    <select
+                                    <Select
                                         value={form.data.return_type}
                                         disabled={!canEdit || !transaction.customer}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                "return_type",
-                                                event.target.value
-                                            )
+                                        onChange={(value) =>
+                                            form.setData("return_type", value)
                                         }
-                                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                    >
-                                        <option value="refund_cash">
-                                            Refund Tunai
-                                        </option>
-                                        {transaction.customer && (
-                                            <option value="store_credit">
-                                                Saldo Toko / Credit
-                                            </option>
-                                        )}
-                                    </select>
+                                        options={[
+                                            {
+                                                value: "refund_cash",
+                                                label: "Refund Tunai",
+                                            },
+                                            ...(transaction.customer
+                                                ? [
+                                                      {
+                                                          value: "store_credit",
+                                                          label: "Saldo Toko / Credit",
+                                                      },
+                                                  ]
+                                                : []),
+                                        ]}
+                                        className="w-full"
+                                    />
                                     {!transaction.customer && (
                                         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                                             Transaksi tanpa pelanggan hanya

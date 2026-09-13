@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Head, Link, router } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 
 const formatCurrency = (value = 0) =>
     new Intl.NumberFormat("id-ID", {
@@ -111,20 +112,22 @@ export default function Index({ salesReturns, filters }) {
                         className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800"
                     />
                     <div className="flex gap-2">
-                        <select
+                        <Select
                             value={form.return_type}
-                            onChange={(event) =>
+                            onChange={(value) =>
                                 setForm((prev) => ({
                                     ...prev,
-                                    return_type: event.target.value,
+                                    return_type: value,
                                 }))
                             }
-                            className="h-11 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800"
-                        >
-                            <option value="">Semua metode</option>
-                            <option value="refund_cash">Refund Tunai</option>
-                            <option value="store_credit">Saldo Toko</option>
-                        </select>
+                            options={[
+                                { value: "", label: "Semua metode" },
+                                { value: "refund_cash", label: "Refund Tunai" },
+                                { value: "store_credit", label: "Saldo Toko" },
+                            ]}
+                            size="sm"
+                            className="flex-1"
+                        />
                         <button
                             type="submit"
                             className="inline-flex h-11 items-center justify-center rounded-xl bg-primary-500 px-4 text-sm font-medium text-white hover:bg-primary-600"

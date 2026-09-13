@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Head, Link, router, usePage, useForm } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconClockHour6,
     IconSearch,
@@ -27,6 +28,14 @@ const formatDate = (value) => {
         year: "numeric",
     });
 };
+
+const statusOptions = [
+    { value: "", label: "Semua Status" },
+    { value: "unpaid", label: "Belum Lunas" },
+    { value: "partial", label: "Parsial" },
+    { value: "paid", label: "Lunas" },
+    { value: "overdue", label: "Jatuh Tempo" },
+];
 
 export default function PayablesIndex({ payables, filters = {}, suppliers = [] }) {
     const { flash } = usePage().props;
@@ -103,18 +112,18 @@ export default function PayablesIndex({ payables, filters = {}, suppliers = [] }
                         <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                             Supplier
                         </label>
-                        <select
+                        <Select
                             value={data.supplier_id}
-                            onChange={(e) => setData("supplier_id", e.target.value)}
-                            className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
-                        >
-                            <option value="">Umum</option>
-                            {suppliers.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                    {s.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(value) => setData("supplier_id", value)}
+                            options={[
+                                { value: "", label: "Umum" },
+                                ...suppliers.map((s) => ({
+                                    value: s.id,
+                                    label: s.name,
+                                })),
+                            ]}
+                            className="w-full"
+                        />
                     </div>
                     <div>
                         <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -193,37 +202,27 @@ export default function PayablesIndex({ payables, filters = {}, suppliers = [] }
                             className="w-full h-11 pl-10 pr-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
                         />
                     </div>
-                    <div className="w-full">
-                        <select
-                            value={supplierId}
-                            onChange={(e) => setSupplierId(e.target.value)}
-                            className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
-                        >
-                            <option value="">Semua Supplier</option>
-                            {suppliers.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                    {s.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="relative w-full">
-                        <IconCalendar
-                            size={18}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                        />
-                        <select
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                            className="w-full h-11 pl-10 pr-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
-                        >
-                            <option value="">Semua Status</option>
-                            <option value="unpaid">Belum Lunas</option>
-                            <option value="partial">Parsial</option>
-                            <option value="paid">Lunas</option>
-                            <option value="overdue">Jatuh Tempo</option>
-                        </select>
-                    </div>
+                    <Select
+                        value={supplierId}
+                        onChange={(value) => setSupplierId(value)}
+                        options={[
+                            { value: "", label: "Semua Supplier" },
+                            ...suppliers.map((s) => ({
+                                value: s.id,
+                                label: s.name,
+                            })),
+                        ]}
+                        size="sm"
+                        className="w-full"
+                    />
+                    <Select
+                        value={status}
+                        onChange={(value) => setStatus(value)}
+                        options={statusOptions}
+                        size="sm"
+                        icon={<IconCalendar size={18} />}
+                        className="w-full"
+                    />
                     <button
                         type="submit"
                         className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold"

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
+import Select from "@/Components/Dashboard/Select";
 import { Head, useForm } from "@inertiajs/react";
 import toast from "react-hot-toast";
 import { IconPrinter } from "@tabler/icons-react";
@@ -101,11 +102,15 @@ export default function Printer({ settings }) {
                 <form onSubmit={submit} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-6 max-w-lg">
                     <div>
                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Ukuran Kertas</label>
-                        <select value={data.printer_paper_size} onChange={(e) => setData("printer_paper_size", e.target.value)}
-                            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm">
-                            <option value="80mm">80 mm</option>
-                            <option value="58mm">58 mm</option>
-                        </select>
+                        <Select
+                            value={data.printer_paper_size}
+                            onChange={(value) => setData("printer_paper_size", value)}
+                            options={[
+                                { value: "80mm", label: "80 mm" },
+                                { value: "58mm", label: "58 mm" },
+                            ]}
+                            className="w-full"
+                        />
                     </div>
 
                     <label className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">

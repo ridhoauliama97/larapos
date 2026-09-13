@@ -4,6 +4,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import Button from "@/Components/Dashboard/Button";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import { useAuthorization } from "@/Utils/authorization";
 import {
     IconDatabaseOff,
@@ -194,16 +195,18 @@ const History = ({ transactions, filters, warehouses = [] }) => {
                                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                         Gudang / Cabang
                                     </label>
-                                    <select
+                                    <Select
                                         value={filterData.warehouse_id}
-                                        onChange={(e) => handleChange("warehouse_id", e.target.value)}
-                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                                    >
-                                        <option value="">Semua Gudang</option>
-                                        {warehouses.map((w) => (
-                                            <option key={w.id} value={w.id}>{w.code} — {w.name}</option>
-                                        ))}
-                                    </select>
+                                        onChange={(value) => handleChange("warehouse_id", value)}
+                                        options={[
+                                            { value: "", label: "Semua Gudang" },
+                                            ...warehouses.map((w) => ({
+                                                value: w.id,
+                                                label: `${w.code} — ${w.name}`,
+                                            })),
+                                        ]}
+                                        className="w-full"
+                                    />
                                 </div>
                                 <div className="flex items-end gap-2">
                                     <button

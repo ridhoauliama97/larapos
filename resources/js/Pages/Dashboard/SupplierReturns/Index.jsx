@@ -4,6 +4,7 @@ import { Head, Link, router } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import { useAuthorization } from "@/Utils/authorization";
 import {
     IconCirclePlus,
@@ -82,26 +83,26 @@ export default function Index({ returns, filters, suppliers }) {
                         <IconSearch size={18} />
                     </div>
                 </div>
-                <select
+                <Select
                     value={filters.status || ""}
-                    onChange={(e) => handleFilterChange("status", e.target.value)}
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Status</option>
-                    <option value="draft">Draft</option>
-                    <option value="completed">Selesai</option>
-                    <option value="cancelled">Dibatalkan</option>
-                </select>
-                <select
+                    onChange={(value) => handleFilterChange("status", value)}
+                    options={[
+                        { value: "", label: "Semua Status" },
+                        { value: "draft", label: "Draft" },
+                        { value: "completed", label: "Selesai" },
+                        { value: "cancelled", label: "Dibatalkan" },
+                    ]}
+                    size="sm"
+                />
+                <Select
                     value={filters.supplier || ""}
-                    onChange={(e) => handleFilterChange("supplier", e.target.value)}
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Supplier</option>
-                    {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                </select>
+                    onChange={(value) => handleFilterChange("supplier", value)}
+                    options={[
+                        { value: "", label: "Semua Supplier" },
+                        ...suppliers.map((s) => ({ value: s.id, label: s.name })),
+                    ]}
+                    size="sm"
+                />
             </div>
 
             <Table.Card title="Daftar Retur Supplier">

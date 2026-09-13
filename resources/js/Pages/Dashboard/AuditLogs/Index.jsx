@@ -3,6 +3,7 @@ import { Head, Link, router } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import { IconEye, IconFileSearch } from "@tabler/icons-react";
 
 const formatDateTime = (value) =>
@@ -54,59 +55,59 @@ export default function Index({
             </div>
 
             <div className="mb-4 grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-3">
-                <select
+                <Select
                     value={currentFilters.user_id}
-                    onChange={(event) =>
+                    onChange={(value) =>
                         updateFilters({
                             ...currentFilters,
-                            user_id: event.target.value,
+                            user_id: value,
                         })
                     }
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Aktor</option>
-                    {users.map((user) => (
-                        <option key={user.id} value={user.id}>
-                            {user.name}
-                        </option>
-                    ))}
-                </select>
+                    options={[
+                        { value: "", label: "Semua Aktor" },
+                        ...users.map((user) => ({
+                            value: user.id,
+                            label: user.name,
+                        })),
+                    ]}
+                    size="sm"
+                />
 
-                <select
+                <Select
                     value={currentFilters.module}
-                    onChange={(event) =>
+                    onChange={(value) =>
                         updateFilters({
                             ...currentFilters,
-                            module: event.target.value,
+                            module: value,
                         })
                     }
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Modul</option>
-                    {modules.map((module) => (
-                        <option key={module} value={module}>
-                            {module}
-                        </option>
-                    ))}
-                </select>
+                    options={[
+                        { value: "", label: "Semua Modul" },
+                        ...modules.map((module) => ({
+                            value: module,
+                            label: module,
+                        })),
+                    ]}
+                    size="sm"
+                />
 
-                <select
+                <Select
                     value={currentFilters.event}
-                    onChange={(event) =>
+                    onChange={(value) =>
                         updateFilters({
                             ...currentFilters,
-                            event: event.target.value,
+                            event: value,
                         })
                     }
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Event</option>
-                    {events.map((eventName) => (
-                        <option key={eventName} value={eventName}>
-                            {eventName}
-                        </option>
-                    ))}
-                </select>
+                    options={[
+                        { value: "", label: "Semua Event" },
+                        ...events.map((eventName) => ({
+                            value: eventName,
+                            label: eventName,
+                        })),
+                    ]}
+                    size="sm"
+                />
 
                 <input
                     type="date"

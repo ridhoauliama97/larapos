@@ -1,6 +1,7 @@
 import React from "react";
 import { Head, useForm } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import { IconArrowLeft, IconDeviceFloppy, IconUsersGroup } from "@tabler/icons-react";
 
 function InputError({ message }) {
@@ -99,14 +100,18 @@ export default function Form({ mode = "create", segment = null }) {
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Tipe Segment
                                 </label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.type}
-                                    onChange={(event) => setData("type", event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="manual">Manual Tag</option>
-                                    <option value="auto">Auto Segment</option>
-                                </select>
+                                    onChange={(value) => setData("type", value)}
+                                    options={[
+                                        { value: "manual", label: "Manual Tag" },
+                                        {
+                                            value: "auto",
+                                            label: "Auto Segment",
+                                        },
+                                    ]}
+                                />
                             </div>
                             <div className="md:col-span-2">
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -142,15 +147,27 @@ export default function Form({ mode = "create", segment = null }) {
                                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Rule Type
                                     </label>
-                                    <select
+                                    <Select
+                                        className="w-full"
                                         value={data.auto_rule_type}
-                                        onChange={(event) => setData("auto_rule_type", event.target.value)}
-                                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                    >
-                                        <option value="spending">Spending</option>
-                                        <option value="purchase_frequency">Purchase Frequency</option>
-                                        <option value="receivable_behavior">Receivable Behavior</option>
-                                    </select>
+                                        onChange={(value) =>
+                                            setData("auto_rule_type", value)
+                                        }
+                                        options={[
+                                            {
+                                                value: "spending",
+                                                label: "Spending",
+                                            },
+                                            {
+                                                value: "purchase_frequency",
+                                                label: "Purchase Frequency",
+                                            },
+                                            {
+                                                value: "receivable_behavior",
+                                                label: "Receivable Behavior",
+                                            },
+                                        ]}
+                                    />
                                 </div>
 
                                 {data.auto_rule_type === "spending" && (

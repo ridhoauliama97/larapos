@@ -2,6 +2,7 @@ import React from "react";
 import { Head, Link, router } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
 import {
@@ -62,6 +63,27 @@ const kindLabel = (kind) => {
     if (kind === "buy_x_get_y") return "BXGY";
     return "Standar";
 };
+
+const statusOptions = [
+    { value: "", label: "Semua Status" },
+    { value: "active", label: "Aktif" },
+    { value: "inactive", label: "Nonaktif" },
+];
+
+const targetOptions = [
+    { value: "", label: "Semua Target" },
+    { value: "all", label: "Semua Produk" },
+    { value: "product", label: "Produk" },
+    { value: "category", label: "Kategori" },
+];
+
+const kindOptions = [
+    { value: "", label: "Semua Jenis" },
+    { value: "standard_discount", label: "Standar" },
+    { value: "qty_break", label: "Grosir" },
+    { value: "bundle_price", label: "Bundle" },
+    { value: "buy_x_get_y", label: "BXGY" },
+];
 
 export default function Index({ rules, filters, summary = {}, recentAudits = [] }) {
     const { can } = useAuthorization();
@@ -137,42 +159,30 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                                 <IconSearch size={18} />
                             </div>
                         </div>
-                        <select
+                        <Select
                             value={filters.status || ""}
-                            onChange={(event) =>
-                                handleFilterChange("status", event.target.value)
+                            onChange={(value) =>
+                                handleFilterChange("status", value)
                             }
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Status</option>
-                            <option value="active">Aktif</option>
-                            <option value="inactive">Nonaktif</option>
-                        </select>
-                        <select
+                            options={statusOptions}
+                            size="sm"
+                        />
+                        <Select
                             value={filters.target_type || ""}
-                            onChange={(event) =>
-                                handleFilterChange("target_type", event.target.value)
+                            onChange={(value) =>
+                                handleFilterChange("target_type", value)
                             }
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Target</option>
-                            <option value="all">Semua Produk</option>
-                            <option value="product">Produk</option>
-                            <option value="category">Kategori</option>
-                        </select>
-                        <select
+                            options={targetOptions}
+                            size="sm"
+                        />
+                        <Select
                             value={filters.kind || ""}
-                            onChange={(event) =>
-                                handleFilterChange("kind", event.target.value)
+                            onChange={(value) =>
+                                handleFilterChange("kind", value)
                             }
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Jenis</option>
-                            <option value="standard_discount">Standar</option>
-                            <option value="qty_break">Grosir</option>
-                            <option value="bundle_price">Bundle</option>
-                            <option value="buy_x_get_y">BXGY</option>
-                        </select>
+                            options={kindOptions}
+                            size="sm"
+                        />
                     </div>
                 </div>
 

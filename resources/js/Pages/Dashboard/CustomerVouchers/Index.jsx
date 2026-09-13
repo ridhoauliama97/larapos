@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Search from "@/Components/Dashboard/Search";
+import Select from "@/Components/Dashboard/Select";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
 import {
@@ -109,20 +110,21 @@ export default function Index({ vouchers, filters = {} }) {
                             placeholder="Cari kode, voucher, pelanggan..."
                             query={filters.search || ""}
                         />
-                        <select
+                        <Select
+                            size="sm"
                             value={filters.status || ""}
-                            onChange={(event) =>
-                                handleFilterChange("status", event.target.value)
+                            onChange={(value) =>
+                                handleFilterChange("status", value)
                             }
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Status</option>
-                            <option value="active">Aktif</option>
-                            <option value="scheduled">Terjadwal</option>
-                            <option value="expired">Expired</option>
-                            <option value="used">Sudah Dipakai</option>
-                            <option value="inactive">Nonaktif</option>
-                        </select>
+                            options={[
+                                { value: "", label: "Semua Status" },
+                                { value: "active", label: "Aktif" },
+                                { value: "scheduled", label: "Terjadwal" },
+                                { value: "expired", label: "Expired" },
+                                { value: "used", label: "Sudah Dipakai" },
+                                { value: "inactive", label: "Nonaktif" },
+                            ]}
+                        />
                     </div>
                 </div>
 

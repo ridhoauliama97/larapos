@@ -1,6 +1,7 @@
 import React from "react";
 import { Head, useForm } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import { IconArrowLeft, IconBroadcast, IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function Form({ mode = "create", campaign = null, audienceOptions }) {
@@ -77,26 +78,40 @@ export default function Form({ mode = "create", campaign = null, audienceOptions
                             </div>
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Tipe Campaign</label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.type}
-                                    onChange={(event) => setData("type", event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="promo_broadcast">Promo Broadcast</option>
-                                    <option value="due_date_reminder">Due Date Reminder</option>
-                                    <option value="repeat_order_reminder">Repeat Order Reminder</option>
-                                </select>
+                                    onChange={(value) => setData("type", value)}
+                                    options={[
+                                        {
+                                            value: "promo_broadcast",
+                                            label: "Promo Broadcast",
+                                        },
+                                        {
+                                            value: "due_date_reminder",
+                                            label: "Due Date Reminder",
+                                        },
+                                        {
+                                            value: "repeat_order_reminder",
+                                            label: "Repeat Order Reminder",
+                                        },
+                                    ]}
+                                />
                             </div>
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Channel</label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.channel}
-                                    onChange={(event) => setData("channel", event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="internal">Internal</option>
-                                    <option value="whatsapp_link">WhatsApp Link</option>
-                                </select>
+                                    onChange={(value) => setData("channel", value)}
+                                    options={[
+                                        { value: "internal", label: "Internal" },
+                                        {
+                                            value: "whatsapp_link",
+                                            label: "WhatsApp Link",
+                                        },
+                                    ]}
+                                />
                             </div>
                             <label className="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
                                 <input
@@ -138,39 +153,39 @@ export default function Form({ mode = "create", campaign = null, audienceOptions
 
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Customer Type</label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.audience_filters.customer_type}
-                                    onChange={(event) => setAudienceFilter("customer_type", event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    {audienceOptions.customer_types.map((option) => (
-                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                    ))}
-                                </select>
+                                    onChange={(value) =>
+                                        setAudienceFilter("customer_type", value)
+                                    }
+                                    options={audienceOptions.customer_types}
+                                />
                             </div>
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Status Piutang</label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.audience_filters.receivable_status}
-                                    onChange={(event) => setAudienceFilter("receivable_status", event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    {audienceOptions.receivable_statuses.map((option) => (
-                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                    ))}
-                                </select>
+                                    onChange={(value) =>
+                                        setAudienceFilter(
+                                            "receivable_status",
+                                            value
+                                        )
+                                    }
+                                    options={audienceOptions.receivable_statuses}
+                                />
                             </div>
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Voucher Filter</label>
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.audience_filters.voucher_filter}
-                                    onChange={(event) => setAudienceFilter("voucher_filter", event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    {audienceOptions.voucher_filters.map((option) => (
-                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                    ))}
-                                </select>
+                                    onChange={(value) =>
+                                        setAudienceFilter("voucher_filter", value)
+                                    }
+                                    options={audienceOptions.voucher_filters}
+                                />
                             </div>
                         </div>
                     </div>

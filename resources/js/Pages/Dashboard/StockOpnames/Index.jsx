@@ -4,6 +4,7 @@ import { Head, Link, router } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import { useAuthorization } from "@/Utils/authorization";
 import {
     IconCirclePlus,
@@ -79,28 +80,29 @@ export default function Index({ stockOpnames, filters, warehouses = [] }) {
                     </div>
                 </div>
 
-                <select
+                <Select
                     value={filters.status || ""}
-                    onChange={(event) =>
-                        handleFilterChange("status", event.target.value)
-                    }
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Status</option>
-                    <option value="draft">Draft</option>
-                    <option value="finalized">Finalized</option>
-                </select>
+                    onChange={(value) => handleFilterChange("status", value)}
+                    options={[
+                        { value: "", label: "Semua Status" },
+                        { value: "draft", label: "Draft" },
+                        { value: "finalized", label: "Finalized" },
+                    ]}
+                    size="sm"
+                />
 
-                <select
+                <Select
                     value={filters.warehouse_id || ""}
-                    onChange={(event) => handleFilterChange("warehouse_id", event.target.value)}
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Gudang</option>
-                    {warehouses.map((w) => (
-                        <option key={w.id} value={w.id}>{w.code} — {w.name}</option>
-                    ))}
-                </select>
+                    onChange={(value) => handleFilterChange("warehouse_id", value)}
+                    options={[
+                        { value: "", label: "Semua Gudang" },
+                        ...warehouses.map((w) => ({
+                            value: w.id,
+                            label: `${w.code} — ${w.name}`,
+                        })),
+                    ]}
+                    size="sm"
+                />
 
                 <div className="grid grid-cols-2 gap-3">
                     <input

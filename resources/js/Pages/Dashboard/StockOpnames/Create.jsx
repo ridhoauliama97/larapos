@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Textarea from "@/Components/Dashboard/TextArea";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import { IconArrowLeft, IconClipboardCheck } from "@tabler/icons-react";
 import toast from "react-hot-toast";
 
@@ -45,17 +46,14 @@ export default function Create({ warehouses = [] }) {
                         <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                             Gudang / Cabang
                         </label>
-                        <select
+                        <Select
                             value={data.warehouse_id}
-                            onChange={(e) => setData("warehouse_id", e.target.value)}
-                            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            {warehouses.map((w) => (
-                                <option key={w.id} value={w.id}>
-                                    {w.code} — {w.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(value) => setData("warehouse_id", value)}
+                            options={warehouses.map((w) => ({
+                                value: w.id,
+                                label: `${w.code} — ${w.name}`,
+                            }))}
+                        />
                     </div>
 
                     <Textarea

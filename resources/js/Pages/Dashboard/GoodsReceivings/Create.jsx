@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconArrowLeft,
     IconTruckDelivery,
@@ -92,19 +93,16 @@ export default function Create({ orders }) {
                 <div className="space-y-6">
                     <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
                         <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Pilih Purchase Order</h2>
-                        <select
+                        <Select
                             value={selectedPoId}
-                            onChange={(e) => selectPO(e.target.value)}
-                            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Pilih PO yang sudah dipesan...</option>
-                            {orders.map((order) => (
-                                <option key={order.id} value={order.id}>
-                                    {order.document_number} - {order.supplier?.name || "Tanpa Supplier"}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.purchase_order_id && <p className="mt-1 text-xs text-danger-500">{errors.purchase_order_id}</p>}
+                            onChange={(value) => selectPO(value)}
+                            options={orders.map((order) => ({
+                                value: order.id,
+                                label: `${order.document_number} - ${order.supplier?.name || "Tanpa Supplier"}`,
+                            }))}
+                            placeholder="Pilih PO yang sudah dipesan..."
+                            error={errors.purchase_order_id}
+                        />
                     </div>
 
                     {selectedOrder && data.items.length > 0 && (

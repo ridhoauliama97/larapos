@@ -11,6 +11,7 @@ import {
 import toast from "react-hot-toast";
 import { useAuthorization } from "@/Utils/authorization";
 import Input from "@/Components/Dashboard/Input";
+import Select from "@/Components/Dashboard/Select";
 
 export default function Warehouses({ warehouses = [] }) {
     const { flash } = usePage().props;
@@ -206,17 +207,16 @@ export default function Warehouses({ warehouses = [] }) {
                                 />
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tipe</label>
-                                    <select
+                                    <Select
                                         value={form.type}
-                                        onChange={(e) => setForm({ ...form, type: e.target.value })}
-                                        className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                                    >
-                                        <option value="branch">Cabang</option>
-                                        <option value="warehouse">Gudang</option>
-                                    </select>
-                                    {errors.type && (
-                                        <p className="text-xs text-danger-500 mt-1">{errors.type}</p>
-                                    )}
+                                        onChange={(value) => setForm({ ...form, type: value })}
+                                        options={[
+                                            { value: "branch", label: "Cabang" },
+                                            { value: "warehouse", label: "Gudang" },
+                                        ]}
+                                        error={errors.type}
+                                        className="w-full"
+                                    />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

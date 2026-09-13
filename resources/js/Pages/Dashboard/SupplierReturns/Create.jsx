@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconArrowLeft,
     IconPlus,
@@ -30,7 +31,7 @@ export default function Create({ suppliers, goodsReceivings, products }) {
     const [selectedGrId, setSelectedGrId] = useState("");
     const [searchProduct, setSearchProduct] = useState("");
 
-    const selectedGr = goodsReceivings.find((gr) => gr.id === Number(selectedGrId));
+    const selectedGr = goodsReceivings.find((gr) => gr.id === selectedGrId);
 
     const filteredProducts = products.filter(
         (p) =>
@@ -134,40 +135,33 @@ export default function Create({ suppliers, goodsReceivings, products }) {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Supplier</label>
-                                <select
+                                <Select
                                     value={data.supplier_id}
-                                    onChange={(e) => {
-                                        setData({ supplier_id: e.target.value, goods_receiving_id: "", payable_id: "", items: [] });
+                                    onChange={(value) => {
+                                        setData({ supplier_id: value, goods_receiving_id: "", payable_id: "", items: [] });
                                         setSelectedGrId("");
                                     }}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Supplier</option>
-                                    {suppliers.map((s) => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                    ))}
-                                </select>
+                                    options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
+                                    placeholder="Pilih Supplier"
+                                />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                                     Penerimaan Barang (Opsional)
                                 </label>
-                                <select
+                                <Select
                                     value={selectedGrId}
-                                    onChange={(e) => {
-                                        setSelectedGrId(e.target.value);
-                                        setData("goods_receiving_id", e.target.value);
+                                    onChange={(value) => {
+                                        setSelectedGrId(value);
+                                        setData("goods_receiving_id", value);
                                     }}
+                                    options={goodsReceivings.map((gr) => ({
+                                        value: gr.id,
+                                        label: `${gr.document_number} (${gr.items?.length || 0} item)`,
+                                    }))}
+                                    placeholder="Tidak terkait GR"
                                     disabled={!data.supplier_id}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 disabled:opacity-50"
-                                >
-                                    <option value="">Tidak terkait GR</option>
-                                    {goodsReceivings.map((gr) => (
-                                        <option key={gr.id} value={gr.id}>
-                                            {gr.document_number} ({gr.items?.length || 0} item)
-                                        </option>
-                                    ))}
-                                </select>
+                                />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Catatan</label>

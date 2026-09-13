@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm, usePage, Link } from "@inertiajs/react";
 import Input from "@/Components/Dashboard/Input";
+import Select from "@/Components/Dashboard/Select";
 import Textarea from "@/Components/Dashboard/TextArea";
 import toast from "react-hot-toast";
 import {
@@ -185,20 +186,18 @@ export default function Edit({ supplier }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Provinsi
                                 </label>
-                                <select
+                                <Select
                                     value={data.province_id}
-                                    onChange={(e) =>
-                                        setData("province_id", e.target.value)
+                                    onChange={(value) =>
+                                        setData("province_id", value)
                                     }
-                                    className="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 text-sm"
-                                >
-                                    <option value="">Pilih Provinsi</option>
-                                    {provinces.map((prov) => (
-                                        <option key={prov.code} value={prov.code}>
-                                            {prov.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={provinces.map((prov) => ({
+                                        value: prov.code,
+                                        label: prov.name,
+                                    }))}
+                                    placeholder="Pilih Provinsi"
+                                    className="w-full"
+                                />
                                 {errors.province_id && (
                                     <p className="text-xs text-danger-500 mt-1">
                                         {errors.province_id}
@@ -209,21 +208,19 @@ export default function Edit({ supplier }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Kota/Kabupaten
                                 </label>
-                                <select
+                                <Select
                                     value={data.regency_id}
-                                    onChange={(e) =>
-                                        setData("regency_id", e.target.value)
+                                    onChange={(value) =>
+                                        setData("regency_id", value)
                                     }
-                                    className="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 text-sm"
+                                    options={regencyList.map((item) => ({
+                                        value: item.code,
+                                        label: item.name,
+                                    }))}
+                                    placeholder="Pilih Kota/Kabupaten"
                                     disabled={!data.province_id}
-                                >
-                                    <option value="">Pilih Kota/Kabupaten</option>
-                                    {regencyList.map((item) => (
-                                        <option key={item.code} value={item.code}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    className="w-full"
+                                />
                                 {errors.regency_id && (
                                     <p className="text-xs text-danger-500 mt-1">
                                         {errors.regency_id}
@@ -237,21 +234,19 @@ export default function Edit({ supplier }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Kecamatan
                                 </label>
-                                <select
+                                <Select
                                     value={data.district_id}
-                                    onChange={(e) =>
-                                        setData("district_id", e.target.value)
+                                    onChange={(value) =>
+                                        setData("district_id", value)
                                     }
-                                    className="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 text-sm"
+                                    options={districtList.map((item) => ({
+                                        value: item.code,
+                                        label: item.name,
+                                    }))}
+                                    placeholder="Pilih Kecamatan"
                                     disabled={!data.regency_id}
-                                >
-                                    <option value="">Pilih Kecamatan</option>
-                                    {districtList.map((item) => (
-                                        <option key={item.code} value={item.code}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    className="w-full"
+                                />
                                 {errors.district_id && (
                                     <p className="text-xs text-danger-500 mt-1">
                                         {errors.district_id}
@@ -262,21 +257,19 @@ export default function Edit({ supplier }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Kelurahan
                                 </label>
-                                <select
+                                <Select
                                     value={data.village_id}
-                                    onChange={(e) =>
-                                        setData("village_id", e.target.value)
+                                    onChange={(value) =>
+                                        setData("village_id", value)
                                     }
-                                    className="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 text-sm"
+                                    options={villageList.map((item) => ({
+                                        value: item.code,
+                                        label: item.name,
+                                    }))}
+                                    placeholder="Pilih Kelurahan"
                                     disabled={!data.district_id}
-                                >
-                                    <option value="">Pilih Kelurahan</option>
-                                    {villageList.map((item) => (
-                                        <option key={item.code} value={item.code}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    className="w-full"
+                                />
                                 {errors.village_id && (
                                     <p className="text-xs text-danger-500 mt-1">
                                         {errors.village_id}

@@ -2,6 +2,7 @@ import React from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import Table from "@/Components/Dashboard/Table";
 import { IconArrowLeft, IconDatabaseOff, IconTrash, IconUsersGroup } from "@tabler/icons-react";
 
@@ -116,18 +117,24 @@ export default function Show({ segment, customers = [] }) {
                         <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
                             <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Tambah Anggota Manual</h2>
                             <form onSubmit={submit} className="space-y-4">
-                                <select
+                                <Select
+                                    className="w-full"
                                     value={data.customer_id}
-                                    onChange={(event) => setData("customer_id", event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih customer</option>
-                                    {customers.map((customer) => (
-                                        <option key={customer.id} value={customer.id}>
-                                            {customer.name} | {customer.no_telp || "-"} | {customer.is_loyalty_member ? customer.loyalty_tier : "non-member"}
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(value) =>
+                                        setData("customer_id", value)
+                                    }
+                                    options={customers.map((customer) => ({
+                                        value: customer.id,
+                                        label: `${customer.name} | ${
+                                            customer.no_telp || "-"
+                                        } | ${
+                                            customer.is_loyalty_member
+                                                ? customer.loyalty_tier
+                                                : "non-member"
+                                        }`,
+                                    }))}
+                                    placeholder="Pilih customer"
+                                />
                                 <button
                                     type="submit"
                                     disabled={processing}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Head, useForm } from "@inertiajs/react";
 import axios from "axios";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconArrowLeft,
     IconChartInfographic,
@@ -27,6 +28,11 @@ const discountTypeOptions = [
     { value: "percentage", label: "Persentase (%)" },
     { value: "fixed_amount", label: "Potongan Nominal" },
     { value: "fixed_price", label: "Harga Final" },
+];
+
+const buyGetRoleOptions = [
+    { value: "buy", label: "Buy" },
+    { value: "get", label: "Get" },
 ];
 
 function InputError({ message }) {
@@ -160,6 +166,11 @@ export default function Form({
 
     const previewGroups = previewState.data?.applied_groups || [];
 
+    const productOptions = products.map((product) => ({
+        value: product.id,
+        label: product.title,
+    }));
+
     return (
         <>
             <Head title={isEdit ? "Edit Promo Harga" : "Buat Promo Harga"} />
@@ -205,19 +216,12 @@ export default function Form({
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Jenis Rule
                                 </label>
-                                <select
+                                <Select
                                     value={data.kind}
-                                    onChange={(event) =>
-                                        setData("kind", event.target.value)
-                                    }
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    {kindOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(value) => setData("kind", value)}
+                                    options={kindOptions}
+                                    className="w-full"
+                                />
                                 <InputError message={errors.kind} />
                             </div>
                             <div>
@@ -263,57 +267,42 @@ export default function Form({
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Target Rule
                                 </label>
-                                <select
+                                <Select
                                     value={data.target_type}
-                                    onChange={(event) =>
-                                        setData("target_type", event.target.value)
+                                    onChange={(value) =>
+                                        setData("target_type", value)
                                     }
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    {targetOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={targetOptions}
+                                    className="w-full"
+                                />
                             </div>
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Scope Pelanggan
                                 </label>
-                                <select
+                                <Select
                                     value={data.customer_scope}
-                                    onChange={(event) =>
-                                        setData("customer_scope", event.target.value)
+                                    onChange={(value) =>
+                                        setData("customer_scope", value)
                                     }
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    {customerScopeOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={customerScopeOptions}
+                                    className="w-full"
+                                />
                             </div>
                             {data.target_type === "product" && (
                                 <div className="md:col-span-2">
                                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Produk
                                     </label>
-                                    <select
+                                    <Select
                                         value={data.product_id}
-                                        onChange={(event) =>
-                                            setData("product_id", event.target.value)
+                                        onChange={(value) =>
+                                            setData("product_id", value)
                                         }
-                                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                    >
-                                        <option value="">Pilih produk</option>
-                                        {products.map((product) => (
-                                            <option key={product.id} value={product.id}>
-                                                {product.title}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        options={productOptions}
+                                        placeholder="Pilih produk"
+                                        className="w-full"
+                                    />
                                     <InputError message={errors.product_id} />
                                 </div>
                             )}
@@ -322,20 +311,18 @@ export default function Form({
                                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Kategori
                                     </label>
-                                    <select
+                                    <Select
                                         value={data.category_id}
-                                        onChange={(event) =>
-                                            setData("category_id", event.target.value)
+                                        onChange={(value) =>
+                                            setData("category_id", value)
                                         }
-                                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                    >
-                                        <option value="">Pilih kategori</option>
-                                        {categories.map((category) => (
-                                            <option key={category.id} value={category.id}>
-                                                {category.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        options={categories.map((category) => ({
+                                            value: category.id,
+                                            label: category.name,
+                                        }))}
+                                        placeholder="Pilih kategori"
+                                        className="w-full"
+                                    />
                                     <InputError message={errors.category_id} />
                                 </div>
                             )}
@@ -396,19 +383,14 @@ export default function Form({
                                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Tipe Diskon
                                     </label>
-                                    <select
+                                    <Select
                                         value={data.discount_type}
-                                        onChange={(event) =>
-                                            setData("discount_type", event.target.value)
+                                        onChange={(value) =>
+                                            setData("discount_type", value)
                                         }
-                                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                    >
-                                        {discountTypeOptions.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        options={discountTypeOptions}
+                                        className="w-full"
+                                    />
                                 </div>
                                 <div>
                                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -456,24 +438,18 @@ export default function Form({
                                             className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
                                             placeholder="Min qty"
                                         />
-                                        <select
+                                        <Select
                                             value={row.discount_type}
-                                            onChange={(event) =>
+                                            onChange={(value) =>
                                                 updateArrayRow(
                                                     "qty_breaks",
                                                     index,
                                                     "discount_type",
-                                                    event.target.value
+                                                    value
                                                 )
                                             }
-                                            className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                                        >
-                                            {discountTypeOptions.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            options={discountTypeOptions}
+                                        />
                                         <input
                                             type="number"
                                             min="0.01"
@@ -544,25 +520,19 @@ export default function Form({
                                         key={`bundle-item-${index}`}
                                         className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_160px_48px] dark:border-slate-700 dark:bg-slate-800"
                                     >
-                                        <select
+                                        <Select
                                             value={row.product_id}
-                                            onChange={(event) =>
+                                            onChange={(value) =>
                                                 updateArrayRow(
                                                     "bundle_items",
                                                     index,
                                                     "product_id",
-                                                    event.target.value
+                                                    value
                                                 )
                                             }
-                                            className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                                        >
-                                            <option value="">Pilih produk</option>
-                                            {products.map((product) => (
-                                                <option key={product.id} value={product.id}>
-                                                    {product.title}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            options={productOptions}
+                                            placeholder="Pilih produk"
+                                        />
                                         <input
                                             type="number"
                                             min="1"
@@ -616,40 +586,31 @@ export default function Form({
                                         key={`buy-get-item-${index}`}
                                         className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[160px_1fr_140px_48px] dark:border-slate-700 dark:bg-slate-800"
                                     >
-                                        <select
+                                        <Select
                                             value={row.role}
-                                            onChange={(event) =>
+                                            onChange={(value) =>
                                                 updateArrayRow(
                                                     "buy_get_items",
                                                     index,
                                                     "role",
-                                                    event.target.value
+                                                    value
                                                 )
                                             }
-                                            className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                                        >
-                                            <option value="buy">Buy</option>
-                                            <option value="get">Get</option>
-                                        </select>
-                                        <select
+                                            options={buyGetRoleOptions}
+                                        />
+                                        <Select
                                             value={row.product_id}
-                                            onChange={(event) =>
+                                            onChange={(value) =>
                                                 updateArrayRow(
                                                     "buy_get_items",
                                                     index,
                                                     "product_id",
-                                                    event.target.value
+                                                    value
                                                 )
                                             }
-                                            className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                                        >
-                                            <option value="">Pilih produk</option>
-                                            {products.map((product) => (
-                                                <option key={product.id} value={product.id}>
-                                                    {product.title}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            options={productOptions}
+                                            placeholder="Pilih produk"
+                                        />
                                         <input
                                             type="number"
                                             min="1"

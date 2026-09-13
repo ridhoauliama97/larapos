@@ -3,6 +3,7 @@ import { Head, useForm, usePage } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Input from "@/Components/Dashboard/Input";
 import Checkbox from "@/Components/Dashboard/Checkbox";
+import Select from "@/Components/Dashboard/Select";
 import { useAuthorization } from "@/Utils/authorization";
 import {
     IconCreditCard,
@@ -114,31 +115,22 @@ export default function Payment({
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Pilih Gateway
                         </label>
-                        <select
+                        <Select
                             value={data.default_gateway}
-                            onChange={(e) =>
-                                setData("default_gateway", e.target.value)
+                            onChange={(value) =>
+                                setData("default_gateway", value)
                             }
+                            options={supportedGateways.map((gw) => ({
+                                value: gw.value,
+                                label: isGatewaySelectable(gw.value)
+                                    ? gw.label
+                                    : `${gw.label} (nonaktif)`,
+                                disabled: !isGatewaySelectable(gw.value),
+                            }))}
                             disabled={!canUpdatePaymentSettings}
-                            className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                        >
-                            {supportedGateways.map((gw) => (
-                                <option
-                                    key={gw.value}
-                                    value={gw.value}
-                                    disabled={!isGatewaySelectable(gw.value)}
-                                >
-                                    {gw.label}
-                                    {!isGatewaySelectable(gw.value) &&
-                                        " (nonaktif)"}
-                                </option>
-                            ))}
-                        </select>
-                        {errors?.default_gateway && (
-                            <small className="text-xs text-danger-500 mt-1">
-                                {errors.default_gateway}
-                            </small>
-                        )}
+                            error={errors?.default_gateway}
+                            className="w-full"
+                        />
                     </div>
                 </div>
 

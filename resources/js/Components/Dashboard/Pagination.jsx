@@ -5,6 +5,7 @@ import {
     IconChevronLeft,
     IconDots,
 } from "@tabler/icons-react";
+import Select from "@/Components/Dashboard/Select";
 
 /**
  * Pagination — robust & responsive.
@@ -67,16 +68,16 @@ export default function Pagination({ links }) {
 
                 <label className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
                     <span className="hidden sm:inline">Tampilkan</span>
-                    <select
+                    <Select
                         value={perPage}
-                        onChange={(e) => changePerPage(e.target.value)}
-                        className="py-1 px-2 rounded-lg text-sm border bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:border-slate-800 border-slate-200 focus:outline-none focus:ring-0"
-                        aria-label="Jumlah data per halaman"
-                    >
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
+                        onChange={changePerPage}
+                        options={[
+                            { value: "10", label: "10" },
+                            { value: "25", label: "25" },
+                            { value: "50", label: "50" },
+                        ]}
+                        size="sm"
+                    />
                     <span className="hidden sm:inline">per halaman</span>
                 </label>
             </div>

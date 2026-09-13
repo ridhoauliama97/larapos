@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import { useAuthorization } from "@/Utils/authorization";
 import {
     IconCashBanknote,
@@ -168,17 +169,15 @@ export default function Index({
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Gudang / Cabang
                                 </label>
-                                <select
+                                <Select
                                     value={warehouseId}
-                                    onChange={(event) => setWarehouseId(event.target.value)}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    {warehouses.map((w) => (
-                                        <option key={w.id} value={w.id}>
-                                            {w.code} — {w.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(value) => setWarehouseId(value)}
+                                    options={warehouses.map((w) => ({
+                                        value: w.id,
+                                        label: `${w.code} — ${w.name}`,
+                                    }))}
+                                    className="w-full"
+                                />
                             </div>
                             <div className="md:col-span-2">
                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -359,34 +358,35 @@ export default function Index({
                     className="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-4"
                 >
                     {cashiers.length > 1 ? (
-                        <select
+                        <Select
                             value={currentFilters.cashier_id}
-                            onChange={(event) => handleFilterChange("cashier_id", event.target.value)}
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Kasir</option>
-                            {cashiers.map((cashier) => (
-                                <option key={cashier.id} value={cashier.id}>
-                                    {cashier.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(value) => handleFilterChange("cashier_id", value)}
+                            options={[
+                                { value: "", label: "Semua Kasir" },
+                                ...cashiers.map((cashier) => ({
+                                    value: cashier.id,
+                                    label: cashier.name,
+                                })),
+                            ]}
+                            size="sm"
+                        />
                     ) : (
                         <div className="flex h-11 items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
                             <IconUser size={18} className="mr-2" />
                             {cashiers[0]?.name || auth?.user?.name}
                         </div>
                     )}
-                    <select
+                    <Select
                         value={currentFilters.status}
-                        onChange={(event) => handleFilterChange("status", event.target.value)}
-                        className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                    >
-                        <option value="">Semua Status</option>
-                        <option value="open">Open</option>
-                        <option value="closed">Closed</option>
-                        <option value="force_closed">Force Closed</option>
-                    </select>
+                        onChange={(value) => handleFilterChange("status", value)}
+                        options={[
+                            { value: "", label: "Semua Status" },
+                            { value: "open", label: "Open" },
+                            { value: "closed", label: "Closed" },
+                            { value: "force_closed", label: "Force Closed" },
+                        ]}
+                        size="sm"
+                    />
                     <input
                         type="date"
                         value={currentFilters.opened_from}

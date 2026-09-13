@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import Table from "@/Components/Dashboard/Table";
 import { IconBroadcast, IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useAuthorization } from "@/Utils/authorization";
@@ -48,28 +49,46 @@ export default function Index({ campaigns, filters }) {
 
                 <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
                     <div className="grid gap-3 md:grid-cols-2">
-                        <select
+                        <Select
+                            size="sm"
                             value={filters.type || ""}
-                            onChange={(event) => handleFilterChange("type", event.target.value)}
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Tipe</option>
-                            <option value="promo_broadcast">Promo Broadcast</option>
-                            <option value="invoice_share">Invoice Share</option>
-                            <option value="due_date_reminder">Due Date Reminder</option>
-                            <option value="repeat_order_reminder">Repeat Order Reminder</option>
-                        </select>
-                        <select
+                            onChange={(value) =>
+                                handleFilterChange("type", value)
+                            }
+                            options={[
+                                { value: "", label: "Semua Tipe" },
+                                {
+                                    value: "promo_broadcast",
+                                    label: "Promo Broadcast",
+                                },
+                                {
+                                    value: "invoice_share",
+                                    label: "Invoice Share",
+                                },
+                                {
+                                    value: "due_date_reminder",
+                                    label: "Due Date Reminder",
+                                },
+                                {
+                                    value: "repeat_order_reminder",
+                                    label: "Repeat Order Reminder",
+                                },
+                            ]}
+                        />
+                        <Select
+                            size="sm"
                             value={filters.status || ""}
-                            onChange={(event) => handleFilterChange("status", event.target.value)}
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Status</option>
-                            <option value="draft">Draft</option>
-                            <option value="ready">Ready</option>
-                            <option value="processed">Processed</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
+                            onChange={(value) =>
+                                handleFilterChange("status", value)
+                            }
+                            options={[
+                                { value: "", label: "Semua Status" },
+                                { value: "draft", label: "Draft" },
+                                { value: "ready", label: "Ready" },
+                                { value: "processed", label: "Processed" },
+                                { value: "cancelled", label: "Cancelled" },
+                            ]}
+                        />
                     </div>
                 </div>
 

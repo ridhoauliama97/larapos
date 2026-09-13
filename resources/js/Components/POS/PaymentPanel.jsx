@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconCash,
     IconCreditCard,
@@ -263,23 +264,20 @@ export default function PaymentPanel({
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 Voucher Customer
                             </label>
-                            <select
+                            <Select
                                 value={selectedVoucherId}
-                                onChange={(e) =>
-                                    onVoucherChange?.(e.target.value)
+                                onChange={(value) =>
+                                    onVoucherChange?.(value)
                                 }
-                                className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700
-                                    bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
-                                    focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500
-                                    transition-all text-base"
-                            >
-                                <option value="">Tanpa voucher</option>
-                                {voucherOptions.map((voucher) => (
-                                    <option key={voucher.id} value={voucher.id}>
-                                        {voucher.code} - {voucher.name}
-                                    </option>
-                                ))}
-                            </select>
+                                options={[
+                                    { value: "", label: "Tanpa voucher" },
+                                    ...voucherOptions.map((voucher) => ({
+                                        value: voucher.id,
+                                        label: `${voucher.code} - ${voucher.name}`,
+                                    })),
+                                ]}
+                                className="w-full"
+                            />
                         </div>
                     </>
                 )}

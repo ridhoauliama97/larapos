@@ -13,6 +13,7 @@ import ProductGrid from "@/Components/POS/ProductGrid";
 import CartPanel from "@/Components/POS/CartPanel";
 import CustomerSelect from "@/Components/POS/CustomerSelect";
 import NumpadModal from "@/Components/POS/NumpadModal";
+import Select from "@/Components/Dashboard/Select";
 import HeldTransactions, {
     HoldButton,
 } from "@/Components/POS/HeldTransactions";
@@ -1500,31 +1501,26 @@ export default function Index({
                                         <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                                             Voucher Customer
                                         </label>
-                                        <select
+                                        <Select
                                             value={selectedVoucherId}
-                                            onChange={(e) =>
-                                                setSelectedVoucherId(
-                                                    e.target.value
-                                                )
+                                            onChange={(value) =>
+                                                setSelectedVoucherId(value)
                                             }
-                                            className="w-full h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                                        >
-                                            <option value="">
-                                                Tanpa voucher
-                                            </option>
-                                            {(
-                                                pricingPreview?.eligible_vouchers ||
-                                                []
-                                            ).map((voucher) => (
-                                                <option
-                                                    key={voucher.id}
-                                                    value={voucher.id}
-                                                >
-                                                    {voucher.code} -{" "}
-                                                    {voucher.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            options={[
+                                                {
+                                                    value: "",
+                                                    label: "Tanpa voucher",
+                                                },
+                                                ...(
+                                                    pricingPreview?.eligible_vouchers ||
+                                                    []
+                                                ).map((voucher) => ({
+                                                    value: voucher.id,
+                                                    label: `${voucher.code} - ${voucher.name}`,
+                                                })),
+                                            ]}
+                                            className="w-full"
+                                        />
                                     </div>
                                 )}
 

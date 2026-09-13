@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import Table from "@/Components/Dashboard/Table";
 import { IconCirclePlus, IconPencil, IconSearch, IconTrash, IconUsersGroup } from "@tabler/icons-react";
 import { useAuthorization } from "@/Utils/authorization";
@@ -50,15 +51,18 @@ export default function Index({ segments, filters }) {
                                 <IconSearch size={18} />
                             </div>
                         </div>
-                        <select
+                        <Select
+                            size="sm"
                             value={filters.type || ""}
-                            onChange={(event) => handleFilterChange("type", event.target.value)}
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Tipe</option>
-                            <option value="manual">Manual</option>
-                            <option value="auto">Auto</option>
-                        </select>
+                            onChange={(value) =>
+                                handleFilterChange("type", value)
+                            }
+                            options={[
+                                { value: "", label: "Semua Tipe" },
+                                { value: "manual", label: "Manual" },
+                                { value: "auto", label: "Auto" },
+                            ]}
+                        />
                     </div>
                 </div>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconHistory,
     IconSearch,
@@ -42,6 +43,14 @@ const statusBadge = (value) => {
             return <span className={`${base} bg-amber-100 text-amber-700`}>Belum Lunas</span>;
     }
 };
+
+const statusOptions = [
+    { value: "", label: "Semua Status" },
+    { value: "unpaid", label: "Belum Lunas" },
+    { value: "partial", label: "Parsial" },
+    { value: "paid", label: "Lunas" },
+    { value: "overdue", label: "Jatuh Tempo" },
+];
 
 export default function ReceivablesIndex({ receivables, filters = {} }) {
     const { flash } = usePage().props;
@@ -241,20 +250,14 @@ export default function ReceivablesIndex({ receivables, filters = {} }) {
                                     className="w-full h-11 pl-10 pr-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                                 />
                             </div>
-                            <div className="relative w-full">
-                                <IconCalendar size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <select
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="w-full h-11 pl-10 pr-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                                >
-                                    <option value="">Semua Status</option>
-                                    <option value="unpaid">Belum Lunas</option>
-                                    <option value="partial">Parsial</option>
-                                    <option value="paid">Lunas</option>
-                                    <option value="overdue">Jatuh Tempo</option>
-                                </select>
-                            </div>
+                            <Select
+                                value={status}
+                                onChange={(value) => setStatus(value)}
+                                options={statusOptions}
+                                size="sm"
+                                icon={<IconCalendar size={18} />}
+                                className="w-full"
+                            />
                             <button
                                 type="submit"
                                 className="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconArrowLeft,
     IconCreditCard,
@@ -294,20 +295,18 @@ export default function PayableShow({ payable, bankAccounts = [] }) {
                                         <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
                                             Rekening
                                         </label>
-                                        <select
+                                        <Select
                                             value={data.bank_account_id}
-                                            onChange={(e) =>
-                                                setData("bank_account_id", e.target.value)
+                                            onChange={(value) =>
+                                                setData("bank_account_id", value)
                                             }
-                                            className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                                        >
-                                            <option value="">Pilih rekening</option>
-                                            {bankAccounts.map((bank) => (
-                                                <option key={bank.id} value={bank.id}>
-                                                    {bank.bank_name} - {bank.account_number}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            options={bankAccounts.map((bank) => ({
+                                                value: bank.id,
+                                                label: `${bank.bank_name} - ${bank.account_number}`,
+                                            }))}
+                                            placeholder="Pilih rekening"
+                                            className="w-full"
+                                        />
                                     </div>
                                 )}
                                 <div>

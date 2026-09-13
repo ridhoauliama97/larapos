@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, router } from "@inertiajs/react";
 import Table from "@/Components/Dashboard/Table";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import { IconHistory } from "@tabler/icons-react";
 
 const formatDateTime = (value) =>
@@ -42,44 +43,43 @@ export default function Index({ stockMutations, products, warehouses = [], filte
             </div>
 
             <div className="mb-4 grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-5">
-                <select
+                <Select
                     value={filters.product_id || ""}
-                    onChange={(event) =>
-                        updateFilter("product_id", event.target.value)
-                    }
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Produk</option>
-                    {products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                            {product.title}
-                        </option>
-                    ))}
-                </select>
+                    onChange={(value) => updateFilter("product_id", value)}
+                    options={[
+                        { value: "", label: "Semua Produk" },
+                        ...products.map((product) => ({
+                            value: product.id,
+                            label: product.title,
+                        })),
+                    ]}
+                    size="sm"
+                />
 
-                <select
+                <Select
                     value={filters.mutation_type || ""}
-                    onChange={(event) =>
-                        updateFilter("mutation_type", event.target.value)
-                    }
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Tipe</option>
-                    <option value="in">In</option>
-                    <option value="out">Out</option>
-                    <option value="adjustment">Adjustment</option>
-                </select>
+                    onChange={(value) => updateFilter("mutation_type", value)}
+                    options={[
+                        { value: "", label: "Semua Tipe" },
+                        { value: "in", label: "In" },
+                        { value: "out", label: "Out" },
+                        { value: "adjustment", label: "Adjustment" },
+                    ]}
+                    size="sm"
+                />
 
-                <select
+                <Select
                     value={filters.warehouse_id || ""}
-                    onChange={(event) => updateFilter("warehouse_id", event.target.value)}
-                    className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                >
-                    <option value="">Semua Gudang</option>
-                    {warehouses.map((w) => (
-                        <option key={w.id} value={w.id}>{w.code} — {w.name}</option>
-                    ))}
-                </select>
+                    onChange={(value) => updateFilter("warehouse_id", value)}
+                    options={[
+                        { value: "", label: "Semua Gudang" },
+                        ...warehouses.map((w) => ({
+                            value: w.id,
+                            label: `${w.code} — ${w.name}`,
+                        })),
+                    ]}
+                    size="sm"
+                />
 
                 <input
                     type="date"

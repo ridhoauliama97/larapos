@@ -1,6 +1,7 @@
 import React from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Pagination from "@/Components/Dashboard/Pagination";
+import Select from "@/Components/Dashboard/Select";
 import Table from "@/Components/Dashboard/Table";
 import { Head, Link, router } from "@inertiajs/react";
 import {
@@ -120,32 +121,33 @@ export default function Index({ members, filters, tierOptions, summary }) {
                             </div>
                         </div>
 
-                        <select
+                        <Select
+                            size="sm"
                             value={filters.tier || ""}
-                            onChange={(event) =>
-                                handleFilterChange("tier", event.target.value)
+                            onChange={(value) =>
+                                handleFilterChange("tier", value)
                             }
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Semua Tier</option>
-                            {tierOptions.map((tier) => (
-                                <option key={tier.value} value={tier.value}>
-                                    {tier.label}
-                                </option>
-                            ))}
-                        </select>
+                            options={[
+                                { value: "", label: "Semua Tier" },
+                                ...tierOptions.map((tier) => ({
+                                    value: tier.value,
+                                    label: tier.label,
+                                })),
+                            ]}
+                        />
 
-                        <select
+                        <Select
+                            size="sm"
                             value={filters.status || "active"}
-                            onChange={(event) =>
-                                handleFilterChange("status", event.target.value)
+                            onChange={(value) =>
+                                handleFilterChange("status", value)
                             }
-                            className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="active">Member Aktif</option>
-                            <option value="inactive">Member Nonaktif</option>
-                            <option value="all">Semua Status</option>
-                        </select>
+                            options={[
+                                { value: "active", label: "Member Aktif" },
+                                { value: "inactive", label: "Member Nonaktif" },
+                                { value: "all", label: "Semua Status" },
+                            ]}
+                        />
                     </div>
                 </div>
 

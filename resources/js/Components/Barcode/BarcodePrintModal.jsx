@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import Select from "@/Components/Dashboard/Select";
 import { BarcodeLabelGrid } from "./BarcodeLabel";
 import {
     IconX,
@@ -125,15 +126,16 @@ export default function BarcodePrintModal({
                             <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                                 Ukuran Label
                             </label>
-                            <select
+                            <Select
                                 value={size}
-                                onChange={(e) => setSize(e.target.value)}
-                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
-                            >
-                                <option value="50x30">50 x 30 mm</option>
-                                <option value="70x50">70 x 50 mm</option>
-                                <option value="100x50">100 x 50 mm</option>
-                            </select>
+                                onChange={(value) => setSize(value)}
+                                options={[
+                                    { value: "50x30", label: "50 x 30 mm" },
+                                    { value: "70x50", label: "70 x 50 mm" },
+                                    { value: "100x50", label: "100 x 50 mm" },
+                                ]}
+                                className="w-full"
+                            />
                         </div>
 
                         {/* Copies */}

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Input from "@/Components/Dashboard/Input";
+import Select from "@/Components/Dashboard/Select";
 import Textarea from "@/Components/Dashboard/TextArea";
 import {
     IconArrowLeft,
@@ -262,22 +263,14 @@ export default function Form({ mode = "create", member = null }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Tier Member
                                 </label>
-                                <select
+                                <Select
+                                    className="mt-2 w-full"
                                     value={data.loyalty_tier}
-                                    onChange={(event) =>
-                                        setData("loyalty_tier", event.target.value)
+                                    onChange={(value) =>
+                                        setData("loyalty_tier", value)
                                     }
-                                    className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {tierOptions.map((tier) => (
-                                        <option
-                                            key={tier.value}
-                                            value={tier.value}
-                                        >
-                                            {tier.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={tierOptions}
+                                />
                                 {errors.loyalty_tier && (
                                     <p className="mt-1 text-xs text-rose-500">
                                         {errors.loyalty_tier}
@@ -297,23 +290,18 @@ export default function Form({ mode = "create", member = null }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Provinsi
                                 </label>
-                                <select
+                                <Select
+                                    className="mt-2 w-full"
                                     value={data.province_id}
-                                    onChange={(event) =>
-                                        setData("province_id", event.target.value)
+                                    onChange={(value) =>
+                                        setData("province_id", value)
                                     }
-                                    className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Provinsi</option>
-                                    {provinces.map((province) => (
-                                        <option
-                                            key={province.code}
-                                            value={province.code}
-                                        >
-                                            {province.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={provinces.map((province) => ({
+                                        value: province.code,
+                                        label: province.name,
+                                    }))}
+                                    placeholder="Pilih Provinsi"
+                                />
                                 {errors.province_id && (
                                     <p className="mt-1 text-xs text-rose-500">
                                         {errors.province_id}
@@ -325,21 +313,19 @@ export default function Form({ mode = "create", member = null }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Kota/Kabupaten
                                 </label>
-                                <select
+                                <Select
+                                    className="mt-2 w-full"
                                     value={data.regency_id}
-                                    onChange={(event) =>
-                                        setData("regency_id", event.target.value)
+                                    onChange={(value) =>
+                                        setData("regency_id", value)
                                     }
                                     disabled={!data.province_id}
-                                    className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Kota/Kabupaten</option>
-                                    {regencyList.map((regency) => (
-                                        <option key={regency.code} value={regency.code}>
-                                            {regency.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={regencyList.map((regency) => ({
+                                        value: regency.code,
+                                        label: regency.name,
+                                    }))}
+                                    placeholder="Pilih Kota/Kabupaten"
+                                />
                                 {errors.regency_id && (
                                     <p className="mt-1 text-xs text-rose-500">
                                         {errors.regency_id}
@@ -353,21 +339,19 @@ export default function Form({ mode = "create", member = null }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Kecamatan
                                 </label>
-                                <select
+                                <Select
+                                    className="mt-2 w-full"
                                     value={data.district_id}
-                                    onChange={(event) =>
-                                        setData("district_id", event.target.value)
+                                    onChange={(value) =>
+                                        setData("district_id", value)
                                     }
                                     disabled={!data.regency_id}
-                                    className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Kecamatan</option>
-                                    {districtList.map((district) => (
-                                        <option key={district.code} value={district.code}>
-                                            {district.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={districtList.map((district) => ({
+                                        value: district.code,
+                                        label: district.name,
+                                    }))}
+                                    placeholder="Pilih Kecamatan"
+                                />
                                 {errors.district_id && (
                                     <p className="mt-1 text-xs text-rose-500">
                                         {errors.district_id}
@@ -379,21 +363,19 @@ export default function Form({ mode = "create", member = null }) {
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Kelurahan
                                 </label>
-                                <select
+                                <Select
+                                    className="mt-2 w-full"
                                     value={data.village_id}
-                                    onChange={(event) =>
-                                        setData("village_id", event.target.value)
+                                    onChange={(value) =>
+                                        setData("village_id", value)
                                     }
                                     disabled={!data.district_id}
-                                    className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Kelurahan</option>
-                                    {villageList.map((village) => (
-                                        <option key={village.code} value={village.code}>
-                                            {village.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={villageList.map((village) => ({
+                                        value: village.code,
+                                        label: village.name,
+                                    }))}
+                                    placeholder="Pilih Kelurahan"
+                                />
                                 {errors.village_id && (
                                     <p className="mt-1 text-xs text-rose-500">
                                         {errors.village_id}

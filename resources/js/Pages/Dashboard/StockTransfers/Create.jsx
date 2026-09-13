@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
+import Select from "@/Components/Dashboard/Select";
 import { IconArrowLeft, IconArrowsLeftRight, IconPlus, IconTrash, IconPackage } from "@tabler/icons-react";
 import toast from "react-hot-toast";
 
@@ -71,27 +72,23 @@ export default function Create({ warehouses, products }) {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Gudang Asal</label>
-                                <select
+                                <Select
                                     value={data.source_warehouse_id}
-                                    onChange={(e) => setData({ ...data, source_warehouse_id: e.target.value })}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Gudang</option>
-                                    {warehouses.map((w) => (<option key={w.id} value={w.id}>{w.code} — {w.name}</option>))}
-                                </select>
-                                {errors.source_warehouse_id && <p className="mt-1 text-xs text-danger-500">{errors.source_warehouse_id}</p>}
+                                    onChange={(value) => setData({ ...data, source_warehouse_id: value })}
+                                    options={warehouses.map((w) => ({ value: w.id, label: `${w.code} — ${w.name}` }))}
+                                    placeholder="Pilih Gudang"
+                                    error={errors.source_warehouse_id}
+                                />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Gudang Tujuan</label>
-                                <select
+                                <Select
                                     value={data.destination_warehouse_id}
-                                    onChange={(e) => setData({ ...data, destination_warehouse_id: e.target.value })}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih Gudang</option>
-                                    {warehousesExcept(data.source_warehouse_id).map((w) => (<option key={w.id} value={w.id}>{w.code} — {w.name}</option>))}
-                                </select>
-                                {errors.destination_warehouse_id && <p className="mt-1 text-xs text-danger-500">{errors.destination_warehouse_id}</p>}
+                                    onChange={(value) => setData({ ...data, destination_warehouse_id: value })}
+                                    options={warehousesExcept(data.source_warehouse_id).map((w) => ({ value: w.id, label: `${w.code} — ${w.name}` }))}
+                                    placeholder="Pilih Gudang"
+                                    error={errors.destination_warehouse_id}
+                                />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">Nomor Dokumen</label>

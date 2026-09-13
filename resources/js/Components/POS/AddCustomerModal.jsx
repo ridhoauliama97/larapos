@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Select from "@/Components/Dashboard/Select";
 import {
     IconCrown,
     IconUserPlus,
@@ -245,25 +246,20 @@ export default function AddCustomerModal({
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                                     Tier Awal
                                 </label>
-                                <select
+                                <Select
                                     value={form.loyalty_tier}
-                                    onChange={(event) =>
+                                    onChange={(value) =>
                                         setForm((prev) => ({
                                             ...prev,
-                                            loyalty_tier: event.target.value,
+                                            loyalty_tier: value,
                                         }))
                                     }
-                                    className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                                >
-                                    {tierOptions.map((tier) => (
-                                        <option
-                                            key={tier.value}
-                                            value={tier.value}
-                                        >
-                                            {tier.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={tierOptions.map((tier) => ({
+                                        value: tier.value,
+                                        label: tier.label,
+                                    }))}
+                                    className="w-full"
+                                />
                             </div>
                         ) : null}
                     </div>

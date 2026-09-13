@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
+import Select from "@/Components/Dashboard/Select";
 import { IconListDetails, IconPlus, IconPencil, IconTrash, IconEye } from "@tabler/icons-react";
 import toast from "react-hot-toast";
 
@@ -74,12 +75,17 @@ export default function PriceLists({ priceLists }) {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Kelompok</label>
-                                    <select value={form.customer_scope} onChange={e => setForm({...form, customer_scope: e.target.value})} className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm">
-                                        <option value="all">Semua Pelanggan</option>
-                                        <option value="walk_in">Walk-in</option>
-                                        <option value="registered">Terdaftar</option>
-                                        <option value="member">Member</option>
-                                    </select>
+                                    <Select
+                                        value={form.customer_scope}
+                                        onChange={(value) => setForm({ ...form, customer_scope: value })}
+                                        options={[
+                                            { value: "all", label: "Semua Pelanggan" },
+                                            { value: "walk_in", label: "Walk-in" },
+                                            { value: "registered", label: "Terdaftar" },
+                                            { value: "member", label: "Member" },
+                                        ]}
+                                        className="w-full"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Prioritas</label>
