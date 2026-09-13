@@ -132,6 +132,20 @@ class StockTransferService
                 'status' => 'in_transit',
             ]);
 
+            $transfer->loadMissing(['sourceWarehouse', 'destinationWarehouse']);
+
+            app(NotificationService::class)->notifyPermission('stock-transfers-access', [
+                'type' => 'stock_transfer',
+                'title' => 'Transfer '.$transfer->document_number.' dikirim',
+                'message' => ($transfer->sourceWarehouse?->name ?? '-').' -> '.($transfer->destinationWarehouse?->name ?? '-'),
+                'url' => route('stock-transfers.index'),
+                'meta' => [
+                    'stock_transfer_id' => $transfer->id,
+                    'document_number' => $transfer->document_number,
+                    'status' => 'in_transit',
+                ],
+            ], $userId);
+
             $this->auditLogService->log(
                 event: 'stock_transfer.sent',
                 module: 'stock',
@@ -190,6 +204,20 @@ class StockTransferService
                 'status' => 'completed',
                 'completed_at' => now(),
             ]);
+
+            $transfer->loadMissing(['sourceWarehouse', 'destinationWarehouse']);
+
+            app(NotificationService::class)->notifyPermission('stock-transfers-access', [
+                'type' => 'stock_transfer',
+                'title' => 'Transfer '.$transfer->document_number.' diterima',
+                'message' => ($transfer->sourceWarehouse?->name ?? '-').' -> '.($transfer->destinationWarehouse?->name ?? '-'),
+                'url' => route('stock-transfers.index'),
+                'meta' => [
+                    'stock_transfer_id' => $transfer->id,
+                    'document_number' => $transfer->document_number,
+                    'status' => 'completed',
+                ],
+            ], $userId);
 
             $this->auditLogService->log(
                 event: 'stock_transfer.received',
@@ -259,6 +287,20 @@ class StockTransferService
             }
 
             $transfer->update(['status' => 'cancelled']);
+
+            $transfer->loadMissing(['sourceWarehouse', 'destinationWarehouse']);
+
+            app(NotificationService::class)->notifyPermission('stock-transfers-access', [
+                'type' => 'stock_transfer',
+                'title' => 'Transfer '.$transfer->document_number.' dibatalkan',
+                'message' => ($transfer->sourceWarehouse?->name ?? '-').' -> '.($transfer->destinationWarehouse?->name ?? '-'),
+                'url' => route('stock-transfers.index'),
+                'meta' => [
+                    'stock_transfer_id' => $transfer->id,
+                    'document_number' => $transfer->document_number,
+                    'status' => 'cancelled',
+                ],
+            ], $userId);
 
             $this->auditLogService->log(
                 event: 'stock_transfer.cancelled',

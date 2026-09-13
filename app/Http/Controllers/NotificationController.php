@@ -59,4 +59,57 @@ class NotificationController extends Controller
 
         return back()->with('status', 'notification-read-all');
     }
+
+    /**
+     * Return the latest notifications for the current user (polling feed).
+     */
+    public function feed(Request $request)
+    {
+        $user = $request->user();
+
+        $notifications = $user->notifications()
+            ->latest()
+            ->limit(20)
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'type' => $notification->data['type'] ?? null,
+                    'title' => $notification->data['title'] ?? null,
+                    'message' => $notification->data['message'] ?? null,
+                    'url' => $notification->data['url'] ?? null,
+                    'meta' => $notification->data['meta'] ?? [],
+                    'read_at' => $notification->read_at?->toISOString(),
+                    'created_at' => $notification->created_at?->toISOString(),
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'unread_count' => $user->unreadNotifications()->count(),
+            'notifications' => $notifications,
+        ]);
+    }
+
+    /**
+     * Mark a single notification as read for the current user.
+     */
+    public function markRead(Request $request, string $id)
+    {
+        $notification = $request->user()->notifications()->findOrFail($id);
+
+        $notification->markAsRead();
+
+        return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Mark all unread notifications as read for the current user.
+     */
+    public function markAllRead(Request $request)
+    {
+        $request->user()->unreadNotifications->markAsRead();
+
+        return response()->json(['ok' => true]);
+    }
 }

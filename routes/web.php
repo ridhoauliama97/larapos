@@ -119,6 +119,9 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
         ->middlewareFor('destroy', ['permission:users-delete', 'step_up']);
     Route::post('/notifications/low-stock/read', [NotificationController::class, 'markLowStockRead'])->name('notifications.stock.read');
     Route::post('/notifications/low-stock/read-all', [NotificationController::class, 'markAllLowStockRead'])->name('notifications.stock.readAll');
+    Route::get('/notifications/feed', [NotificationController::class, 'feed'])->name('notifications.feed');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read.all');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::get('/regions/regencies', [RegionController::class, 'regencies'])->name('regions.regencies');
     Route::get('/regions/districts', [RegionController::class, 'districts'])->name('regions.districts');
     Route::get('/regions/villages', [RegionController::class, 'villages'])->name('regions.villages');

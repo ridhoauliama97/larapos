@@ -1,14 +1,107 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import {
+    IconAlertTriangle,
+    IconArrowsExchange,
     IconBell,
-    IconDots,
     IconCircleCheck,
+    IconCurrencyDollar,
+    IconDots,
     IconPackage,
     IconReceipt,
-    IconCurrencyDollar,
+    IconShieldLock,
+    IconShoppingCart,
 } from "@tabler/icons-react";
 import { usePage, router } from "@inertiajs/react";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+const FEED_POLL_INTERVAL = 15000;
+const MAX_TOASTS_PER_POLL = 3;
+const TOAST_DURATION = 6000;
+
+// Icon and tint per system notification type (10x10 rounded-full circle pattern).
+const systemNotificationTypes = {
+    transaction: {
+        icon: IconShoppingCart,
+        tint: "bg-primary-100 text-primary-600",
+    },
+    low_stock: {
+        icon: IconAlertTriangle,
+        tint: "bg-amber-100 text-amber-600",
+    },
+    stock_mutation: {
+        icon: IconPackage,
+        tint: "bg-slate-100 text-slate-600",
+    },
+    stock_transfer: {
+        icon: IconArrowsExchange,
+        tint: "bg-cyan-100 text-cyan-600",
+    },
+    payable: {
+        icon: IconCurrencyDollar,
+        tint: "bg-emerald-100 text-emerald-600",
+    },
+    receivable: {
+        icon: IconReceipt,
+        tint: "bg-amber-100 text-amber-600",
+    },
+    security: {
+        icon: IconShieldLock,
+        tint: "bg-rose-100 text-rose-600",
+    },
+};
+
+const fallbackSystemNotificationType = {
+    icon: IconPackage,
+    tint: "bg-slate-100 text-slate-600",
+};
+
+const renderSystemIcon = (type) => {
+    const { icon: Icon, tint } =
+        systemNotificationTypes[type] || fallbackSystemNotificationType;
+
+    return (
+        <span
+            className={`w-10 h-10 rounded-full ${tint} flex items-center justify-center`}
+        >
+            <Icon size={18} />
+        </span>
+    );
+};
+
+// POSLayout mounts two Notification instances (desktop + mobile), so track
+// toasted ids at module scope to avoid showing the same toast twice.
+const toastedNotificationIds = new Set();
+
+const showSystemToast = (notification) => {
+    toast.custom(
+        (t) => (
+            <div
+                onClick={() => {
+                    if (notification.url) {
+                        router.visit(notification.url);
+                    }
+                    toast.dismiss(t.id);
+                }}
+                className={`flex items-start gap-3 w-80 max-w-[90vw] p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg ${
+                    notification.url ? "cursor-pointer" : "cursor-default"
+                }`}
+            >
+                {renderSystemIcon(notification.type)}
+                <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-sm text-gray-700 dark:text-gray-200 truncate">
+                        {notification.title}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                        {notification.message}
+                    </div>
+                </div>
+            </div>
+        ),
+        { duration: TOAST_DURATION }
+    );
+};
 
 export default function Notification() {
     const {
@@ -76,10 +169,14 @@ export default function Notification() {
     ];
 
     const [data, setData] = useState(mergeData());
+    const [systemNotifications, setSystemNotifications] = useState([]);
+    const [unreadSystemCount, setUnreadSystemCount] = useState(0);
 
     const [isMobile, setIsMobile] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const notificationRef = useRef(null);
+    const seenNotificationIds = useRef(new Set());
+    const hasLoadedFeed = useRef(false);
 
     const handleClickOutside = (event) => {
         if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -107,13 +204,97 @@ export default function Notification() {
         setData(mergeData());
     },         [lowStockNotifications, expiringBatchNotifications, receivableNotifications, payableNotifications]);
 
+    // Poll the database notification feed and toast items that arrive after the first load.
+    useEffect(() => {
+        const fetchFeed = async () => {
+            try {
+                const response = await axios.get(route("notifications.feed"), {
+                    headers: { Accept: "application/json" },
+                });
+
+                const notifications = response.data?.notifications ?? [];
+                const unreadCount = response.data?.unread_count ?? 0;
+
+                if (hasLoadedFeed.current) {
+                    const newNotifications = notifications.filter(
+                        (notification) =>
+                            !seenNotificationIds.current.has(notification.id)
+                    );
+
+                    newNotifications
+                        .filter(
+                            (notification) =>
+                                !toastedNotificationIds.has(notification.id)
+                        )
+                        .slice(0, MAX_TOASTS_PER_POLL)
+                        .forEach((notification) => {
+                            toastedNotificationIds.add(notification.id);
+                            showSystemToast(notification);
+                        });
+                }
+
+                notifications.forEach((notification) => {
+                    seenNotificationIds.current.add(notification.id);
+                });
+
+                hasLoadedFeed.current = true;
+                setSystemNotifications(notifications);
+                setUnreadSystemCount(unreadCount);
+            } catch {
+                // Keep the last feed data when a poll fails.
+            }
+        };
+
+        fetchFeed();
+
+        const interval = setInterval(fetchFeed, FEED_POLL_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // System notifications on top, computed Inertia items below.
+    const mapSystemItems = (notifications) =>
+        notifications.map((notification) => ({
+            ...notification,
+            id: `sys-${notification.id}`,
+            originalId: notification.id,
+            system: true,
+            unread: notification.read_at === null,
+            icon: renderSystemIcon(notification.type),
+            subtitle: notification.message,
+            time: notification.created_at
+                ? new Date(notification.created_at).toLocaleString("id-ID")
+                : "",
+        }));
+
+    const displayData = [...mapSystemItems(systemNotifications), ...data];
+    const badgeCount = data.length + unreadSystemCount;
+
     const handleMarkRead = (id) => {
-        const item = data.find((d) => d.id === id);
-        if (item?.noAck) {
+        const item = displayData.find((entry) => entry.id === id);
+        if (!item || item.noAck) {
             return;
         }
+
+        if (item.system) {
+            setSystemNotifications((prev) =>
+                prev.filter((notification) => `sys-${notification.id}` !== id)
+            );
+            if (item.unread) {
+                setUnreadSystemCount((prev) => Math.max(prev - 1, 0));
+            }
+            axios
+                .post(
+                    route("notifications.read", item.originalId),
+                    {},
+                    { headers: { Accept: "application/json" } }
+                )
+                .catch(() => {});
+            return;
+        }
+
         setData((prev) => prev.filter((item) => item.id !== id));
-        if (item?.type === "stock") {
+        if (item.type === "stock") {
             router.post(
                 route("notifications.stock.read"),
                 { product_id: item.originalId || id },
@@ -129,27 +310,49 @@ export default function Notification() {
             {},
             { preserveScroll: true, preserveState: true }
         );
+
+        if (systemNotifications.length > 0) {
+            setSystemNotifications([]);
+            setUnreadSystemCount(0);
+            axios
+                .post(
+                    route("notifications.read.all"),
+                    {},
+                    { headers: { Accept: "application/json" } }
+                )
+                .catch(() => {});
+        }
     };
 
-    const badgeCount = data.length;
-
     const NotificationList = () => (
-        <div className="flex flex-col gap-3 items-start max-h-80 overflow-y-auto pr-1">
-            {badgeCount === 0 && (
+        <div className="flex flex-col gap-3 items-start w-full max-h-80 overflow-y-auto pr-1">
+            {displayData.length === 0 && (
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                     Tidak ada notifikasi
                 </div>
             )}
-            {data.map((item) => (
+            {displayData.map((item) => (
                 <div
-                    className="flex items-center justify-between w-full p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-primary-200 dark:hover:border-primary-800 hover:shadow transition-all"
+                    className={`flex items-center justify-between w-full p-5 rounded-2xl bg-white dark:bg-slate-900 border hover:shadow transition-all ${
+                        item.unread
+                            ? "border-primary-200 dark:border-primary-800"
+                            : "border-slate-200 dark:border-slate-800 hover:border-primary-200 dark:hover:border-primary-800"
+                    }`}
                     key={item.id}
                 >
                     <div className="flex items-center gap-4">
                         {item.icon}
                         <div>
-                            <div className="font-semibold text-sm md:text-base text-gray-700 dark:text-gray-200">
-                                {item.title}
+                            <div className="flex items-center gap-2">
+                                <div className="font-semibold text-sm md:text-base text-gray-700 dark:text-gray-200">
+                                    {item.title}
+                                </div>
+                                {item.unread && (
+                                    <span
+                                        className="w-2 h-2 rounded-full bg-primary-500 shrink-0"
+                                        aria-hidden="true"
+                                    />
+                                )}
                             </div>
                             <div className="text-gray-500 text-xs md:text-sm">
                                 {item.subtitle} {item.time && `• ${item.time}`}
@@ -232,7 +435,7 @@ export default function Notification() {
                     >
                         <div className="flex justify-between items-center gap-2 p-4 border-b mt-2 dark:border-gray-900 ">
                             <div className="text-base font-bold text-gray-500 dark:text-gray-400 ">
-                                Notifications
+                                Notifikasi
                             </div>
                             <IconDots className="text-gray-500 dark:text-gray-400" size={24} />
                         </div>
