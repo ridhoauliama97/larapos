@@ -8,6 +8,7 @@ export default function ImageDropzone({
     original = null,
     onSelect,
     onReset = null,
+    hint = "JPG, PNG, atau WebP. Maksimal 2 MB.",
     error,
     aspect = "aspect-[4/3]",
     accept = DEFAULT_ACCEPT,
