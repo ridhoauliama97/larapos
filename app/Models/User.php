@@ -31,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
         'locale',
         'completed_tours',
+        'notification_preferences',
     ];
 
     /**
@@ -54,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'completed_tours' => 'array',
+            'notification_preferences' => 'array',
         ];
     }
 
@@ -122,6 +124,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function cashierShifts()
     {
         return $this->hasMany(CashierShift::class);
+    }
+
+    /**
+     * Whether the user wants to receive the given system notification type.
+     * Missing preference means enabled (default: all notifications on).
+     */
+    public function wantsNotification(string $type): bool
+    {
+        $preferences = $this->notification_preferences ?? [];
+
+        return ($preferences[$type] ?? true) !== false;
     }
 
     public function auditLogs()

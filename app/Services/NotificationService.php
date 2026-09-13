@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\SystemNotification;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\DatabaseNotification;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -61,13 +62,18 @@ class NotificationService
     public function checkLowStock(Product $product): void
     {
         if ($product->min_stock <= 0 || $product->stock > $product->min_stock) {
+            // Stock recovered (or tracking disabled): resolve pending unread alerts
+            // so the next drop below the threshold notifies again.
+            $this->lowStockAlerts($product)->update(['read_at' => now()]);
+
             return;
         }
 
-        // Skip when an unread low-stock notification for this product already exists.
-        $alreadyNotified = DatabaseNotification::whereNull('read_at')
-            ->where('data->type', 'low_stock')
-            ->where('data->meta->product_id', $product->id)
+        // Skip when a recent unread low-stock notification for this product exists.
+        // The window keeps a stale unread alert — e.g., stock changed through an
+        // import that bypassed StockMutationObserver — from suppressing alerts forever.
+        $alreadyNotified = $this->lowStockAlerts($product)
+            ->where('created_at', '>=', now()->subHours(12))
             ->exists();
 
         if ($alreadyNotified) {
@@ -84,12 +90,28 @@ class NotificationService
     }
 
     /**
+     * Pending unread low-stock alerts for the given product.
+     *
+     * @return Builder<DatabaseNotification>
+     */
+    private function lowStockAlerts(Product $product)
+    {
+        return DatabaseNotification::whereNull('read_at')
+            ->where('data->type', 'low_stock')
+            ->where('data->meta->product_id', $product->id);
+    }
+
+    /**
      * Deliver the payload to a single user as a database notification.
      *
      * @param  array<string, mixed>  $data
      */
     private function send(User $user, array $data): void
     {
+        if (! $user->wantsNotification($data['type'])) {
+            return;
+        }
+
         $user->notify(new SystemNotification(
             type: $data['type'],
             title: $data['title'],

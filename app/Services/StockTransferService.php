@@ -144,7 +144,7 @@ class StockTransferService
                     'document_number' => $transfer->document_number,
                     'status' => 'in_transit',
                 ],
-            ], $userId);
+            ]);
 
             $this->auditLogService->log(
                 event: 'stock_transfer.sent',
@@ -217,7 +217,7 @@ class StockTransferService
                     'document_number' => $transfer->document_number,
                     'status' => 'completed',
                 ],
-            ], $userId);
+            ]);
 
             $this->auditLogService->log(
                 event: 'stock_transfer.received',
@@ -300,7 +300,7 @@ class StockTransferService
                     'document_number' => $transfer->document_number,
                     'status' => 'cancelled',
                 ],
-            ], $userId);
+            ]);
 
             $this->auditLogService->log(
                 event: 'stock_transfer.cancelled',

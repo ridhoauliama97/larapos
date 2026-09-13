@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Support\NotificationTypes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'notificationPreferences' => NotificationTypes::forUser($request->user()),
         ]);
     }
 
@@ -50,6 +52,27 @@ class ProfileController extends Controller
         }
 
         $user->save();
+
+        return Redirect::route('profile.edit');
+    }
+
+    /**
+     * Update the user's system notification preferences.
+     */
+    public function updateNotifications(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'preferences' => ['required', 'array'],
+            'preferences.*' => ['boolean'],
+        ]);
+
+        $preferences = [];
+
+        foreach (NotificationTypes::TYPES as $type) {
+            $preferences[$type] = (bool) ($validated['preferences'][$type] ?? true);
+        }
+
+        $request->user()->update(['notification_preferences' => $preferences]);
 
         return Redirect::route('profile.edit');
     }

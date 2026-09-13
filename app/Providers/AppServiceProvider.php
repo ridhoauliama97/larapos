@@ -15,6 +15,7 @@ use App\Support\ProductionSecurityBaseline;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -51,10 +52,19 @@ class AppServiceProvider extends ServiceProvider
         Payable::observe(PayableObserver::class);
 
         Event::listen(Failed::class, function (Failed $event) {
+            $email = $event->credentials['email'] ?? 'unknown';
+            $ip = request()->ip();
+
+            // Throttle per email + IP so brute-force attempts cannot flood the
+            // notifications table with one alert per super-admin per attempt.
+            if (! Cache::add("login-failed-notified:{$email}:{$ip}", true, now()->addMinutes(5))) {
+                return;
+            }
+
             app(NotificationService::class)->notifySuperAdmins([
                 'type' => 'security',
                 'title' => 'Percobaan login gagal',
-                'message' => ($event->credentials['email'] ?? 'unknown').' dari IP '.request()->ip(),
+                'message' => $email.' dari IP '.$ip,
                 'url' => route('audit-logs.index'),
                 'meta' => [],
             ]);

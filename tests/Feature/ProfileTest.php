@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\NotificationTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -97,6 +98,76 @@ class ProfileTest extends TestCase
             ->assertRedirect(route('profile.edit'));
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_profile_page_shares_notification_preferences_defaulting_to_enabled(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('profile.edit'));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->where('notificationPreferences', NotificationTypes::defaults())
+        );
+    }
+
+    public function test_notification_preferences_can_be_updated(): void
+    {
+        $user = User::factory()->create();
+
+        $preferences = NotificationTypes::defaults();
+        $preferences['low_stock'] = false;
+
+        $response = $this
+            ->actingAs($user)
+            ->patch(route('profile.notifications.update'), [
+                'preferences' => $preferences,
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('profile.edit'));
+
+        $user->refresh();
+
+        $this->assertSame($preferences, $user->notification_preferences);
+        $this->assertFalse($user->wantsNotification('low_stock'));
+        $this->assertTrue($user->wantsNotification('transaction'));
+    }
+
+    public function test_unknown_notification_preference_keys_are_ignored(): void
+    {
+        $user = User::factory()->create();
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.notifications.update'), [
+                'preferences' => [
+                    'low_stock' => false,
+                    'not_a_type' => false,
+                ],
+            ])
+            ->assertSessionHasNoErrors();
+
+        $preferences = $user->refresh()->notification_preferences;
+
+        $this->assertArrayNotHasKey('not_a_type', $preferences);
+        $this->assertCount(count(NotificationTypes::TYPES), $preferences);
+        $this->assertFalse($preferences['low_stock']);
+        $this->assertTrue($preferences['transaction']);
+    }
+
+    public function test_notification_preferences_must_be_boolean(): void
+    {
+        $user = User::factory()->create();
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.notifications.update'), [
+                'preferences' => ['low_stock' => 'nope'],
+            ])
+            ->assertSessionHasErrors('preferences.low_stock');
     }
 
     public function test_profile_avatar_can_be_updated(): void

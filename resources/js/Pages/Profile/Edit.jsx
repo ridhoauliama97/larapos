@@ -1,17 +1,19 @@
 import React, { useRef, useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head } from "@inertiajs/react";
-import { IconLock, IconUserCircle } from "@tabler/icons-react";
+import { IconBell, IconLock, IconUserCircle } from "@tabler/icons-react";
 import DeleteUserForm from "./Partials/DeleteUserForm";
+import UpdateNotificationPreferencesForm from "./Partials/UpdateNotificationPreferencesForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
 
 const TABS = [
     { key: "profile", label: "Profil", icon: IconUserCircle },
     { key: "security", label: "Keamanan", icon: IconLock },
+    { key: "notifications", label: "Notifikasi", icon: IconBell },
 ];
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function Edit({ mustVerifyEmail, status, notificationPreferences }) {
     const [active, setActive] = useState("profile");
     const tabRefs = useRef({});
 
@@ -54,7 +56,7 @@ export default function Edit({ mustVerifyEmail, status }) {
             <div
                 role="tablist"
                 aria-label="Pengaturan profil"
-                className="mb-6 grid w-full grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800 lg:w-[280px]"
+                className="mb-6 grid w-full grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800 lg:w-[400px]"
             >
                 {TABS.map((tab, index) => {
                     const Icon = tab.icon;
@@ -113,6 +115,18 @@ export default function Edit({ mustVerifyEmail, status }) {
                     <div className="mt-8 border-t border-slate-100 pt-8 dark:border-slate-800">
                         <DeleteUserForm />
                     </div>
+                </div>
+
+                <div
+                    id="profile-panel-notifications"
+                    role="tabpanel"
+                    aria-labelledby="profile-tab-notifications"
+                    hidden={active !== "notifications"}
+                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6"
+                >
+                    <UpdateNotificationPreferencesForm
+                        preferences={notificationPreferences}
+                    />
                 </div>
             </div>
         </>

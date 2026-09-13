@@ -29,7 +29,7 @@ class TransactionObserver
                     'transaction_id' => $transaction->id,
                     'invoice' => $transaction->invoice,
                 ],
-            ], $transaction->cashier_id);
+            ]);
 
             foreach ($transaction->details->pluck('product')->filter()->unique('id') as $product) {
                 $service->checkLowStock($product);

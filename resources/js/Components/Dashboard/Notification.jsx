@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import {
     IconAlertTriangle,
@@ -16,7 +16,7 @@ import { usePage, router } from "@inertiajs/react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const FEED_POLL_INTERVAL = 15000;
+const FEED_POLL_INTERVAL = 10000;
 const MAX_TOASTS_PER_POLL = 3;
 const TOAST_DURATION = 6000;
 
@@ -177,6 +177,8 @@ export default function Notification() {
     const notificationRef = useRef(null);
     const seenNotificationIds = useRef(new Set());
     const hasLoadedFeed = useRef(false);
+    // Read locally but maybe not persisted yet — keep them read if a poll races the POST.
+    const locallyReadIds = useRef(new Set());
 
     const handleClickOutside = (event) => {
         if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -204,53 +206,85 @@ export default function Notification() {
         setData(mergeData());
     },         [lowStockNotifications, expiringBatchNotifications, receivableNotifications, payableNotifications]);
 
-    // Poll the database notification feed and toast items that arrive after the first load.
-    useEffect(() => {
-        const fetchFeed = async () => {
-            try {
-                const response = await axios.get(route("notifications.feed"), {
-                    headers: { Accept: "application/json" },
-                });
+    // Fetch the database notification feed and toast items that arrive after the first load.
+    const fetchFeed = useCallback(async () => {
+        try {
+            const response = await axios.get(route("notifications.feed"), {
+                headers: { Accept: "application/json" },
+            });
 
-                const notifications = response.data?.notifications ?? [];
-                const unreadCount = response.data?.unread_count ?? 0;
+            const notifications = response.data?.notifications ?? [];
+            const unreadCount = response.data?.unread_count ?? 0;
 
-                if (hasLoadedFeed.current) {
-                    const newNotifications = notifications.filter(
+            if (hasLoadedFeed.current) {
+                const newNotifications = notifications.filter(
+                    (notification) =>
+                        !seenNotificationIds.current.has(notification.id)
+                );
+
+                newNotifications
+                    .filter(
                         (notification) =>
-                            !seenNotificationIds.current.has(notification.id)
-                    );
-
-                    newNotifications
-                        .filter(
-                            (notification) =>
-                                !toastedNotificationIds.has(notification.id)
-                        )
-                        .slice(0, MAX_TOASTS_PER_POLL)
-                        .forEach((notification) => {
-                            toastedNotificationIds.add(notification.id);
-                            showSystemToast(notification);
-                        });
-                }
-
-                notifications.forEach((notification) => {
-                    seenNotificationIds.current.add(notification.id);
-                });
-
-                hasLoadedFeed.current = true;
-                setSystemNotifications(notifications);
-                setUnreadSystemCount(unreadCount);
-            } catch {
-                // Keep the last feed data when a poll fails.
+                            !toastedNotificationIds.has(notification.id)
+                    )
+                    .slice(0, MAX_TOASTS_PER_POLL)
+                    .forEach((notification) => {
+                        toastedNotificationIds.add(notification.id);
+                        showSystemToast(notification);
+                    });
             }
-        };
 
+            notifications.forEach((notification) => {
+                seenNotificationIds.current.add(notification.id);
+            });
+
+            hasLoadedFeed.current = true;
+            setSystemNotifications(
+                notifications.map((notification) =>
+                    notification.read_at === null &&
+                    locallyReadIds.current.has(notification.id)
+                        ? {
+                              ...notification,
+                              read_at: new Date().toISOString(),
+                          }
+                        : notification
+                )
+            );
+            setUnreadSystemCount(unreadCount);
+        } catch {
+            // Keep the last feed data when a poll fails.
+        }
+    }, []);
+
+    useEffect(() => {
         fetchFeed();
 
         const interval = setInterval(fetchFeed, FEED_POLL_INTERVAL);
 
-        return () => clearInterval(interval);
-    }, []);
+        // Refresh immediately when the tab becomes visible again or when an
+        // Inertia action (checkout, payment, etc.) finishes, instead of waiting
+        // for the next poll tick.
+        const refreshWhenVisible = () => {
+            if (!document.hidden) {
+                fetchFeed();
+            }
+        };
+
+        const unsubscribe = router.on("success", fetchFeed);
+
+        document.addEventListener("visibilitychange", refreshWhenVisible);
+        window.addEventListener("focus", refreshWhenVisible);
+
+        return () => {
+            clearInterval(interval);
+            unsubscribe();
+            document.removeEventListener(
+                "visibilitychange",
+                refreshWhenVisible
+            );
+            window.removeEventListener("focus", refreshWhenVisible);
+        };
+    }, [fetchFeed]);
 
     // System notifications on top, computed Inertia items below.
     const mapSystemItems = (notifications) =>
@@ -268,21 +302,28 @@ export default function Notification() {
         }));
 
     const displayData = [...mapSystemItems(systemNotifications), ...data];
-    const badgeCount = data.length + unreadSystemCount;
+
+    // Read notifications stay visible as history — only their styling changes.
+    const isUnread = (item) => (item.system ? item.unread : !item.read);
+    const unreadComputedCount = data.filter((item) => !item.read).length;
+    const badgeCount = unreadComputedCount + unreadSystemCount;
 
     const handleMarkRead = (id) => {
         const item = displayData.find((entry) => entry.id === id);
-        if (!item || item.noAck) {
+        if (!item || item.noAck || !isUnread(item)) {
             return;
         }
 
         if (item.system) {
+            locallyReadIds.current.add(item.originalId);
             setSystemNotifications((prev) =>
-                prev.filter((notification) => `sys-${notification.id}` !== id)
+                prev.map((notification) =>
+                    notification.id === item.originalId
+                        ? { ...notification, read_at: new Date().toISOString() }
+                        : notification
+                )
             );
-            if (item.unread) {
-                setUnreadSystemCount((prev) => Math.max(prev - 1, 0));
-            }
+            setUnreadSystemCount((prev) => Math.max(prev - 1, 0));
             axios
                 .post(
                     route("notifications.read", item.originalId),
@@ -293,7 +334,11 @@ export default function Notification() {
             return;
         }
 
-        setData((prev) => prev.filter((item) => item.id !== id));
+        setData((prev) =>
+            prev.map((entry) =>
+                entry.id === id ? { ...entry, read: true } : entry
+            )
+        );
         if (item.type === "stock") {
             router.post(
                 route("notifications.stock.read"),
@@ -304,15 +349,40 @@ export default function Notification() {
     };
 
     const handleMarkAllRead = () => {
-        setData([]);
-        router.post(
-            route("notifications.stock.readAll"),
-            {},
-            { preserveScroll: true, preserveState: true }
+        const hasUnreadSystem = systemNotifications.some(
+            (notification) => notification.read_at === null
+        );
+        const hasUnreadComputed = data.some(
+            (item) => !item.read && !item.noAck
         );
 
-        if (systemNotifications.length > 0) {
-            setSystemNotifications([]);
+        if (!hasUnreadSystem && !hasUnreadComputed) {
+            return;
+        }
+
+        if (hasUnreadComputed) {
+            setData((prev) =>
+                prev.map((item) =>
+                    item.noAck ? item : { ...item, read: true }
+                )
+            );
+            router.post(
+                route("notifications.stock.readAll"),
+                {},
+                { preserveScroll: true, preserveState: true }
+            );
+        }
+
+        if (hasUnreadSystem) {
+            systemNotifications.forEach((notification) =>
+                locallyReadIds.current.add(notification.id)
+            );
+            setSystemNotifications((prev) =>
+                prev.map((notification) => ({
+                    ...notification,
+                    read_at: notification.read_at ?? new Date().toISOString(),
+                }))
+            );
             setUnreadSystemCount(0);
             axios
                 .post(
@@ -331,44 +401,72 @@ export default function Notification() {
                     Tidak ada notifikasi
                 </div>
             )}
-            {displayData.map((item) => (
-                <div
-                    className={`flex items-center justify-between w-full p-5 rounded-2xl bg-white dark:bg-slate-900 border hover:shadow transition-all ${
-                        item.unread
-                            ? "border-primary-200 dark:border-primary-800"
-                            : "border-slate-200 dark:border-slate-800 hover:border-primary-200 dark:hover:border-primary-800"
-                    }`}
-                    key={item.id}
-                >
-                    <div className="flex items-center gap-4">
-                        {item.icon}
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <div className="font-semibold text-sm md:text-base text-gray-700 dark:text-gray-200">
-                                    {item.title}
+            {displayData.map((item) => {
+                const unread = isUnread(item);
+
+                return (
+                    <div
+                        className={`flex items-center justify-between w-full p-5 rounded-2xl border hover:shadow transition-all ${
+                            unread
+                                ? "border-primary-200 bg-primary-50/40 dark:border-primary-800 dark:bg-primary-500/5"
+                                : "border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40"
+                        }`}
+                        key={item.id}
+                    >
+                        <div className="flex items-center gap-4">
+                            <span className={unread ? "" : "opacity-60 grayscale"}>
+                                {item.icon}
+                            </span>
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className={`font-semibold text-sm md:text-base ${
+                                            unread
+                                                ? "text-gray-700 dark:text-gray-200"
+                                                : "text-slate-400 dark:text-slate-500"
+                                        }`}
+                                    >
+                                        {item.title}
+                                    </div>
+                                    {unread && (
+                                        <span
+                                            className="w-2 h-2 rounded-full bg-primary-500 shrink-0 ring-2 ring-primary-100 dark:ring-primary-900/60"
+                                            aria-hidden="true"
+                                        />
+                                    )}
                                 </div>
-                                {item.unread && (
-                                    <span
-                                        className="w-2 h-2 rounded-full bg-primary-500 shrink-0"
-                                        aria-hidden="true"
-                                    />
-                                )}
-                            </div>
-                            <div className="text-gray-500 text-xs md:text-sm">
-                                {item.subtitle} {item.time && `• ${item.time}`}
+                                <div
+                                    className={`text-xs md:text-sm ${
+                                        unread
+                                            ? "text-gray-500 dark:text-gray-400"
+                                            : "text-slate-400 dark:text-slate-500"
+                                    }`}
+                                >
+                                    {item.subtitle} {item.time && `• ${item.time}`}
+                                </div>
                             </div>
                         </div>
+                        {unread ? (
+                            <button
+                                onClick={() => handleMarkRead(item.id)}
+                                disabled={item.noAck}
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-primary-600 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-900/30 border border-transparent hover:border-primary-200 dark:hover:border-primary-800 ${item.noAck ? "opacity-50 cursor-default" : ""}`}
+                            >
+                                <IconCircleCheck size={16} />
+                                Dibaca
+                            </button>
+                        ) : (
+                            <span
+                                className="inline-flex shrink-0 items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 dark:text-slate-500"
+                                aria-label="Sudah dibaca"
+                            >
+                                <IconCircleCheck size={16} />
+                                Dibaca
+                            </span>
+                        )}
                     </div>
-                    <button
-                        onClick={() => handleMarkRead(item.id)}
-                        disabled={item.noAck}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-primary-600 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-900/30 border border-transparent hover:border-primary-200 dark:hover:border-primary-800 ${item.noAck ? "opacity-50 cursor-default" : ""}`}
-                    >
-                        <IconCircleCheck size={16} />
-                        Dibaca
-                    </button>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 

@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Notifications\SystemNotification;
+use App\Services\NotificationService;
+use App\Support\NotificationTypes;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\UserSeeder;
@@ -116,6 +118,101 @@ class NotificationFeedTest extends TestCase
         $this->assertNotNull($lowStockNotification);
         $this->assertSame('Stok menipis: '.$product->title, $lowStockNotification->data['title']);
         $this->assertSame('Sisa 5 (min 5)', $lowStockNotification->data['message']);
+    }
+
+    public function test_low_stock_alerts_again_after_stock_recovers_then_drops(): void
+    {
+        $admin = $this->admin();
+        $product = $this->createProduct(stock: 3, minStock: 5);
+        $service = app(NotificationService::class);
+
+        $service->checkLowStock($product);
+        $this->assertSame(1, $admin->unreadNotifications()->where('data->type', 'low_stock')->count());
+
+        $product->update(['stock' => 20]);
+        $service->checkLowStock($product->refresh());
+        $this->assertSame(0, $admin->unreadNotifications()->where('data->type', 'low_stock')->count());
+
+        $product->update(['stock' => 2]);
+        $service->checkLowStock($product->refresh());
+
+        $this->assertSame(2, $admin->notifications()->where('data->type', 'low_stock')->count());
+        $this->assertSame(1, $admin->unreadNotifications()->where('data->type', 'low_stock')->count());
+        $this->assertStringContainsString('Sisa 2 (min 5)', $admin->unreadNotifications()->where('data->type', 'low_stock')->first()->data['message']);
+    }
+
+    public function test_failed_login_alerts_are_throttled_per_email_and_ip(): void
+    {
+        $admin = $this->admin();
+
+        event(new Failed('web', null, ['email' => 'intruder@example.test']));
+        event(new Failed('web', null, ['email' => 'intruder@example.test']));
+        event(new Failed('web', null, ['email' => 'other@example.test']));
+
+        $this->assertSame(2, $admin->notifications()->where('data->type', 'security')->count());
+    }
+
+    public function test_transaction_actor_with_reports_access_also_receives_the_notification(): void
+    {
+        $admin = $this->admin();
+        $product = $this->createProduct(stock: 20, minStock: 0);
+
+        DB::transaction(function () use ($admin, $product) {
+            $transaction = Transaction::create([
+                'cashier_id' => $admin->id,
+                'invoice' => 'TRX-'.Str::upper(Str::random(8)),
+                'cash' => 15000,
+                'change' => 0,
+                'discount' => 0,
+                'grand_total' => 15000,
+                'payment_method' => 'cash',
+                'payment_status' => 'paid',
+            ]);
+
+            $transaction->details()->create([
+                'product_id' => $product->id,
+                'qty' => 1,
+                'price' => 15000,
+            ]);
+        });
+
+        $this->assertSame(1, $admin->notifications()->where('data->type', 'transaction')->count());
+    }
+
+    public function test_notifications_respect_user_preferences(): void
+    {
+        $admin = $this->admin();
+        $admin->update([
+            'notification_preferences' => array_merge(
+                NotificationTypes::defaults(),
+                ['transaction' => false]
+            ),
+        ]);
+
+        $cashier = $this->cashier();
+        $product = $this->createProduct(stock: 5, minStock: 5);
+
+        DB::transaction(function () use ($cashier, $product) {
+            $transaction = Transaction::create([
+                'cashier_id' => $cashier->id,
+                'invoice' => 'TRX-'.Str::upper(Str::random(8)),
+                'cash' => 15000,
+                'change' => 0,
+                'discount' => 0,
+                'grand_total' => 15000,
+                'payment_method' => 'cash',
+                'payment_status' => 'paid',
+            ]);
+
+            $transaction->details()->create([
+                'product_id' => $product->id,
+                'qty' => 1,
+                'price' => 15000,
+            ]);
+        });
+
+        $this->assertSame(0, $admin->notifications()->where('data->type', 'transaction')->count());
+        $this->assertSame(1, $admin->notifications()->where('data->type', 'low_stock')->count());
     }
 
     public function test_failed_login_event_notifies_super_admins(): void
