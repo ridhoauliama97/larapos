@@ -142,6 +142,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 
 1. **Permission cache stale after seed** — logout + login again. Seeder resets cache but session still holds old permissions.
 2. **Webhooks need public APP_URL** — Midtrans/Xendit won't work with localhost.
+3. **Local dev needs a live Gotenberg** — the bundled engine only exists inside the Docker app image; `composer run dev` has none, so PDF routes fail with "cURL error 7 ... localhost:3000". Start it first: `./deploy.sh gotenberg` (runs a `gotenberg-local` container on :3000) or `docker run --rm -d -p 3000:3000 gotenberg/gotenberg:8`.
 3. **Product images need storage:link** — `php artisan storage:link` or images won't render.
 4. **Missing migrations cause 500 on new modules** — run `php artisan migrate` for newer modules (purchase orders, goods receiving, supplier returns, stock opname, dine-in, etc.).
 5. **Tests force SQLite in-memory** — `phpunit.xml` sets `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`. Don't assume MySQL features. **Set `tax_rate=0` on test Product::create** to avoid PPN changing grand_total.
