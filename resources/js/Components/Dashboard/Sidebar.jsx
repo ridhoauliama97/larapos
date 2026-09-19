@@ -3,11 +3,25 @@ import { usePage } from "@inertiajs/react";
 import { IconLayoutGrid } from "@tabler/icons-react";
 import LinkItem from "@/Components/Dashboard/LinkItem";
 import LinkItemDropdown from "@/Components/Dashboard/LinkItemDropdown";
+import { resolveActiveHrefs } from "@/Utils/activeUrl";
 import Menu from "@/Utils/Menu";
 
 export default function Sidebar({ sidebarOpen }) {
-    const { auth, storeProfile, appVersion } = usePage().props;
+    const page = usePage();
+    const { auth, storeProfile, appVersion } = page.props;
+    const url = page.url;
     const menuNavigation = Menu();
+
+    const activeHrefs = resolveActiveHrefs(
+        url,
+        menuNavigation.flatMap((section) =>
+            section.details.flatMap((detail) =>
+                detail.subdetails
+                    ? detail.subdetails.map((sub) => sub.href)
+                    : [detail.href]
+            )
+        )
+    );
 
     const storeName = storeProfile?.name || "KASIR";
     const storeLogo = storeProfile?.logo || null;
@@ -21,7 +35,7 @@ export default function Sidebar({ sidebarOpen }) {
             className={`
                 ${sidebarOpen ? "translate-x-0 w-[260px]" : "-translate-x-full w-[260px]"}
                 md:translate-x-0 ${sidebarOpen ? "md:w-[260px]" : "md:w-[80px]"}
-                fixed md:relative inset-y-0 left-0 z-40
+                fixed inset-y-0 left-0 z-40
                 flex h-screen flex-col overflow-hidden md:sticky md:top-0 md:self-stretch md:shrink-0
                 border-r border-slate-200 dark:border-slate-800
                 bg-white dark:bg-slate-900
@@ -45,24 +59,22 @@ export default function Sidebar({ sidebarOpen }) {
                                 </span>
                             </div>
                         )}
-                        <span className="text-xl font-bold text-slate-800 dark:text-white truncate">
+                        <span className="text-lg font-bold text-slate-800 dark:text-white truncate">
                             {storeName}
                         </span>
                     </div>
+                ) : storeLogo ? (
+                    <img
+                        src={storeLogo}
+                        alt={storeName}
+                        className="w-9 h-9 rounded-md object-cover"
+                    />
                 ) : (
-                    storeLogo ? (
-                        <img
-                            src={storeLogo}
-                            alt={storeName}
-                            className="w-9 h-9 rounded-md object-cover"
-                        />
-                    ) : (
-                        <div className="w-9 h-9 rounded-md bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">
-                                {storeInitial}
-                            </span>
-                        </div>
-                    )
+                    <div className="w-9 h-9 rounded-md bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">
+                            {storeInitial}
+                        </span>
+                    </div>
                 )}
             </div>
 
@@ -70,7 +82,7 @@ export default function Sidebar({ sidebarOpen }) {
             <nav className="dashboard-scrollbar min-h-0 flex-1 overflow-y-auto py-3">
                 {menuNavigation.map((section, index) => {
                     const hasPermission = section.details.some(
-                        (detail) => detail.permissions === true
+                        (detail) => detail.permissions === true,
                     );
                     if (!hasPermission) return null;
 
@@ -116,6 +128,7 @@ export default function Sidebar({ sidebarOpen }) {
                                             icon={detail.icon}
                                             href={detail.href}
                                             access={detail.permissions}
+                                            active={activeHrefs.has(detail.href)}
                                             sidebarOpen={sidebarOpen}
                                         />
                                     );
