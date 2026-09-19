@@ -21,9 +21,9 @@ class SupplierController extends Controller
             $search = request()->search;
             $suppliers = $suppliers->where(function ($query) use ($search) {
                 $query
-                    ->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('phone', 'like', '%' . $search . '%')
-                    ->orWhere('email', 'like', '%' . $search . '%');
+                    ->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('phone', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%');
             });
         })->orderBy('name')->paginate($this->perPage())->withQueryString();
 
