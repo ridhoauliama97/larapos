@@ -41,6 +41,26 @@ chown -h www-data:www-data public/storage
 ) | crontab -u www-data - 2>/dev/null || true
 crond -b 2>/dev/null || true
 
+# Bundled Gotenberg PDF engine (same container): auto-restart loop, internal port 3000.
+# Gotenberg 8.37 needs these envs because it runs on Alpine instead of its own image.
+# Only the chromium route (/forms/chromium/convert/html) is used by the app; pdftk
+# (needs Java) and LibreOffice engines are placeholders that satisfy provisioning.
+export CHROMIUM_BIN_PATH=/usr/bin/chromium-browser
+export CHROMIUM_HYPHEN_DATA_DIR_PATH=/opt/gotenberg/chromium-hyphen-data
+export EXIFTOOL_BIN_PATH=/usr/local/bin/exiftool
+export PERL5LIB=/opt/gotenberg/perl
+export PDFCPU_BIN_PATH=/usr/local/bin/pdfcpu
+export QPDF_BIN_PATH=/usr/bin/qpdf
+export PDFTK_BIN_PATH=/usr/local/bin/pdftk
+export LIBREOFFICE_BIN_PATH=/usr/local/bin/unoconverter
+export UNOCONVERTER_BIN_PATH=/usr/local/bin/unoconverter
+(
+  while true; do
+    gotenberg --api-port=3000 --log-level=error >/dev/null 2>&1
+    sleep 2
+  done
+) &
+
 su -s /bin/sh www-data -c "cd /var/www/html && php artisan queue:work --sleep=3 --tries=1 --max-time=3600" &
 nginx
 exec php-fpm -F
