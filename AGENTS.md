@@ -123,7 +123,7 @@ Web group also appends `SetLocale`, `SecureHeaders`, `EnforceAbsoluteSessionLife
 
 `DatabaseSeeder` runs these seeders with permission cache reset before & after (order matters — `UserSeeder` needs roles/permissions to exist):
 
-```
+```text
 PermissionSeeder → RoleSeeder → UserSeeder → PaymentSettingSeeder → DineInSettingsSeeder
 ```
 
