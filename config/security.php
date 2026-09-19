@@ -14,6 +14,11 @@ return [
         'token_ttl_seconds' => (int) env('SECURITY_BOT_GUARD_TOKEN_TTL_SECONDS', 1800),
         'message' => env('SECURITY_BOT_GUARD_MESSAGE', 'Permintaan tidak valid. Silakan coba lagi.'),
     ],
+    'baseline' => [
+        // Explicit opt-out for HTTP-only deployments (local docker, LAN testing).
+        // Real deployments must serve HTTPS and set SESSION_SECURE_COOKIE=true.
+        'allow_http' => env('SECURITY_BASELINE_ALLOW_HTTP', false),
+    ],
     'session' => [
         'absolute_lifetime_seconds' => (int) env('SECURITY_SESSION_ABSOLUTE_LIFETIME_SECONDS', 43200),
     ],

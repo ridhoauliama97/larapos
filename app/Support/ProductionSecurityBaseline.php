@@ -22,20 +22,27 @@ class ProductionSecurityBaseline
             ];
         }
 
-        $appUrl = (string) config('app.url');
+        // APP_URL HTTPS + secure cookie go together: they are only satisfiable
+        // behind TLS. Skip both when the deployment explicitly opts out
+        // (SECURITY_BASELINE_ALLOW_HTTP=true) for local/LAN HTTP testing.
+        $allowHttp = filter_var(config('security.baseline.allow_http'), FILTER_VALIDATE_BOOL);
 
-        if (blank($appUrl) || ! str_starts_with($appUrl, 'https://')) {
-            $issues[] = [
-                'key' => 'app_url_https',
-                'message' => 'APP_URL harus menggunakan HTTPS yang valid di production.',
-            ];
-        }
+        if (! $allowHttp) {
+            $appUrl = (string) config('app.url');
 
-        if (config('session.secure') !== true) {
-            $issues[] = [
-                'key' => 'session_secure_cookie',
-                'message' => 'SESSION_SECURE_COOKIE harus bernilai true di production.',
-            ];
+            if (blank($appUrl) || ! str_starts_with($appUrl, 'https://')) {
+                $issues[] = [
+                    'key' => 'app_url_https',
+                    'message' => 'APP_URL harus menggunakan HTTPS yang valid di production.',
+                ];
+            }
+
+            if (config('session.secure') !== true) {
+                $issues[] = [
+                    'key' => 'session_secure_cookie',
+                    'message' => 'SESSION_SECURE_COOKIE harus bernilai true di production.',
+                ];
+            }
         }
 
         return $issues;
