@@ -13,6 +13,7 @@ export default function ImageDropzone({
     aspect = "aspect-[4/3]",
     accept = DEFAULT_ACCEPT,
     shape = "rounded",
+    disabled = false,
 }) {
     const inputId = useId();
     const inputRef = useRef(null);
@@ -21,7 +22,13 @@ export default function ImageDropzone({
     const hasPreview = Boolean(preview);
     const isReplaced = hasPreview && preview !== original;
 
-    const openPicker = () => inputRef.current?.click();
+    const openPicker = () => {
+        if (disabled) {
+            return;
+        }
+
+        inputRef.current?.click();
+    };
 
     const handleFiles = (files) => {
         const file = files?.[0];
@@ -55,8 +62,9 @@ export default function ImageDropzone({
                 }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={handleDrop}
+                disabled={disabled}
                 aria-describedby={descriptionIds}
-                className={`relative block ${aspect} w-full overflow-hidden border text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 motion-reduce:transition-none ${
+                className={`relative block ${aspect} w-full overflow-hidden border text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60 ${
                     shape === "circle" ? "rounded-full" : "rounded-xl"
                 } ${
                     error
@@ -100,7 +108,8 @@ export default function ImageDropzone({
                         <button
                             type="button"
                             onClick={openPicker}
-                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                            disabled={disabled}
+                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                         >
                             <IconReplace size={14} />
                             Ganti
@@ -111,7 +120,8 @@ export default function ImageDropzone({
                         <button
                             type="button"
                             onClick={onReset}
-                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-danger-500/40 dark:text-slate-400 dark:hover:bg-danger-500/10 dark:hover:text-danger-400"
+                            disabled={disabled}
+                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-danger-500/40 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-400 dark:hover:bg-danger-500/10 dark:hover:text-danger-400"
                         >
                             <IconX size={14} />
                             {original ? "Batalkan" : "Hapus"}
@@ -136,6 +146,7 @@ export default function ImageDropzone({
                 type="file"
                 accept={accept}
                 className="sr-only"
+                disabled={disabled}
                 onChange={(event) => {
                     handleFiles(event.target.files);
                     event.target.value = "";

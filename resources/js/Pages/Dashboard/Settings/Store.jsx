@@ -2,10 +2,10 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Input from "@/Components/Dashboard/Input";
 import Textarea from "@/Components/Dashboard/TextArea";
+import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
-    IconBuildingStore,
     IconDeviceFloppy,
     IconPhone,
     IconMapPin,
@@ -17,7 +17,7 @@ import {
 } from "@tabler/icons-react";
 
 export default function Store({ settings }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, transform, post, processing, errors, reset } = useForm({
         store_name: settings.store_name || "",
         store_logo: null,
         store_address: settings.store_address || "",
@@ -30,18 +30,54 @@ export default function Store({ settings }) {
         tax_default_rate: settings.tax_default_rate || "11.00",
     });
 
-    const [logoPreview, setLogoPreview] = useState(settings.store_logo || null);
+    const originalLogo = settings.store_logo
+        ? settings.store_logo.startsWith("http") ||
+          settings.store_logo.startsWith("/storage")
+            ? settings.store_logo
+            : `/storage/${settings.store_logo}`
+        : null;
 
-    useEffect(() => {
-        return () => {
-            if (logoPreview && logoPreview.startsWith("blob:")) {
-                URL.revokeObjectURL(logoPreview);
+    const [logoPreview, setLogoPreview] = useState(originalLogo);
+    const objectUrlRef = useRef(null);
+
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
             }
-        };
-    }, [logoPreview]);
+        },
+        [],
+    );
+
+    const handleLogoSelect = (file) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+        }
+
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData("store_logo", file);
+        setLogoPreview(objectUrlRef.current);
+    };
+
+    const handleLogoReset = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setData("store_logo", null);
+        setLogoPreview(originalLogo);
+    };
 
     const submit = (e) => {
         e.preventDefault();
+
+        transform((data) => {
+            const { store_logo, ...rest } = data;
+
+            return store_logo ? data : rest;
+        });
+
         post(route("settings.store.update"), {
             preserveScroll: true,
             onSuccess: () => {
@@ -74,35 +110,14 @@ export default function Store({ settings }) {
                                 <IconPhoto size={18} />
                                 Logo Toko
                             </label>
-                            <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden mb-3">
-                                {logoPreview ? (
-                                    <img
-                                        src={logoPreview.startsWith("http") || logoPreview.startsWith("/storage")
-                                            ? logoPreview
-                                            : `/storage/${logoPreview}`}
-                                        alt="Logo"
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <IconBuildingStore size={36} className="text-slate-300" />
-                                )}
-                            </div>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                    const file = e.target.files[0];
-                                    if (file) {
-                                        setData("store_logo", file);
-                                        setLogoPreview(URL.createObjectURL(file));
-                                    }
-                                }}
+                            <ImageDropzone
+                                preview={logoPreview}
+                                original={originalLogo}
+                                onSelect={handleLogoSelect}
+                                onReset={handleLogoReset}
+                                error={errors.store_logo}
+                                aspect="aspect-square"
                             />
-                            {errors.store_logo && (
-                                <p className="text-xs text-danger-500 mt-1">
-                                    {errors.store_logo}
-                                </p>
-                            )}
                         </div>
 
                         {/* Info */}

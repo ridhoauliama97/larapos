@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Head, useForm, Link, usePage } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import {
@@ -8,6 +8,7 @@ import {
 } from "@tabler/icons-react";
 import toast from "react-hot-toast";
 import Input from "@/Components/Dashboard/Input";
+import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
 import { useAuthorization } from "@/Utils/authorization";
 
 export default function BankAccountForm({ bankAccount = null }) {
@@ -24,10 +25,43 @@ export default function BankAccountForm({ bankAccount = null }) {
     is_active: bankAccount?.is_active ?? true,
 });
 
+    const originalLogo = bankAccount?.logo ? `/storage/${bankAccount.logo}` : null;
+    const [logoPreview, setLogoPreview] = useState(originalLogo);
+    const objectUrlRef = useRef(null);
+
     useEffect(() => {
         if (flash?.success) toast.success(flash.success);
         if (flash?.error) toast.error(flash.error);
     }, [flash]);
+
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        },
+        [],
+    );
+
+    const handleLogoSelect = (file) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+        }
+
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData("logo", file);
+        setLogoPreview(objectUrlRef.current);
+    };
+
+    const handleLogoReset = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+
+        setData("logo", null);
+        setLogoPreview(originalLogo);
+    };
 
     const handleSubmit = (e) => {
     e.preventDefault();
@@ -104,20 +138,16 @@ export default function BankAccountForm({ bankAccount = null }) {
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 Logo Bank (opsional)
                             </label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) =>
-                                    setData("logo", e.target.files?.[0] || null)
-                                }
+                            <ImageDropzone
+                                preview={logoPreview}
+                                original={originalLogo}
+                                onSelect={handleLogoSelect}
+                                onReset={handleLogoReset}
+                                error={errors.logo}
+                                accept="image/png,image/jpeg"
+                                hint="PNG atau JPG. Maksimal 1 MB."
                                 disabled={!canUpdatePaymentSettings}
-                                className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                             />
-                            {errors.logo && (
-                                <p className="text-xs text-danger-500 mt-1">
-                                    {errors.logo}
-                                </p>
-                            )}
                         </div>
                         <div className="flex items-end">
                             <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
