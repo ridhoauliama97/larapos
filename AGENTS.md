@@ -77,18 +77,31 @@ vendor/bin/pint
 
 # Production build
 PUPPETEER_SKIP_DOWNLOAD=true npm run build   # CI/deploy skip Puppeteer's Chromium download
+
+# Docker production deploy (PHP 8.4-fpm + nginx + PostgreSQL 17 + Redis)
+docker compose --env-file .env.production up -d --build
+# First deploy: set APP_KEY in .env.production (docker compose run --rm app php artisan key:generate --show)
+# and POSTGRES_PASSWORD + APP_URL (must be HTTPS for the security baseline)
+
+# Migrate local SQLite data into the dockerized PostgreSQL (one-off utility)
+docker compose --env-file .env.production cp database/database.sqlite app:/tmp/source.sqlite
+docker compose --env-file .env.production cp docker/tools/sqlite-to-pg.php app:/tmp/sqlite-to-pg.php
+docker compose --env-file .env.production exec app sh -c "cd /var/www/html && php /tmp/sqlite-to-pg.php /tmp/source.sqlite"
+docker compose --env-file .env.production cp storage/app/public/. app:/var/www/html/storage/app/public/
+# then: docker compose --env-file .env.production exec app php artisan permission:cache-reset
 ```
 
 Production must trigger `php artisan schedule:run` every minute for the scheduled CRM and reorder commands.
 
 ## Architecture
 
-- **Controllers**: `app/Http/Controllers/Apps/` — per-module web controllers (~35)
+- **Controllers**: `app/Http/Controllers/Apps/` — per-module web controllers (~35). Watch for same-named classes in different namespaces: `Controllers/DineOrderController.php` (public dine-in guest ordering) vs `Controllers/Apps/DineOrderController.php` (dashboard accept/reject); `Controllers/Api/*` vs `Controllers/Apps/*` share names too — check imports.
 - **API Controllers**: `app/Http/Controllers/Api/` — REST API (Sanctum token auth)
-- **Services**: `app/Services/` — 21 services: AuditLog, BatchService, CashierShiftService, DineOrderService, GoodsReceivingService, LoyaltyService, PaymentGatewayManager, PricingService, PriceListService, PurchaseOrderService, ReorderService, StockMutationService, StockTransferService, UnitConversionService, WhatsAppService, etc.
+- **Services**: `app/Services/` (~24) + `app/Services/Payments/` (PaymentGatewayManager, MidtransGateway, XenditGateway)
+- **Observers**: `Transaction`, `StockMutation`, `Receivable`, `Payable` have observers registered in `AppServiceProvider` — saving these models fires notification side effects automatically
 - **Layouts**: `POSLayout.jsx` (POS), `DashboardLayout.jsx` (admin), `AuthenticatedLayout.jsx` (profile), `GuestLayout.jsx` (auth), `PublicLayout.jsx` (public dine-in)
-- **Routes**: `routes/web.php` (~50+ dashboard routes), `routes/api.php` (webhooks + REST API), `routes/auth.php` (Breeze)
-- **Inertia shared props**: `HandleInertiaRequests.php` — auth, permissions, notifications (low stock, receivables, payables aging), active shift, store profile, appVersion
+- **Routes**: `routes/web.php` (~50+ dashboard routes under `/dashboard` prefix, plus public token routes: `/dine/{token}` menu/order, `/portal/transactions/{invoice}` customer portal, `/share/transactions/{invoice}` public invoice), `routes/api.php` (webhooks + REST API), `routes/auth.php` (Breeze)
+- **Inertia shared props**: `HandleInertiaRequests.php` — auth + permissions, notifications (low stock, expiring batches, receivables/payables due ≤3 days, aging summaries, pending approvals/dine orders), active shift, store profile, printerSettings, security warnings, appVersion
 
 ## Middleware
 
@@ -116,7 +129,7 @@ PermissionSeeder → RoleSeeder → UserSeeder → PaymentSettingSeeder → Dine
 
 After seeding, a default `PUSAT` warehouse is created and existing product stock is migrated to the `product_warehouse` pivot.
 
-**Default users (fork-customized):** `UserSeeder` creates `admin.nelsha@gmail.com` (super-admin) and `cashier.nelsha@gmail.com` (cashier), password `password`, pre-verified (seeders run `Model::unguarded()`, so `email_verified_at` persists despite not being in `$fillable`). The `/setup` wizard is still available while `Setting::app_setup_completed` is false (root redirects there); users it creates — and users created via the admin user form — have **no `email_verified_at`** while dashboard routes require the `verified` middleware: verify via the link logged with `MAIL_MAILER=log` (`storage/logs/laravel.log`) or set it manually.
+**Default users (fork-customized):** `UserSeeder` creates `admin.nelsha@gmail.com` (super-admin) and `cashier.nelsha@gmail.com` (cashier), password `password`, pre-verified (seeders run `Model::unguarded()`, so `email_verified_at` persists despite not being in `$fillable`). **UserSeeder skips itself in production** — a `db:seed` on a production box creates no default accounts. The `/setup` wizard is still available while `Setting::app_setup_completed` is false (root redirects there); users it creates — and users created via the admin user form — have **no `email_verified_at`** while dashboard routes require the `verified` middleware: verify via the link logged with `MAIL_MAILER=log` (`storage/logs/laravel.log`) or set it manually.
 
 **Demo seeders are opt-in:** `php artisan db:seed --class=SampleDataSeeder`, plus `OperationalCoreSeeder`, `FeatureCoverageSeeder`, `FeatureDemoSeeder` for full demo data.
 
@@ -136,7 +149,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 8. **CRM campaign auto-send** — requires `wa_enabled=true` + connected device in Settings > WhatsApp.
 9. **Version bump on release** — update `APP_VERSION` in `.env` + `.env.example` when tagging.
 10. **Concurrency patterns** — all stock mutations (checkout, transfer, receiving, payment) are wrapped in `DB::transaction` with `lockForUpdate()` on affected rows. Never skip the transaction or lock.
-11. **Dine-in online payment is disabled** — `payment_option=pay_online` returns 422. Only `pay_at_counter` is accepted.
+11. **Dine-in online payment is disabled** — the public `DineOrderController` (`app/Http/Controllers/DineOrderController.php`) validates `payment_option in:pay_at_counter` only; `pay_online` returns 422.
 
 ## Release Process
 
@@ -152,7 +165,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 - **Alerts/confirm**: `react-hot-toast` + `sweetalert2`
 - **Charts**: `chart.js`
 - **Routing**: Ziggy `route()` helper available
-- **Offline mode**: `resources/js/Utils/offlineDb.js` (IndexedDB via `idb`) queues transactions when offline, flushes on reconnect; idempotent via `client_uuid` — server price wins
+- **Offline mode**: `resources/js/Utils/offlineDb.js` (IndexedDB via `idb`) queues transactions when offline, flushes on reconnect; idempotent via `client_uuid` — server price wins. A service worker (`/sw.js`) is registered in `app.jsx` for offline caching.
 - **ESC/POS printing**: `resources/js/Utils/escpos.js` (WebUSB, Chromium-only; fallback `window.print()`)
 - **Tailwind tokens**: `primary` (indigo), `accent` (cyan), `success` (emerald), `warning` (amber), `danger` (rose)
 - **i18n**: Indonesian (`id.json`) and English (`en.json`) in `resources/js/i18n/locales`
@@ -197,6 +210,20 @@ API tests must use `Sanctum::actingAs($user, ['*'])` or real tokens via `$user->
 
 ## Route Naming Gotchas
 
-- Price list sidebar link: `price-lists.index` (NOT `settings.price-lists.index`)
+- **`Route::resource('/settings/price-lists')` names routes after the LAST path segment only** (`price-lists.index`), because Laravel's `prefixedResource` splits the slash-prefixed resource name. Use explicit `->names('settings.x')` for any other `/settings/*` resource (warehouses/units do this). Sidebar links to `route('price-lists.index')` — don't "fix" it to `settings.price-lists.index`.
 - Profile URL: `/dashboard/profile` (NOT `/apps/profile`)
 - Public invoice: `/share/transactions/{invoice}?token={access_token}`
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as local markdown files under `.scratch/<feature-slug>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical triage roles with default label strings. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
