@@ -15,7 +15,7 @@ import {
     IconWallet,
     IconArrowsMaximize,
     IconArrowsMinimize,
-    IconQuestionMark,
+    IconBook,
 } from "@tabler/icons-react";
 import Notification from "@/Components/Dashboard/Notification";
 import { useTour } from "@/Hooks/useTour";
@@ -23,7 +23,8 @@ import i18n from "@/i18n";
 import { getPendingCount } from "@/Utils/offlineDb";
 
 export default function POSLayout({ children }) {
-    const { auth, storeProfile, activeCashierShift, appVersion } = usePage().props;
+    const { auth, storeProfile, activeCashierShift, appVersion } =
+        usePage().props;
     const { darkMode, themeSwitcher } = useTheme();
     const { start: startTour, isActive: tourActive } = useTour("pos");
     const [pendingSyncCount, setPendingSyncCount] = useState(0);
@@ -34,16 +35,22 @@ export default function POSLayout({ children }) {
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+            document.documentElement
+                .requestFullscreen()
+                .then(() => setIsFullscreen(true))
+                .catch(() => {});
         } else {
-            document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+            document
+                .exitFullscreen()
+                .then(() => setIsFullscreen(false))
+                .catch(() => {});
         }
     };
 
     useEffect(() => {
         const handler = () => setIsFullscreen(!!document.fullscreenElement);
-        document.addEventListener('fullscreenchange', handler);
-        return () => document.removeEventListener('fullscreenchange', handler);
+        document.addEventListener("fullscreenchange", handler);
+        return () => document.removeEventListener("fullscreenchange", handler);
     }, []);
 
     // Update time every minute
@@ -112,7 +119,10 @@ export default function POSLayout({ children }) {
                     </button>
 
                     {/* Logo */}
-                    <Link href={route("dashboard")} className="flex items-center gap-2">
+                    <Link
+                        href={route("dashboard")}
+                        className="flex items-center gap-2"
+                    >
                         <div className="w-9 h-9 flex items-center justify-center overflow-hidden">
                             {storeProfile?.logo ? (
                                 <img
@@ -185,19 +195,27 @@ export default function POSLayout({ children }) {
                         className="p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors min-w-touch min-h-touch flex items-center justify-center disabled:opacity-50"
                         title={i18n.t("tour.button")}
                     >
-                        <IconQuestionMark size={20} className="text-slate-500" />
+                        <IconBook size={20} className="text-slate-500" />
                     </button>
 
                     {/* Fullscreen Toggle */}
                     <button
                         onClick={toggleFullscreen}
                         className="p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors min-w-touch min-h-touch flex items-center justify-center"
-                        title={isFullscreen ? "Keluar Fullscreen" : "Fullscreen"}
+                        title={
+                            isFullscreen ? "Keluar Fullscreen" : "Fullscreen"
+                        }
                     >
                         {isFullscreen ? (
-                            <IconArrowsMinimize size={20} className="text-slate-500" />
+                            <IconArrowsMinimize
+                                size={20}
+                                className="text-slate-500"
+                            />
                         ) : (
-                            <IconArrowsMaximize size={20} className="text-slate-500" />
+                            <IconArrowsMaximize
+                                size={20}
+                                className="text-slate-500"
+                            />
                         )}
                     </button>
 
@@ -223,14 +241,17 @@ export default function POSLayout({ children }) {
                     <div className="flex items-center gap-2 pl-2 lg:pl-3 border-l border-slate-200 dark:border-slate-700">
                         {activeCashierShift && (
                             <Link
-                                href={route("cashier-shifts.show", activeCashierShift.id)}
+                                href={route(
+                                    "cashier-shifts.show",
+                                    activeCashierShift.id,
+                                )}
                                 className="hidden lg:flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-950/60"
                             >
                                 <IconWallet size={16} />
                                 <span>
                                     Shift aktif •{" "}
                                     {new Intl.NumberFormat("id-ID").format(
-                                        activeCashierShift.expected_cash || 0
+                                        activeCashierShift.expected_cash || 0,
                                     )}
                                 </span>
                             </Link>
@@ -255,7 +276,8 @@ export default function POSLayout({ children }) {
 
             {!isOnline && (
                 <div className="bg-amber-500 text-white text-center text-xs font-medium py-1 px-4">
-                    Transaksi disimpan offline — akan dikirim saat online kembali
+                    Transaksi disimpan offline — akan dikirim saat online
+                    kembali
                 </div>
             )}
 

@@ -5,7 +5,7 @@ import {
     IconMoon,
     IconSun,
     IconSearch,
-    IconQuestionMark,
+    IconBook,
 } from "@tabler/icons-react";
 import AuthDropdown from "@/Components/Dashboard/AuthDropdown";
 import LanguageSwitcher from "@/Components/Dashboard/LanguageSwitcher";
@@ -70,7 +70,9 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
                 {/* Mobile Logo */}
                 <div className="md:hidden flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                        <span className="text-white font-bold text-xs">{storeInitial}</span>
+                        <span className="text-white font-bold text-xs">
+                            {storeInitial}
+                        </span>
                     </div>
                     <span className="text-lg font-bold text-slate-800 dark:text-white">
                         {storeName}
@@ -95,7 +97,7 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
                     className="p-2.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
                     title={i18n.t("tour.button")}
                 >
-                    <IconQuestionMark size={20} strokeWidth={1.5} />
+                    <IconBook size={20} strokeWidth={1.5} />
                 </button>
 
                 {/* Language Switcher */}

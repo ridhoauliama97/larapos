@@ -23,6 +23,9 @@
     <meta name="twitter:image" content="{{ config('app.url') }}/images/og-image.png">
     <link rel="manifest" href="/manifest.json">
 
+    <link rel="icon" sizes="any" href="/images/favicon.ico">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4f46e5">
+    <meta name="msapplication-TileColor" content="#4f46e5">
     <title data-inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts - Preconnect for performance -->
