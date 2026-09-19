@@ -4,7 +4,7 @@ Open-source POS system. Laravel 13 + Inertia 3.0 + React 19.
 
 ## Important: This Repo
 
-**Remote:** `git@github.com:aryadwiputra/point-of-sales.git`
+**Remote:** push ke fork `larapos` (`git@github.com:ridhoauliama97/larapos.git`) — satu-satunya remote aktif. Remote `origin` (`https://github.com/aryadwiputra/point-of-sales.git`) hanya upstream baca; akun GitHub terdaftar (`ridhoauliama97`) tidak punya izin push ke sana (403). Jangan buang waktu mencoba push ke origin.
 
 **Branch structure:**
 
