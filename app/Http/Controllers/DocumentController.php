@@ -7,20 +7,12 @@ use App\Models\Receivable;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Services\ThermalPrintService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Picqer\Barcode\BarcodeGeneratorPNG;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class DocumentController extends Controller
 {
-    private function ensureFontDirectory(): void
-    {
-        $fontDir = storage_path('fonts');
-        if (! is_dir($fontDir)) {
-            @mkdir($fontDir, 0755, true);
-        }
-    }
-
     private function storeProfile(): array
     {
         $logo = Setting::get('store_logo');
@@ -63,19 +55,18 @@ class DocumentController extends Controller
 
     public function invoice(string $invoice)
     {
-        $this->ensureFontDirectory();
-
         $transaction = Transaction::with(['details.product', 'cashier', 'customer'])
             ->where('invoice', $invoice)
             ->firstOrFail();
 
-        $pdf = Pdf::loadView('pdf.invoice', [
+        return Pdf::view('pdf.invoice', [
             'transaction' => $transaction,
             'store' => $this->storeProfile(),
             'barcode' => $this->barcode($transaction->invoice),
-        ])->setPaper('a4');
-
-        return $pdf->stream("invoice-{$transaction->invoice}.pdf");
+        ])
+            ->format('a4')
+            ->margins(0, 0, 0, 0, 'mm')
+            ->inline("invoice-{$transaction->invoice}.pdf");
     }
 
     /**
@@ -83,60 +74,55 @@ class DocumentController extends Controller
      */
     public function publicInvoice(string $invoice, Request $request)
     {
-        $this->ensureFontDirectory();
-
         $transaction = Transaction::with(['details.product', 'cashier', 'customer'])
             ->where('invoice', $invoice)
             ->where('access_token', $request->query('token'))
             ->firstOrFail();
 
-        $pdf = Pdf::loadView('pdf.invoice', [
+        return Pdf::view('pdf.invoice', [
             'transaction' => $transaction,
             'store' => $this->storeProfile(),
             'barcode' => $this->barcode($transaction->invoice),
-        ])->setPaper('a4');
-
-        return $pdf->stream("invoice-{$transaction->invoice}.pdf");
+        ])
+            ->format('a4')
+            ->margins(0, 0, 0, 0, 'mm')
+            ->inline("invoice-{$transaction->invoice}.pdf");
     }
 
     public function receipt(string $invoice, string $size = '80')
     {
-        $this->ensureFontDirectory();
-
         $transaction = Transaction::with(['details.product', 'cashier', 'customer'])
             ->where('invoice', $invoice)
             ->firstOrFail();
 
         $template = $size === '58' ? 'pdf.receipt_58' : 'pdf.receipt_80';
-        $width = $size === '58' ? 164.4 : 226.8; // points (mm*2.8346)
-        $pdf = Pdf::loadView($template, [
+        $width = $size === '58' ? 58 : 80;
+
+        return Pdf::view($template, [
             'transaction' => $transaction,
             'store' => $this->storeProfile(),
             'barcode' => $this->barcode($transaction->invoice),
-        ])->setPaper([0, 0, $width, 800], 'portrait');
-
-        return $pdf->stream("receipt-{$transaction->invoice}-{$size}.pdf");
+            'locale' => app()->getLocale(),
+        ])
+            ->paperSize($width, 282, 'mm')
+            ->margins(0, 0, 0, 0, 'mm')
+            ->inline("receipt-{$transaction->invoice}-{$size}.pdf");
     }
 
     public function shipping(string $invoice)
     {
-        $this->ensureFontDirectory();
-
         $transaction = Transaction::with(['details.product', 'customer', 'cashier'])
             ->where('invoice', $invoice)
             ->firstOrFail();
 
-        $pdf = Pdf::loadView('pdf.shipping_label', [
+        return Pdf::view('pdf.shipping_label', [
             'transaction' => $transaction,
             'store' => $this->storeProfile(),
             'barcode' => $this->barcode($transaction->invoice),
-        ]);
-
-        // Set kertas 150mm x 100mm (dalam Points: 1mm = 2.83465pt)
-        // 150mm = 425pt, 100mm = 283pt
-        $pdf->setPaper([0, 0, 425, 283], 'landscape');
-
-        return $pdf->stream("shipping-{$transaction->invoice}.pdf");
+        ])
+            ->paperSize(150, 100, 'mm')
+            ->margins(0, 0, 0, 0, 'mm')
+            ->inline("shipping-{$transaction->invoice}.pdf");
     }
 
     public function thermalPrint(string $invoice)
@@ -153,31 +139,29 @@ class DocumentController extends Controller
 
     public function receivable(Receivable $receivable)
     {
-        $this->ensureFontDirectory();
-
         $receivable->load(['customer', 'payments.bankAccount', 'payments.user']);
 
-        $pdf = Pdf::loadView('pdf.receivable', [
+        return Pdf::view('pdf.receivable', [
             'receivable' => $receivable,
             'store' => $this->storeProfile(),
             'barcode' => $this->barcode($receivable->invoice),
-        ])->setPaper('a5', 'portrait');
-
-        return $pdf->stream("piutang-{$receivable->invoice}.pdf");
+        ])
+            ->format('a5')
+            ->margins(10, 10, 10, 10, 'mm')
+            ->inline("piutang-{$receivable->invoice}.pdf");
     }
 
     public function payable(Payable $payable)
     {
-        $this->ensureFontDirectory();
-
         $payable->load(['supplier', 'payments.bankAccount', 'payments.user']);
 
-        $pdf = Pdf::loadView('pdf.payable', [
+        return Pdf::view('pdf.payable', [
             'payable' => $payable,
             'store' => $this->storeProfile(),
             'barcode' => $this->barcode($payable->document_number),
-        ])->setPaper('a5', 'portrait');
-
-        return $pdf->stream("hutang-{$payable->document_number}.pdf");
+        ])
+            ->format('a5')
+            ->margins(10, 10, 10, 10, 'mm')
+            ->inline("hutang-{$payable->document_number}.pdf");
     }
 }

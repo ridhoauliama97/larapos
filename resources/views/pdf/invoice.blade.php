@@ -1,5 +1,5 @@
 @php
-    $fontFamily = "'Geist', 'Geist Mono', 'Inter', 'Helvetica', 'Arial', sans-serif";
+    $fontFamily = "'Geist', 'Helvetica', 'Arial', sans-serif";
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -7,73 +7,27 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        @font-face {
-            font-family: 'Geist';
-            font-style: normal;
-            font-weight: 400;
-            src: url("{{ public_path('geist/Geist-Regular.ttf') }}") format('truetype')
-        }
-
-        @font-face {
-            font-family: 'Geist';
-            font-style: normal;
-            font-weight: 500;
-            src: url("{{ public_path('geist/Geist-Medium.ttf') }}") format('truetype')
-        }
-
-        @font-face {
-            font-family: 'Geist';
-            font-style: normal;
-            font-weight: 600;
-            src: url("{{ public_path('geist/Geist-SemiBold.ttf') }}") format('truetype')
-        }
-
-        @font-face {
-            font-family: 'Geist';
-            font-style: normal;
-            font-weight: 700;
-            src: url("{{ public_path('geist/Geist-Bold.ttf') }}") format('truetype')
-        }
-
-        @font-face {
-            font-family: 'Geist Mono';
-            font-style: normal;
-            font-weight: 400;
-            src: url("{{ public_path('geist_mono/GeistMono-Regular.ttf') }}") format('truetype')
-        }
-
-        @font-face {
-            font-family: 'Geist Mono';
-            font-style: normal;
-            font-weight: 500;
-            src: url("{{ public_path('geist_mono/GeistMono-Medium.ttf') }}") format('truetype')
-        }
-
-        @font-face {
-            font-family: 'Geist Mono';
-            font-style: normal;
-            font-weight: 600;
-            src: url("{{ public_path('geist_mono/GeistMono-SemiBold.ttf') }}") format('truetype')
-        }
-
-        @font-face {
-            font-family: 'Geist Mono';
-            font-style: normal;
-            font-weight: 700;
-            src: url("{{ public_path('geist_mono/GeistMono-Bold.ttf') }}") format('truetype')
-        }
+        @include('pdf.fonts')
 
         * {
             box-sizing: border-box
         }
 
         body {
-            font-family:
-                {{ $fontFamily }}
-            ;
+            font-family: 'Geist', sans-serif;
             margin: 0;
             padding: 24px;
             color: #0f172a
+        }
+
+        .mono {
+            font-family: 'Geist Mono', 'Courier New', monospace
+        }
+
+        /* Angka memakai Geist Mono: kolom harga/qty dan total ringkasan */
+        td.right,
+        td.qty {
+            font-family: 'Geist Mono', 'Courier New', monospace
         }
 
         .header {
@@ -218,8 +172,8 @@
         </td>
         <td style="width:40%; vertical-align:middle; text-align:right;">
             <div class="badge">INVOICE</div>
-            <div style="font-size:25px;font-weight:700; margin-top:8px;">{{ $transaction->invoice }}</div>
-            <div style="font-size:12px;color:#475569; margin-top:6px;">
+            <div class="mono" style="font-size:25px;font-weight:700; margin-top:8px;">{{ $transaction->invoice }}</div>
+            <div class="mono" style="font-size:12px;color:#475569; margin-top:6px;">
                 {{ \Carbon\Carbon::parse($transaction->created_at)->format('d M Y H:i') }}
             </div>
         </td>
@@ -372,7 +326,7 @@
     <div class="footer">
         <div class="barcode" style="margin-top: 15px">
             <img src="{{ $barcode }}" alt="barcode">
-            <div style="font-size:10px;color:#475569;margin-top: 5px;">{{ $transaction->invoice }}</div>
+            <div class="mono" style="font-size:10px;color:#475569;margin-top: 5px;">{{ $transaction->invoice }}</div>
         </div>
         <div style="font-size:11px;color:#94a3b8; text-align:center; margin-top: 20px;">
             Terima kasih atas kepercayaan Anda.

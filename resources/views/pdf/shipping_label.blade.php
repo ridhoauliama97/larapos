@@ -8,6 +8,8 @@
 <head>
     <meta charset="UTF-8">
     <style>
+        @include('pdf.fonts')
+
         /* Ukuran 150mm x 100mm dalam Points */
         @page {
             margin: 0;
@@ -15,12 +17,17 @@
         }
 
         body {
-            font-family: 'Helvetica', sans-serif;
+            font-family: 'Geist', 'Helvetica', sans-serif;
             margin: 0;
             padding: 0;
             width: 425.2pt;
             height: 283.5pt;
             color: #1e293b;
+        }
+
+        /* Angka memakai Geist Mono: nomor invoice, tanggal, dan nominal */
+        .mono {
+            font-family: 'Geist Mono', 'Courier New', monospace;
         }
 
         .container {
@@ -131,6 +138,7 @@
             margin-top: 5pt;
             color: #000;
             text-align: center;
+            font-family: 'Geist Mono', 'Courier New', monospace;
             /* Nomor invoice rata tengah terhadap barcode */
         }
 
@@ -165,7 +173,8 @@
                 </td>
                 <td style="text-align: left;">
                     <div class="text-bold" style="font-size: 13pt; line-height: 1.1;">{{ $store['name'] }} </div>
-                    <div class="text-small text-muted" style="margin-top: 3pt;font-size: 7pt;">{{ Str::limit($store['address'], 60) }}
+                    <div class="text-small text-muted" style="margin-top: 3pt;font-size: 7pt;">
+                        {{ Str::limit($store['address'], 60) }}
                     </div>
                     <div class="text-small text-muted" style="margin-top: 2pt;letter-spacing: 0.7pt;">
                         {{ $store['phone'] }}@if ($store['phone'] && $store['email'])
@@ -175,9 +184,10 @@
                 </td>
                 <td width="180pt" style="text-align: right; vertical-align: top;">
                     <div class="text-muted" style="font-size: 7pt;">INVOICE </div>
-                    <div class="text-bold" style="font-size: 15pt; color: #000; line-height: 1.1;">
-                        {{ $transaction->invoice }}</div>
-                    <div class="text-small">{{ $formatDate($transaction->created_at) }}</div>
+                    <div class="text-bold mono" style="font-size: 15pt; color: #000; line-height: 1.1;">
+                        {{ $transaction->invoice }}
+                    </div>
+                    <div class="text-small mono">{{ $formatDate($transaction->created_at) }}</div>
                 </td>
             </tr>
         </table>
@@ -191,9 +201,11 @@
                         <div class="title-label">Penerima</div>
                         <div class="text-bold">{{ $transaction->customer->name ?? 'Umum' }}</div>
                         <div class="text-small text-muted" style="margin-top: 5px; margin-bottom: 5px;">
-                            {{ $transaction->customer->no_telp ?? '-' }}</div>
+                            {{ $transaction->customer->no_telp ?? '-' }}
+                        </div>
                         <div class="text-small text-muted">
-                            {{ Str::limit($transaction->customer->address ?? 'No Address', 80) }}</div>
+                            {{ Str::limit($transaction->customer->address ?? 'No Address', 80) }}
+                        </div>
                         <div class="text-small text-muted" style="margin-top:2pt;">
                             {{ $transaction->customer->village_name ?? '-' }}
                             @if ($transaction->customer->district_name)
@@ -218,8 +230,9 @@
                             </tr>
                             <tr>
                                 <td style="padding-top: 15pt;" class="text-bold">Total</td>
-                                <td style="padding-top: 15pt; text-align: right;" class="text-bold">
-                                    {{ $formatPrice($transaction->grand_total) }}</td>
+                                <td style="padding-top: 15pt; text-align: right;" class="text-bold mono">
+                                    {{ $formatPrice($transaction->grand_total) }}
+                                </td>
                             </tr>
                         </table>
                     </div>

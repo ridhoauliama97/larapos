@@ -5,24 +5,59 @@
 @endphp
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <style>
-        @page { margin: 0; }
-        body { font-family: 'Inter','Helvetica','Arial',sans-serif; width: 58mm; margin: 0; padding: 6px; font-size: 11px; line-height: 1.4; }
-        .center { text-align: center; }
-        .bold { font-weight: 700; }
-        .barcode img { height: 24px; }
-        .section { margin: 5px 0; }
+        @include('pdf.fonts')
+
+        @page {
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Geist', 'Helvetica', 'Arial', sans-serif;
+            width: 58mm;
+            margin: 0;
+            padding: 6px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
+
+        /* Angka memakai Geist Mono agar rata kolom */
+        .num {
+            font-family: 'Geist Mono', 'Courier New', monospace;
+        }
+
+        .barcode img {
+            height: 24px;
+        }
+
+        .section {
+            margin: 5px 0;
+        }
     </style>
 </head>
+
 <body>
     <div class="center section" style="margin-top:0;">
         <div class="bold" style="margin-bottom:2px;">{{ $store['name'] }}</div>
-        @if($store['address'])<div>{{ $store['address'] }}</div>@endif
-        @if($store['phone'])<div>Telp: {{ $store['phone'] }}</div>@endif
-        @if($store['email'])<div>Email: {{ $store['email'] }}</div>@endif
-        @if($store['website'])<div>{{ $store['website'] }}</div>@endif
+        @if($store['address'])
+        <div>{{ $store['address'] }}</div>@endif
+        @if($store['phone'])
+        <div>Telp: {{ $store['phone'] }}</div>@endif
+        @if($store['email'])
+        <div>Email: {{ $store['email'] }}</div>@endif
+        @if($store['website'])
+        <div>{{ $store['website'] }}</div>@endif
     </div>
 
     <pre style="margin:3px 0;">{{ $line }}</pre>
@@ -30,11 +65,11 @@
     <div class="section">
         <div style="display:flex; justify-content:space-between;">
             <span>No:</span>
-            <span>{{ $transaction->invoice }}</span>
+            <span class="num">{{ $transaction->invoice }}</span>
         </div>
         <div style="display:flex; justify-content:space-between;">
             <span>Tgl:</span>
-            <span>{{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y H:i') }}</span>
+            <span class="num">{{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y H:i') }}</span>
         </div>
         <div style="display:flex; justify-content:space-between;">
             <span>Kasir:</span>
@@ -59,12 +94,12 @@
             @if($item->discount_total > 0 && ($item->pricing_group_label || $item->pricing_rule_name))
                 <div style="display:flex; justify-content:space-between; font-size:9px; color:#64748b;">
                     <span>Promo: {{ $item->pricing_group_label ?: $item->pricing_rule_name }}</span>
-                    <span>{{ $formatPrice($item->base_unit_price) }}</span>
+                    <span class="num">{{ $formatPrice($item->base_unit_price) }}</span>
                 </div>
             @endif
             <div style="display:flex; justify-content:space-between;">
-                <span>{{ $qty }}x @ {{ $formatPrice($unit) }}</span>
-                <span>{{ $formatPrice($total) }}</span>
+                <span class="num">{{ $qty }}x @ {{ $formatPrice($unit) }}</span>
+                <span class="num">{{ $formatPrice($total) }}</span>
             </div>
         @endforeach
     </div>
@@ -89,47 +124,47 @@
     <div class="section">
         <div style="display:flex; justify-content:space-between;">
             <span>Subtotal</span>
-            <span>{{ $formatPrice($subtotal) }}</span>
+            <span class="num">{{ $formatPrice($subtotal) }}</span>
         </div>
         @if($promoDiscount > 0)
             <div style="display:flex; justify-content:space-between;">
                 <span>Promo</span>
-                <span>-{{ $formatPrice($promoDiscount) }}</span>
+                <span class="num">-{{ $formatPrice($promoDiscount) }}</span>
             </div>
         @endif
         @if($discount > 0)
             <div style="display:flex; justify-content:space-between;">
                 <span>Diskon Manual</span>
-                <span>-{{ $formatPrice($discount) }}</span>
+                <span class="num">-{{ $formatPrice($discount) }}</span>
             </div>
         @endif
         @if($voucherDiscount > 0)
             <div style="display:flex; justify-content:space-between;">
                 <span>Voucher</span>
-                <span>-{{ $formatPrice($voucherDiscount) }}</span>
+                <span class="num">-{{ $formatPrice($voucherDiscount) }}</span>
             </div>
         @endif
         @if($loyaltyDiscount > 0)
             <div style="display:flex; justify-content:space-between;">
                 <span>Redeem Poin</span>
-                <span>-{{ $formatPrice($loyaltyDiscount) }}</span>
+                <span class="num">-{{ $formatPrice($loyaltyDiscount) }}</span>
             </div>
         @endif
         @if($shipping > 0)
             <div style="display:flex; justify-content:space-between;">
                 <span>Ongkir</span>
-                <span>{{ $formatPrice($shipping) }}</span>
+                <span class="num">{{ $formatPrice($shipping) }}</span>
             </div>
         @endif
         @if($taxTotal > 0)
             <div style="display:flex; justify-content:space-between;">
                 <span>PPN {{ number_format($taxRate, 0) }}%</span>
-                <span>{{ $formatPrice($taxTotal) }}</span>
+                <span class="num">{{ $formatPrice($taxTotal) }}</span>
             </div>
         @endif
         <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
             <span>TOTAL</span>
-            <span>{{ $formatPrice($total) }}</span>
+            <span class="num">{{ $formatPrice($total) }}</span>
         </div>
     </div>
 
@@ -138,12 +173,12 @@
     <div class="section">
         <div style="display:flex; justify-content:space-between;">
             <span>Bayar ({{ $paymentMethod }})</span>
-            <span>{{ $formatPrice($cash) }}</span>
+            <span class="num">{{ $formatPrice($cash) }}</span>
         </div>
         @if($change > 0)
             <div style="display:flex; justify-content:space-between; font-weight:700;">
                 <span>Kembali</span>
-                <span>{{ $formatPrice($change) }}</span>
+                <span class="num">{{ $formatPrice($change) }}</span>
             </div>
         @endif
     </div>
@@ -158,4 +193,5 @@
         <div>Terima kasih!</div>
     </div>
 </body>
+
 </html>

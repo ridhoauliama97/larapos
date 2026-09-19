@@ -5,9 +5,18 @@ namespace Tests;
 use App\Support\BotGuard;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Crypt;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // PDF generation is stubbed so tests never depend on a live Gotenberg engine
+        Pdf::fake();
+    }
+
     protected function botGuardPayload(): array
     {
         $payload = BotGuard::payload();
