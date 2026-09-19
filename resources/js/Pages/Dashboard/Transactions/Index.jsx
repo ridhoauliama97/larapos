@@ -90,7 +90,7 @@ export default function Index({
     const [selectedCustomer, setSelectedCustomer] = useState(defaultCustomer);
     const [pricingPreview, setPricingPreview] = useState(initialPricingPreview);
     const [isLoadingPricing, setIsLoadingPricing] = useState(false);
-    const [discountInput, setDiscountInput] = useState("");
+    const [discountPercentInput, setDiscountPercentInput] = useState("");
     const [redeemPointsInput, setRedeemPointsInput] = useState("");
     const [cashInput, setCashInput] = useState("");
     const [shippingInput, setShippingInput] = useState("");
@@ -169,9 +169,26 @@ export default function Index({
     const LowStockAlerts = () => null;
 
     // Calculations
+    const discountPercent = useMemo(() => {
+        const value = parseFloat(discountPercentInput);
+
+        return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+    }, [discountPercentInput]);
+    // Manual discount applies to the subtotal after promo, voucher, and loyalty points
+    // (same base the backend clamps against; voucher/loyalty totals never depend on it)
+    const percentBase = useMemo(
+        () =>
+            Math.max(
+                0,
+                Number(pricingPreview?.summary?.subtotal_after_promo ?? 0) -
+                    Number(pricingPreview?.summary?.voucher_discount_total ?? 0) -
+                    Number(pricingPreview?.summary?.loyalty_discount_total ?? 0)
+            ),
+        [pricingPreview]
+    );
     const discount = useMemo(
-        () => Math.max(0, Number(discountInput) || 0),
-        [discountInput]
+        () => Math.min(Math.round((percentBase * discountPercent) / 100), percentBase),
+        [discountPercent, percentBase]
     );
     const shipping = useMemo(
         () => Math.max(0, Number(shippingInput) || 0),
@@ -665,7 +682,7 @@ export default function Index({
             },
             {
                 onSuccess: () => {
-                    setDiscountInput("");
+                    setDiscountPercentInput("");
                     setRedeemPointsInput("");
                     setCashInput("");
                     setShippingInput("");
@@ -1174,23 +1191,32 @@ export default function Index({
 
                                 <div>
                                     <label className="mb-2 block text-xs font-medium text-slate-600 dark:text-slate-400">
-                                        Diskon Manual (Rp)
+                                        Diskon (%)
                                     </label>
                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                                            Rp
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                                            %
                                         </span>
                                         <input
                                             type="text"
-                                            inputMode="numeric"
-                                            value={discountInput}
+                                            inputMode="decimal"
+                                            value={discountPercentInput}
                                             onChange={(e) =>
-                                                setDiscountInput(e.target.value.replace(/[^\d]/g, ""))
+                                                setDiscountPercentInput(
+                                                    e.target.value
+                                                        .replace(/[^0-9.]/g, "")
+                                                        .replace(/(\..*?)\./g, "$1")
+                                                )
                                             }
                                             placeholder="0"
-                                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-800 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                                            className="h-10 w-full rounded-xl border border-slate-200 bg-white px-4 pr-8 text-sm text-slate-800 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
                                         />
                                     </div>
+                                    <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+                                        {discountPercent > 0
+                                            ? `= ${formatPrice(discount)} dari subtotal`
+                                            : "Potongan dihitung dari subtotal setelah promo & voucher"}
+                                    </p>
                                 </div>
 
                                 <div>
