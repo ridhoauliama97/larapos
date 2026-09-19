@@ -28,11 +28,12 @@ Open-source POS system. Laravel 13 + Inertia 3.0 + React 19.
 - **i18n**: react-i18next; locales in `resources/js/i18n/locales`; `SetLocale` middleware on web group
 - **Payment gateways**: Midtrans, Xendit (webhooks in `routes/api.php`)
 - **WhatsApp**: whatsapp-web.js via separate Node service (`whatsapp-service/`, port 3001)
+- **PDF**: `spatie/laravel-pdf` with the Gotenberg driver (`LARAVEL_PDF_DRIVER=gotenberg`, `GOTENBERG_URL=http://localhost:3000`). **Gotenberg 8.37 is bundled inside the app image** (multi-stage copy from `gotenberg/gotenberg:8` + Alpine chromium); `docker/entrypoint.sh` launches it on port 3000 with an auto-restart loop. Only the Chromium route is supported — pdftk/LibreOffice engines are placeholder binaries (no Java/LibreOffice in the image).
 
 ## CI / Deploy
 
-- **CI is build-only** — `.github/workflows/deploy.yml` validates composer + `npm run build` (PHP 8.4, Node 22). It does **NOT run tests**. Run `php artisan test` locally before every PR.
-- **Push to `main` auto-deploys to production** (`Larapos.web.id` via SSH). Never push directly to `main` — use the release process below.
+- **`.github/workflows/build.yml`** runs on every PR + push to `main`/`development`: `vendor/bin/pint --test` → `npm run build` (before tests, so the vite manifest exists) → `php artisan test` (PHP 8.4, Node 22), plus a Docker image build job (no push). Still run `php artisan test` locally — CI is slower to iterate on.
+- **`.github/workflows/deploy.yml`**: PR/push to `main` → build job; push to `main` → SSH deploy to `Larapos.web.id` (skipped gracefully if VPS secrets are unset). **Never push directly to `main`** — use the release process below.
 - Deploy VPS uses Node 24.15 + PHP 8.4 (`php8.4 artisan migrate --force`).
 - npm is the package manager of record (`package-lock.json` committed, `bun.lock` gitignored). CI/deploy run `npm ci`. Don't switch to bun/yarn lockfiles.
 
@@ -149,7 +150,9 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 8. **CRM campaign auto-send** — requires `wa_enabled=true` + connected device in Settings > WhatsApp.
 9. **Version bump on release** — update `APP_VERSION` in `.env` + `.env.example` when tagging.
 10. **Concurrency patterns** — all stock mutations (checkout, transfer, receiving, payment) are wrapped in `DB::transaction` with `lockForUpdate()` on affected rows. Never skip the transaction or lock.
+4. **Image size** — the app image includes Chromium + the bundled Gotenberg engine; expect ~1.7 GB. Keep the PDF-engine apk layer (`chromium perl perl-image-exiftool qpdf`) separate from the PHP extension compile layer in the Dockerfile — merging them back invalidates the ~14-minute `docker-php-ext-install` cache.
 11. **Dine-in online payment is disabled** — the public `DineOrderController` (`app/Http/Controllers/DineOrderController.php`) validates `payment_option in:pay_at_counter` only; `pay_online` returns 422.
+12. **Gotenberg resolves assets relative to attached files** — PDF HTML rendered through `spatie/laravel-pdf` (Gotenberg driver) cannot load local file paths (`public/...`); reference fonts/images via inline base64, `@font-face` with URLs Gotenberg can reach, or attach assets in the same request. `views/pdf/fonts.blade.php` already inlines Geist/Geist Mono — keep it that way. Page sizes/margins are set in `DocumentController` (`->format()`, `->paperSize()`, `->margins()`), not via CSS `@page`.
 
 ## Release Process
 
