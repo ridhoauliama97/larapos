@@ -620,7 +620,7 @@ class TransactionController extends Controller
 
             $gatewayReady = $paymentSetting && ($paymentGateway === 'qris'
                 ? $paymentSetting->isGatewayReady(PaymentSetting::GATEWAY_MIDTRANS)
-                    || $paymentSetting->isGatewayReady(PaymentSetting::GATEWAY_XENDIT)
+                || $paymentSetting->isGatewayReady(PaymentSetting::GATEWAY_XENDIT)
                 : $paymentSetting->isGatewayReady($paymentGateway));
 
             if (! $gatewayReady) {
@@ -643,21 +643,7 @@ class TransactionController extends Controller
             ? CustomerVoucher::find($request->integer('customer_voucher_id'))
             : null;
 
-        $transaction = DB::transaction(function () use (
-            $request,
-            $invoice,
-            $cashAmount,
-            $paymentGateway,
-            $isCashPayment,
-            $isPayLater,
-            $manualDiscount,
-            $shippingCost,
-            $requestedRedeemPoints,
-            $customer,
-            $voucher,
-            $orderType,
-            $note
-        ) {
+        $transaction = DB::transaction(function () use ($request, $invoice, $cashAmount, $paymentGateway, $isCashPayment, $isPayLater, $manualDiscount, $shippingCost, $requestedRedeemPoints, $customer, $voucher, $orderType, $note) {
             $activeShift = $this->cashierShiftService->requireActiveShiftForUser(
                 auth()->user()->id,
                 lockForUpdate: true

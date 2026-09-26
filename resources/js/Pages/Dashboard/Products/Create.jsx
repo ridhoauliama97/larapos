@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, useForm, usePage, Link } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
-import Input from "@/Components/Dashboard/Input";
-import Textarea from "@/Components/Dashboard/TextArea";
-import InputSelect from "@/Components/Dashboard/InputSelect";
-import toast from "react-hot-toast";
-import { slugify, uniqueSlug } from "@/Utils/slug";
+import { useEffect, useRef, useState } from 'react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
+import ImageDropzone from '@/Components/Dashboard/ImageDropzone';
+import Input from '@/Components/Dashboard/Input';
+import Textarea from '@/Components/Dashboard/TextArea';
+import InputSelect from '@/Components/Dashboard/InputSelect';
+import toast from 'react-hot-toast';
+import { slugify, uniqueSlug } from '@/Utils/slug';
 import {
     IconPackage,
     IconDeviceFloppy,
@@ -18,30 +17,25 @@ import {
     IconTrash,
     IconPackages,
     IconRulerMeasure,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
-export default function Create({
-    categories,
-    products,
-    units = [],
-    existingSkus = [],
-}) {
+export default function Create({ categories, products, units = [], existingSkus = [] }) {
     const { errors } = usePage().props;
 
     const { data, setData, post, processing } = useForm({
-        image: "",
-        barcode: "",
-        sku: "",
-        title: "",
-        category_id: "",
-        description: "",
-        buy_price: "",
-        sell_price: "",
-        stock: "",
-        min_stock: "",
-        max_stock: "",
-        tax_type: "exclusive",
-        tax_rate: "11",
+        image: '',
+        barcode: '',
+        sku: '',
+        title: '',
+        category_id: '',
+        description: '',
+        buy_price: '',
+        sell_price: '',
+        stock: '',
+        min_stock: '',
+        max_stock: '',
+        tax_type: 'exclusive',
+        tax_rate: '11',
         is_composite: false,
         components: [],
         units: [],
@@ -53,8 +47,8 @@ export default function Create({
     const takenSkus = new Set(existingSkus);
 
     const handleTitleChange = (value) => {
-        setData("title", value);
-        setData("sku", uniqueSlug(slugify(value), takenSkus));
+        setData('title', value);
+        setData('sku', uniqueSlug(slugify(value), takenSkus));
     };
 
     useEffect(
@@ -63,81 +57,69 @@ export default function Create({
                 URL.revokeObjectURL(objectUrlRef.current);
             }
         },
-        [],
+        []
     );
 
     const setSelectedCategoryHandler = (value) => {
         setSelectedCategory(value);
-        setData("category_id", value?.id || "");
+        setData('category_id', value?.id || '');
     };
 
     const toggleComposite = (checked) => {
-        setData("is_composite", checked);
-        if (checked) setData("units", []);
+        setData('is_composite', checked);
+        if (checked) setData('units', []);
     };
 
     const addUnitRow = () => {
-        const firstUnused = units.find(
-            (u) => !data.units.some((row) => row.unit_id === u.id),
-        );
+        const firstUnused = units.find((u) => !data.units.some((row) => row.unit_id === u.id));
         if (!firstUnused) return;
-        setData("units", [
+        setData('units', [
             ...data.units,
             {
                 unit_id: firstUnused.id,
                 is_base: data.units.length === 0,
-                conversion_factor: data.units.length === 0 ? 1 : "",
-                sell_price: "",
-                barcode: "",
+                conversion_factor: data.units.length === 0 ? 1 : '',
+                sell_price: '',
+                barcode: '',
             },
         ]);
     };
 
     const updateUnitRow = (index, field, value) => {
-        const rows = data.units.map((r, i) =>
-            i === index ? { ...r, [field]: value } : r,
-        );
-        if (field === "is_base" && value) {
+        const rows = data.units.map((r, i) => (i === index ? { ...r, [field]: value } : r));
+        if (field === 'is_base' && value) {
             rows.forEach((r, i) => {
                 if (i !== index) r.is_base = false;
             });
         }
-        setData("units", rows);
+        setData('units', rows);
     };
 
     const removeUnitRow = (index) => {
         setData(
-            "units",
-            data.units.filter((_, i) => i !== index),
+            'units',
+            data.units.filter((_, i) => i !== index)
         );
     };
 
     const availableUnits = (selectedIndex) =>
-        units.filter(
-            (u) =>
-                !data.units.some(
-                    (r, i) => i !== selectedIndex && r.unit_id === u.id,
-                ),
-        );
+        units.filter((u) => !data.units.some((r, i) => i !== selectedIndex && r.unit_id === u.id));
 
     const addComponent = () => {
-        setData("components", [
-            ...data.components,
-            { component_product_id: "", qty: 1 },
-        ]);
+        setData('components', [...data.components, { component_product_id: '', qty: 1 }]);
     };
 
     const updateComponent = (index, field, value) => {
         const components = data.components.map((c, i) =>
-            i === index ? { ...c, [field]: value } : c,
+            i === index ? { ...c, [field]: value } : c
         );
-        setData("components", components);
+        setData('components', components);
     };
 
     const removeComponent = (index) => {
         setData(
-            "components",
-            data.components.filter((_, i) => i !== index),
+            'components',
+            data.components.filter((_, i) => i !== index)
         );
     };
 
@@ -146,19 +128,14 @@ export default function Create({
             (p) =>
                 !p.is_composite &&
                 !data.components.some(
-                    (c, i) =>
-                        i !== selectedIndex && c.component_product_id === p.id,
-                ),
+                    (c, i) => i !== selectedIndex && c.component_product_id === p.id
+                )
         );
 
     const estimatedSellPrice = data.is_composite
         ? data.components.reduce((total, c) => {
-              const product = products.find(
-                  (p) => p.id === Number(c.component_product_id),
-              );
-              return product
-                  ? total + product.sell_price * (Number(c.qty) || 0)
-                  : total;
+              const product = products.find((p) => p.id === Number(c.component_product_id));
+              return product ? total + product.sell_price * (Number(c.qty) || 0) : total;
           }, 0)
         : data.sell_price;
 
@@ -168,7 +145,7 @@ export default function Create({
         }
 
         objectUrlRef.current = URL.createObjectURL(file);
-        setData("image", file);
+        setData('image', file);
         setImagePreview(objectUrlRef.current);
     };
 
@@ -178,7 +155,7 @@ export default function Create({
             objectUrlRef.current = null;
         }
 
-        setData("image", "");
+        setData('image', '');
         setImagePreview(null);
     };
 
@@ -186,12 +163,12 @@ export default function Create({
     const submitCompositeAware = (e) => {
         e.preventDefault();
         if (data.is_composite) {
-            setData("sell_price", 0);
-            setData("stock", 0);
+            setData('sell_price', 0);
+            setData('stock', 0);
         }
-        post(route("products.store"), {
-            onSuccess: () => toast.success("Produk berhasil ditambahkan"),
-            onError: () => toast.error("Gagal menyimpan produk"),
+        post(route('products.store'), {
+            onSuccess: () => toast.success('Produk berhasil ditambahkan'),
+            onError: () => toast.error('Gagal menyimpan produk'),
         });
     };
 
@@ -202,24 +179,24 @@ export default function Create({
             {/* Header */}
             <div className="mb-6">
                 <Link
-                    href={route("products.index")}
-                    className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600 mb-3"
+                    href={route('products.index')}
+                    className="mb-3 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600"
                 >
                     <IconArrowLeft size={16} />
                     Kembali ke Produk
                 </Link>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
                     <IconPackage size={28} className="text-primary-500" />
                     Tambah Produk Baru
                 </h1>
             </div>
 
             <form onSubmit={submitCompositeAware}>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Left Column - Image */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                 <IconPhoto size={18} />
                                 Gambar Produk
                             </h3>
@@ -234,14 +211,14 @@ export default function Create({
                     </div>
 
                     {/* Right Column - Form */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="space-y-6 lg:col-span-2">
                         {/* Basic Info */}
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                 <IconBarcode size={18} />
                                 Informasi Dasar
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="md:col-span-2">
                                     <InputSelect
                                         label="Kategori"
@@ -259,9 +236,7 @@ export default function Create({
                                     type="text"
                                     label="Nama Produk"
                                     value={data.title}
-                                    onChange={(e) =>
-                                        handleTitleChange(e.target.value)
-                                    }
+                                    onChange={(e) => handleTitleChange(e.target.value)}
                                     errors={errors.title}
                                     placeholder="Masukkan nama produk"
                                 />
@@ -286,8 +261,8 @@ export default function Create({
                                         className="cursor-not-allowed opacity-70"
                                     />
                                     <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
-                                        Dibuat otomatis setelah disimpan: PROD +
-                                        ID produk (4 digit) + tanggal.
+                                        Dibuat otomatis setelah disimpan: PROD + ID produk (4 digit)
+                                        + tanggal.
                                     </p>
                                 </div>
                                 <div className="md:col-span-2">
@@ -295,12 +270,7 @@ export default function Create({
                                         label="Deskripsi"
                                         placeholder="Deskripsi produk (opsional)"
                                         errors={errors.description}
-                                        onChange={(e) =>
-                                            setData(
-                                                "description",
-                                                e.target.value,
-                                            )
-                                        }
+                                        onChange={(e) => setData('description', e.target.value)}
                                         value={data.description}
                                         rows={3}
                                     />
@@ -309,78 +279,58 @@ export default function Create({
                         </div>
 
                         {/* Pricing & Stock */}
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                 <IconCurrencyDollar size={18} />
                                 Harga & Stok
                             </h3>
-                            <label className="flex items-center gap-2 mb-4 cursor-pointer">
+                            <label className="mb-4 flex cursor-pointer items-center gap-2">
                                 <input
                                     type="checkbox"
                                     checked={data.is_composite}
-                                    onChange={(e) =>
-                                        toggleComposite(e.target.checked)
-                                    }
+                                    onChange={(e) => toggleComposite(e.target.checked)}
                                     className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                                 />
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                <span className="flex items-center gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                                     <IconPackages size={16} />
                                     Produk Komposit (bundling / paket)
                                 </span>
                             </label>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <Input
                                     type="number"
                                     label="Harga Beli"
                                     value={data.buy_price}
-                                    onChange={(e) =>
-                                        setData("buy_price", e.target.value)
-                                    }
+                                    onChange={(e) => setData('buy_price', e.target.value)}
                                     errors={errors.buy_price}
                                     placeholder="0"
                                 />
                                 <Input
                                     type="number"
                                     label="Harga Jual"
-                                    value={
-                                        data.is_composite ? "" : data.sell_price
-                                    }
+                                    value={data.is_composite ? '' : data.sell_price}
                                     disabled={data.is_composite}
-                                    onChange={(e) =>
-                                        setData("sell_price", e.target.value)
-                                    }
+                                    onChange={(e) => setData('sell_price', e.target.value)}
                                     errors={errors.sell_price}
-                                    placeholder={
-                                        data.is_composite
-                                            ? "Otomatis dari komponen"
-                                            : "0"
-                                    }
+                                    placeholder={data.is_composite ? 'Otomatis dari komponen' : '0'}
                                 />
                                 <Input
                                     type="number"
                                     label="Stok"
-                                    value={data.is_composite ? "" : data.stock}
+                                    value={data.is_composite ? '' : data.stock}
                                     disabled={data.is_composite}
-                                    onChange={(e) =>
-                                        setData("stock", e.target.value)
-                                    }
+                                    onChange={(e) => setData('stock', e.target.value)}
                                     errors={errors.stock}
-                                    placeholder={
-                                        data.is_composite
-                                            ? "Dari stok komponen"
-                                            : "0"
-                                    }
+                                    placeholder={data.is_composite ? 'Dari stok komponen' : '0'}
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <Input
                                     type="number"
                                     label="Stok Minimum"
                                     value={data.min_stock}
-                                    onChange={(e) =>
-                                        setData("min_stock", e.target.value)
-                                    }
+                                    onChange={(e) => setData('min_stock', e.target.value)}
                                     errors={errors.min_stock}
                                     placeholder="0"
                                 />
@@ -388,23 +338,20 @@ export default function Create({
                                     type="number"
                                     label="Stok Maksimum"
                                     value={data.max_stock}
-                                    onChange={(e) =>
-                                        setData("max_stock", e.target.value)
-                                    }
+                                    onChange={(e) => setData('max_stock', e.target.value)}
                                     errors={errors.max_stock}
                                     placeholder="0"
                                 />
-                                <p className="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400">
-                                    Dipakai untuk reorder point: saat stok
-                                    menyentuh minimum, draft purchase order
-                                    otomatis dibuat oleh sistem
-                                    (reorder:generate harian).
+                                <p className="text-xs text-slate-500 dark:text-slate-400 sm:col-span-2">
+                                    Dipakai untuk reorder point: saat stok menyentuh minimum, draft
+                                    purchase order otomatis dibuat oleh sistem (reorder:generate
+                                    harian).
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Tipe Pajak
                                     </label>
                                     <div className="flex gap-4">
@@ -413,15 +360,9 @@ export default function Create({
                                                 type="radio"
                                                 name="tax_type"
                                                 value="exclusive"
-                                                checked={
-                                                    data.tax_type ===
-                                                    "exclusive"
-                                                }
+                                                checked={data.tax_type === 'exclusive'}
                                                 onChange={(e) =>
-                                                    setData(
-                                                        "tax_type",
-                                                        e.target.value,
-                                                    )
+                                                    setData('tax_type', e.target.value)
                                                 }
                                             />
                                             Exclusive
@@ -431,22 +372,16 @@ export default function Create({
                                                 type="radio"
                                                 name="tax_type"
                                                 value="inclusive"
-                                                checked={
-                                                    data.tax_type ===
-                                                    "inclusive"
-                                                }
+                                                checked={data.tax_type === 'inclusive'}
                                                 onChange={(e) =>
-                                                    setData(
-                                                        "tax_type",
-                                                        e.target.value,
-                                                    )
+                                                    setData('tax_type', e.target.value)
                                                 }
                                             />
                                             Inclusive
                                         </label>
                                     </div>
                                     {errors.tax_type && (
-                                        <p className="text-xs text-danger-500 mt-1">
+                                        <p className="mt-1 text-xs text-danger-500">
                                             {errors.tax_type}
                                         </p>
                                     )}
@@ -455,9 +390,7 @@ export default function Create({
                                     type="number"
                                     label="Persentase Pajak (%)"
                                     value={data.tax_rate}
-                                    onChange={(e) =>
-                                        setData("tax_rate", e.target.value)
-                                    }
+                                    onChange={(e) => setData('tax_rate', e.target.value)}
                                     errors={errors.tax_rate}
                                     placeholder="11"
                                 />
@@ -465,28 +398,26 @@ export default function Create({
 
                             {/* Profit Estimation */}
                             {data.buy_price > 0 && data.sell_price > 0 && (
-                                <div className="mt-4 p-4 rounded-xl bg-success-50 dark:bg-success-950/30 border border-success-200 dark:border-success-900">
+                                <div className="mt-4 rounded-xl border border-success-200 bg-success-50 p-4 dark:border-success-900 dark:bg-success-950/30">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm text-success-700 dark:text-success-400 font-medium">
+                                            <p className="text-sm font-medium text-success-700 dark:text-success-400">
                                                 Estimasi Profit per Item
                                             </p>
-                                            <p className="text-2xl font-bold text-success-600 dark:text-success-500 mt-1">
-                                                + Rp{" "}
-                                                {(
-                                                    data.sell_price -
-                                                    data.buy_price
-                                                ).toLocaleString("id-ID")}
+                                            <p className="mt-1 text-2xl font-bold text-success-600 dark:text-success-500">
+                                                + Rp{' '}
+                                                {(data.sell_price - data.buy_price).toLocaleString(
+                                                    'id-ID'
+                                                )}
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm text-success-700 dark:text-success-400 font-medium">
+                                            <p className="text-sm font-medium text-success-700 dark:text-success-400">
                                                 Margin
                                             </p>
-                                            <p className="text-xl font-bold text-success-600 dark:text-success-500 mt-1">
+                                            <p className="mt-1 text-xl font-bold text-success-600 dark:text-success-500">
                                                 {(
-                                                    ((data.sell_price -
-                                                        data.buy_price) /
+                                                    ((data.sell_price - data.buy_price) /
                                                         data.buy_price) *
                                                     100
                                                 ).toFixed(1)}
@@ -500,64 +431,50 @@ export default function Create({
 
                         {/* Units */}
                         {!data.is_composite && (
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                                <div className="mb-4 flex items-center justify-between">
+                                    <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                         <IconRulerMeasure size={18} />
                                         Satuan
                                     </h3>
                                     <button
                                         type="button"
                                         onClick={addUnitRow}
-                                        disabled={
-                                            data.units.length >= units.length
-                                        }
-                                        className="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-40"
+                                        disabled={data.units.length >= units.length}
+                                        className="text-sm font-medium text-primary-600 hover:text-primary-700 disabled:opacity-40"
                                     >
                                         + Tambah Satuan
                                     </button>
                                 </div>
                                 {errors.units && (
-                                    <p className="text-sm text-danger-600 mb-2">
-                                        {errors.units}
-                                    </p>
+                                    <p className="mb-2 text-sm text-danger-600">{errors.units}</p>
                                 )}
                                 {data.units.length === 0 && (
                                     <p className="text-sm text-slate-500">
-                                        Satuan dasar otomatis dibuat jika tidak
-                                        ditambahkan. Tambahkan satuan (box, kg,
-                                        dll) untuk penjualan multi-satuan.
+                                        Satuan dasar otomatis dibuat jika tidak ditambahkan.
+                                        Tambahkan satuan (box, kg, dll) untuk penjualan
+                                        multi-satuan.
                                     </p>
                                 )}
                                 <div className="space-y-3">
                                     {data.units.map((row, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-end gap-3"
-                                        >
+                                        <div key={index} className="flex items-end gap-3">
                                             <div className="flex-1">
                                                 <InputSelect
                                                     data={availableUnits(index)}
                                                     selected={
-                                                        units.find(
-                                                            (u) =>
-                                                                u.id ===
-                                                                row.unit_id,
-                                                        ) || null
+                                                        units.find((u) => u.id === row.unit_id) ||
+                                                        null
                                                     }
                                                     setSelected={(value) =>
                                                         updateUnitRow(
                                                             index,
-                                                            "unit_id",
-                                                            value?.id ?? "",
+                                                            'unit_id',
+                                                            value?.id ?? ''
                                                         )
                                                     }
                                                     placeholder="Pilih satuan"
-                                                    errors={
-                                                        errors[
-                                                            `units.${index}.unit_id`
-                                                        ]
-                                                    }
+                                                    errors={errors[`units.${index}.unit_id`]}
                                                     searchable={true}
                                                     displayKey="code"
                                                 />
@@ -567,20 +484,16 @@ export default function Create({
                                                     type="number"
                                                     min="0.0001"
                                                     step="0.0001"
-                                                    value={
-                                                        row.conversion_factor
-                                                    }
+                                                    value={row.conversion_factor}
                                                     onChange={(e) =>
                                                         updateUnitRow(
                                                             index,
-                                                            "conversion_factor",
-                                                            e.target.value,
+                                                            'conversion_factor',
+                                                            e.target.value
                                                         )
                                                     }
                                                     errors={
-                                                        errors[
-                                                            `units.${index}.conversion_factor`
-                                                        ]
+                                                        errors[`units.${index}.conversion_factor`]
                                                     }
                                                     placeholder="Konversi"
                                                     disabled={row.is_base}
@@ -594,15 +507,11 @@ export default function Create({
                                                     onChange={(e) =>
                                                         updateUnitRow(
                                                             index,
-                                                            "sell_price",
-                                                            e.target.value,
+                                                            'sell_price',
+                                                            e.target.value
                                                         )
                                                     }
-                                                    errors={
-                                                        errors[
-                                                            `units.${index}.sell_price`
-                                                        ]
-                                                    }
+                                                    errors={errors[`units.${index}.sell_price`]}
                                                     placeholder="Harga jual"
                                                 />
                                             </div>
@@ -613,27 +522,23 @@ export default function Create({
                                                     onChange={(e) =>
                                                         updateUnitRow(
                                                             index,
-                                                            "barcode",
-                                                            e.target.value,
+                                                            'barcode',
+                                                            e.target.value
                                                         )
                                                     }
-                                                    errors={
-                                                        errors[
-                                                            `units.${index}.barcode`
-                                                        ]
-                                                    }
+                                                    errors={errors[`units.${index}.barcode`]}
                                                     placeholder="Barcode (opsional)"
                                                 />
                                             </div>
-                                            <label className="flex items-center gap-1 pb-3 text-xs text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                                            <label className="flex items-center gap-1 whitespace-nowrap pb-3 text-xs text-slate-600 dark:text-slate-300">
                                                 <input
                                                     type="checkbox"
                                                     checked={row.is_base}
                                                     onChange={(e) =>
                                                         updateUnitRow(
                                                             index,
-                                                            "is_base",
-                                                            e.target.checked,
+                                                            'is_base',
+                                                            e.target.checked
                                                         )
                                                     }
                                                     className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
@@ -642,10 +547,8 @@ export default function Create({
                                             </label>
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    removeUnitRow(index)
-                                                }
-                                                className="p-2.5 rounded-xl text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-950/30 transition-colors"
+                                                onClick={() => removeUnitRow(index)}
+                                                className="rounded-xl p-2.5 text-danger-600 transition-colors hover:bg-danger-50 dark:hover:bg-danger-950/30"
                                             >
                                                 <IconTrash size={18} />
                                             </button>
@@ -657,56 +560,51 @@ export default function Create({
 
                         {/* Composite Components */}
                         {data.is_composite && (
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                                <div className="mb-4 flex items-center justify-between">
+                                    <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                         <IconPackages size={18} />
                                         Komponen Paket
                                     </h3>
                                     <button
                                         type="button"
                                         onClick={addComponent}
-                                        className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                                        className="text-sm font-medium text-primary-600 hover:text-primary-700"
                                     >
                                         + Tambah Komponen
                                     </button>
                                 </div>
                                 {errors.components && (
-                                    <p className="text-sm text-danger-600 mb-2">
+                                    <p className="mb-2 text-sm text-danger-600">
                                         {errors.components}
                                     </p>
                                 )}
                                 {data.components.length === 0 && (
                                     <p className="text-sm text-slate-500">
-                                        Belum ada komponen. Stok dan harga jual
-                                        dihitung otomatis dari komponen.
+                                        Belum ada komponen. Stok dan harga jual dihitung otomatis
+                                        dari komponen.
                                     </p>
                                 )}
                                 <div className="space-y-3">
                                     {data.components.map((component, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-end gap-3"
-                                        >
+                                        <div key={index} className="flex items-end gap-3">
                                             <div className="flex-1">
                                                 <InputSelect
-                                                    data={availableProducts(
-                                                        index,
-                                                    )}
+                                                    data={availableProducts(index)}
                                                     selected={
                                                         products.find(
                                                             (p) =>
                                                                 p.id ===
                                                                 Number(
-                                                                    component.component_product_id,
-                                                                ),
+                                                                    component.component_product_id
+                                                                )
                                                         ) || null
                                                     }
                                                     setSelected={(value) =>
                                                         updateComponent(
                                                             index,
-                                                            "component_product_id",
-                                                            value?.id ?? "",
+                                                            'component_product_id',
+                                                            value?.id ?? ''
                                                         )
                                                     }
                                                     placeholder="Pilih produk komponen"
@@ -727,60 +625,50 @@ export default function Create({
                                                     onChange={(e) =>
                                                         updateComponent(
                                                             index,
-                                                            "qty",
-                                                            e.target.value,
+                                                            'qty',
+                                                            e.target.value
                                                         )
                                                     }
-                                                    errors={
-                                                        errors[
-                                                            `components.${index}.qty`
-                                                        ]
-                                                    }
+                                                    errors={errors[`components.${index}.qty`]}
                                                     placeholder="Qty"
                                                 />
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    removeComponent(index)
-                                                }
-                                                className="p-2.5 rounded-xl text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-950/30 transition-colors"
+                                                onClick={() => removeComponent(index)}
+                                                className="rounded-xl p-2.5 text-danger-600 transition-colors hover:bg-danger-50 dark:hover:bg-danger-950/30"
                                             >
                                                 <IconTrash size={18} />
                                             </button>
                                         </div>
                                     ))}
                                 </div>
-                                {data.is_composite &&
-                                    estimatedSellPrice > 0 && (
-                                        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-                                            Estimasi harga jual dari komponen:{" "}
-                                            <span className="font-semibold text-slate-700 dark:text-slate-200">
-                                                Rp{" "}
-                                                {estimatedSellPrice.toLocaleString(
-                                                    "id-ID",
-                                                )}
-                                            </span>
-                                        </p>
-                                    )}
+                                {data.is_composite && estimatedSellPrice > 0 && (
+                                    <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+                                        Estimasi harga jual dari komponen:{' '}
+                                        <span className="font-semibold text-slate-700 dark:text-slate-200">
+                                            Rp {estimatedSellPrice.toLocaleString('id-ID')}
+                                        </span>
+                                    </p>
+                                )}
                             </div>
                         )}
 
                         {/* Submit */}
                         <div className="flex justify-end gap-3">
                             <Link
-                                href={route("products.index")}
-                                className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors"
+                                href={route('products.index')}
+                                className="rounded-xl border border-slate-200 px-6 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
                             >
                                 Batal
                             </Link>
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors disabled:opacity-50"
+                                className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-6 py-2.5 font-medium text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
                             >
                                 <IconDeviceFloppy size={18} />
-                                {processing ? "Menyimpan..." : "Simpan Produk"}
+                                {processing ? 'Menyimpan...' : 'Simpan Produk'}
                             </button>
                         </div>
                     </div>

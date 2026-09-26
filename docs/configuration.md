@@ -5,7 +5,7 @@ Kembali ke indeks dokumentasi: `docs/README.md`
 ## Environment Penting
 
 | Variable | Untuk apa |
-|----------|-----------|
+| ---------- | ----------- |
 | `APP_URL` | Webhook URL, public invoice, customer portal link, payment callback |
 | `APP_VERSION` | Versi aplikasi (tampil di sidebar + POS navbar) |
 | `DB_DATABASE` | Nama database (default: `point_of_sales`) |
@@ -14,6 +14,8 @@ Kembali ke indeks dokumentasi: `docs/README.md`
 | `XENDIT_SECRET_KEY` | Secret key Xendit |
 | `XENDIT_PUBLIC_KEY` | Public key Xendit |
 | `XENDIT_CALLBACK_TOKEN` | Callback token verifikasi webhook Xendit |
+
+> **Kunci sisi klien dan mode sandbox/production TIDAK dibaca dari `.env`.** `config/services.php` hanya membaca tiga key di atas. `MIDTRANS_CLIENT_KEY`, `MIDTRANS_IS_PRODUCTION`, dan pasangan `XENDIT_PUBLIC_KEY` / mode produksi disimpan di tabel **`payment_settings`** (UI: Dashboard → Payment Settings), dengan fallback env. Jangan isi `MIDTRANS_CLIENT_KEY` atau `XENDIT_PUBLIC_KEY` di `.env.production` — nilainya tidak dibaca apa pun.
 | `AUTH_PUBLIC_REGISTRATION` | Aktifkan registrasi publik (`true`/`false`, default: `false`) |
  | `WA_SERVICE_URL` | Alamat Node.js WhatsApp service (default: `http://localhost:3001`) |
 

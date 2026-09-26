@@ -1,11 +1,20 @@
-import { forwardRef, useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
-export default forwardRef(function TextInput({ type = 'text', className = '', isFocused = false, ...props }, ref) {
-    const input = ref ? ref : useRef();
+export default forwardRef(function TextInput(
+    { type = 'text', className = '', isFocused = false, ...props },
+    ref
+) {
+    // Always create the internal ref; a forwarded ref is merged in below.
+    // Calling useRef() conditionally would break hook order when a parent
+    // starts or stops passing a ref between renders.
+    const internalRef = useRef(null);
+
+    // Expose the underlying <input> node to the forwarded ref.
+    useImperativeHandle(ref, () => internalRef.current);
 
     useEffect(() => {
         if (isFocused) {
-            input.current.focus();
+            internalRef.current?.focus();
         }
     }, []);
 
@@ -14,10 +23,10 @@ export default forwardRef(function TextInput({ type = 'text', className = '', is
             {...props}
             type={type}
             className={
-                'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm ' +
+                'rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ' +
                 className
             }
-            ref={input}
+            ref={internalRef}
         />
     );
 });

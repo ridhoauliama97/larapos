@@ -123,7 +123,7 @@ COPY --from=node-build /app/public/build ./public/build
 COPY . .
 
 RUN mkdir -p storage/framework/{cache/data,sessions,testing,views} \
-        storage/app/public bootstrap/cache database \
+        storage/app/public storage/logs bootstrap/cache database \
     && touch database/database.sqlite \
     && chown -R www-data:www-data storage bootstrap/cache database \
     && chmod +x artisan

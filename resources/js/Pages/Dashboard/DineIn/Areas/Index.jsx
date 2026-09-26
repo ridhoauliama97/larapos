@@ -1,37 +1,40 @@
-import React, { useState } from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, usePage, router, useForm } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import {
-    IconCirclePlus,
-    IconDatabaseOff,
-    IconPencilCog,
-    IconTrash,
-    IconLayoutGrid,
-} from "@tabler/icons-react";
-import Table from "@/Components/Dashboard/Table";
-import Modal from "@/Components/Dashboard/Modal";
-import Input from "@/Components/Dashboard/Input";
-import { useAuthorization } from "@/Utils/authorization";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, router, useForm } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import { IconCirclePlus, IconDatabaseOff, IconPencilCog, IconTrash } from '@tabler/icons-react';
+import Table from '@/Components/Dashboard/Table';
+import Modal from '@/Components/Dashboard/Modal';
+import Input from '@/Components/Dashboard/Input';
+import { useAuthorization } from '@/Utils/authorization';
+import toast from 'react-hot-toast';
 
 export default function Index({ areas }) {
     const { can } = useAuthorization();
-    const canCreate = can("dine-tables-create");
-    const canUpdate = can("dine-tables-access");
-    const canDelete = can("dine-tables-access");
+    const canCreate = can('dine-tables-create');
+    const canUpdate = can('dine-tables-access');
+    const canDelete = can('dine-tables-access');
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingArea, setEditingArea] = useState(null);
-    const { data, setData, post, patch, processing, errors, reset } = useForm({
-        name: "",
+    // Function initializer: Inertia reassigns `defaults` to the last submitted
+    // payload after every successful submit, so `reset()` would refill the form with
+    // whatever was just saved. Only a function initializer makes `reset()` return
+    // the pristine values.
+    const { data, setData, post, patch, processing, errors, reset } = useForm(() => ({
+        name: '',
         sort_order: 0,
         is_active: true,
-    });
+    }));
 
     const openCreate = () => {
         setEditingArea(null);
-        reset({ name: "", sort_order: areas.length, is_active: true });
+        // `reset` takes field *names* and copies them from the defaults — passing an
+        // object of values is silently a no-op, which left the previous edit's values
+        // in the form. No args restores the defaults; `setData` then applies the one
+        // field that is intentionally not the default.
+        reset();
+        setData('sort_order', areas.length);
         setModalOpen(true);
     };
 
@@ -48,23 +51,23 @@ export default function Index({ areas }) {
     const submit = (e) => {
         e.preventDefault();
         const onSuccess = () => {
-            toast.success(editingArea ? "Area berhasil diperbarui." : "Area berhasil ditambahkan.");
+            toast.success(editingArea ? 'Area berhasil diperbarui.' : 'Area berhasil ditambahkan.');
             setModalOpen(false);
         };
-        const onError = () => toast.error("Gagal menyimpan area.");
+        const onError = () => toast.error('Gagal menyimpan area.');
 
         if (editingArea) {
-            patch(route("dine-areas.update", editingArea.id), { onSuccess, onError });
+            patch(route('dine-areas.update', editingArea.id), { onSuccess, onError });
         } else {
-            post(route("dine-areas.store"), { onSuccess, onError });
+            post(route('dine-areas.store'), { onSuccess, onError });
         }
     };
 
     const handleDelete = (area) => {
         if (!confirm(`Hapus area "${area.name}"?`)) return;
-        router.delete(route("dine-areas.destroy", area.id), {
-            onSuccess: () => toast.success("Area berhasil dihapus."),
-            onError: () => toast.error("Gagal menghapus area."),
+        router.delete(route('dine-areas.destroy', area.id), {
+            onSuccess: () => toast.success('Area berhasil dihapus.'),
+            onError: () => toast.error('Gagal menghapus area.'),
         });
     };
 
@@ -73,7 +76,7 @@ export default function Index({ areas }) {
             <Head title="Area Dine-In" />
 
             <div className="mb-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                             Area Dine-In
@@ -84,12 +87,12 @@ export default function Index({ areas }) {
                     </div>
                     {canCreate && (
                         <Button
-                            type={"link"}
+                            type={'link'}
                             icon={<IconCirclePlus size={18} strokeWidth={1.5} />}
                             className={
-                                "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                                'bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600'
                             }
-                            label={"Tambah Area"}
+                            label={'Tambah Area'}
                             onClick={openCreate}
                         />
                     )}
@@ -97,7 +100,7 @@ export default function Index({ areas }) {
             </div>
 
             {areas.length > 0 ? (
-                <Table.Card title={"Data Area"}>
+                <Table.Card title={'Data Area'}>
                     <Table>
                         <Table.Thead>
                             <tr>
@@ -111,7 +114,7 @@ export default function Index({ areas }) {
                         <Table.Tbody>
                             {areas.map((area, i) => (
                                 <tr
-                                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                                    className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
                                     key={area.id}
                                 >
                                     <Table.Td className="text-center">{++i}</Table.Td>
@@ -127,33 +130,38 @@ export default function Index({ areas }) {
                                     </Table.Td>
                                     <Table.Td>
                                         <span
-                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                                                 area.is_active
-                                                    ? "bg-success-100 text-success-700 dark:bg-success-900/50 dark:text-success-400"
-                                                    : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                                                    ? 'bg-success-100 text-success-700 dark:bg-success-900/50 dark:text-success-400'
+                                                    : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                                             }`}
                                         >
-                                            {area.is_active ? "Aktif" : "Nonaktif"}
+                                            {area.is_active ? 'Aktif' : 'Nonaktif'}
                                         </span>
                                     </Table.Td>
                                     <Table.Td>
-                                        <div className="flex gap-2 justify-end">
+                                        <div className="flex justify-end gap-2">
                                             {canUpdate && (
                                                 <Button
-                                                    type={"edit"}
-                                                    icon={<IconPencilCog size={16} strokeWidth={1.5} />}
+                                                    type={'edit'}
+                                                    icon={
+                                                        <IconPencilCog
+                                                            size={16}
+                                                            strokeWidth={1.5}
+                                                        />
+                                                    }
                                                     className={
-                                                        "border bg-warning-100 border-warning-200 text-warning-600 hover:bg-warning-200 dark:bg-warning-900/50 dark:border-warning-800 dark:text-warning-400"
+                                                        'border border-warning-200 bg-warning-100 text-warning-600 hover:bg-warning-200 dark:border-warning-800 dark:bg-warning-900/50 dark:text-warning-400'
                                                     }
                                                     onClick={() => openEdit(area)}
                                                 />
                                             )}
                                             {canDelete && (
                                                 <Button
-                                                    type={"delete"}
+                                                    type={'delete'}
                                                     icon={<IconTrash size={16} strokeWidth={1.5} />}
                                                     className={
-                                                        "border bg-danger-100 border-danger-200 text-danger-600 hover:bg-danger-200 dark:bg-danger-900/50 dark:border-danger-800 dark:text-danger-400"
+                                                        'border border-danger-200 bg-danger-100 text-danger-600 hover:bg-danger-200 dark:border-danger-800 dark:bg-danger-900/50 dark:text-danger-400'
                                                     }
                                                     onClick={() => handleDelete(area)}
                                                 />
@@ -166,22 +174,22 @@ export default function Index({ areas }) {
                     </Table>
                 </Table.Card>
             ) : (
-                <div className="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 dark:border-slate-800 dark:bg-slate-900">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                         <IconDatabaseOff size={32} className="text-slate-400" strokeWidth={1.5} />
                     </div>
-                    <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-1">
+                    <h3 className="mb-1 text-lg font-medium text-slate-800 dark:text-slate-200">
                         Belum Ada Area
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                    <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
                         Tambahkan area dine-in pertama Anda.
                     </p>
                     {canCreate && (
                         <Button
-                            type={"link"}
+                            type={'link'}
                             icon={<IconCirclePlus size={18} />}
-                            className={"bg-primary-500 hover:bg-primary-600 text-white"}
-                            label={"Tambah Area"}
+                            className={'bg-primary-500 text-white hover:bg-primary-600'}
+                            label={'Tambah Area'}
                             onClick={openCreate}
                         />
                     )}
@@ -191,14 +199,14 @@ export default function Index({ areas }) {
             <Modal
                 show={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={editingArea ? "Edit Area" : "Tambah Area"}
+                title={editingArea ? 'Edit Area' : 'Tambah Area'}
             >
                 <form onSubmit={submit} className="space-y-4">
                     <Input
                         label="Nama Area"
                         value={data.name}
-                        onChange={(e) => setData("name", e.target.value)}
-                        error={errors.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        errors={errors.name}
                         placeholder="Contoh: Indoor, Outdoor, VIP"
                         required
                     />
@@ -207,15 +215,15 @@ export default function Index({ areas }) {
                         type="number"
                         min="0"
                         value={data.sort_order}
-                        onChange={(e) => setData("sort_order", parseInt(e.target.value) || 0)}
-                        error={errors.sort_order}
+                        onChange={(e) => setData('sort_order', parseInt(e.target.value) || 0)}
+                        errors={errors.sort_order}
                     />
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex cursor-pointer items-center gap-3">
                         <input
                             type="checkbox"
                             checked={data.is_active}
-                            onChange={(e) => setData("is_active", e.target.checked)}
-                            className="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500"
+                            onChange={(e) => setData('is_active', e.target.checked)}
+                            className="h-4 w-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500"
                         />
                         <span className="text-sm text-slate-700 dark:text-slate-300">
                             Area aktif
@@ -223,15 +231,15 @@ export default function Index({ areas }) {
                     </label>
                     <div className="flex justify-end gap-3 pt-2">
                         <Button
-                            type={"button"}
-                            label={"Batal"}
+                            type={'button'}
+                            label={'Batal'}
                             onClick={() => setModalOpen(false)}
                         />
                         <Button
-                            type={"submit"}
-                            label={editingArea ? "Perbarui" : "Simpan"}
+                            type={'submit'}
+                            label={editingArea ? 'Perbarui' : 'Simpan'}
                             processing={processing}
-                            className={"bg-primary-500 hover:bg-primary-600 text-white"}
+                            className={'bg-primary-500 text-white hover:bg-primary-600'}
                         />
                     </div>
                 </form>

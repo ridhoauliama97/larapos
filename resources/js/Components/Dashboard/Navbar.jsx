@@ -1,78 +1,65 @@
-import React, { useEffect, useState } from "react";
-import { usePage } from "@inertiajs/react";
-import {
-    IconMenu2,
-    IconMoon,
-    IconSun,
-    IconSearch,
-    IconBook,
-} from "@tabler/icons-react";
-import AuthDropdown from "@/Components/Dashboard/AuthDropdown";
-import LanguageSwitcher from "@/Components/Dashboard/LanguageSwitcher";
-import Menu from "@/Utils/Menu";
-import Notification from "@/Components/Dashboard/Notification";
-import { useTour } from "@/Hooks/useTour";
-import i18n from "@/i18n";
+import { useEffect, useState } from 'react';
+import { usePage } from '@inertiajs/react';
+import { IconMenu2, IconMoon, IconSun, IconBook } from '@tabler/icons-react';
+import AuthDropdown from '@/Components/Dashboard/AuthDropdown';
+import LanguageSwitcher from '@/Components/Dashboard/LanguageSwitcher';
+import Menu from '@/Utils/Menu';
+import Notification from '@/Components/Dashboard/Notification';
+import { useTour } from '@/Hooks/useTour';
+import i18n from '@/i18n';
 
 export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
     const { auth, storeProfile } = usePage().props;
-    const { start: startTour, isActive: tourActive } = useTour("dashboard");
+    const { start: startTour, isActive: tourActive } = useTour('dashboard');
     const menuNavigation = Menu();
 
-    const storeName = storeProfile?.name || "KASIR";
-    const storeInitial = storeName?.charAt(0)?.toUpperCase() || "K";
+    const storeName = storeProfile?.name || 'KASIR';
+    const storeInitial = storeName?.charAt(0)?.toUpperCase() || 'K';
 
     // Get current page title
     const links = menuNavigation.flatMap((item) => item.details);
     const sublinks = links
-        .filter((item) => item.hasOwnProperty("subdetails"))
+        .filter((item) => Object.hasOwn(item, 'subdetails'))
         .flatMap((item) => item.subdetails);
 
     const getCurrentTitle = () => {
         for (const link of links) {
-            if (link.hasOwnProperty("subdetails")) {
+            if (Object.hasOwn(link, 'subdetails')) {
                 const activeSublink = sublinks.find((s) => s.active);
                 if (activeSublink) return activeSublink.title;
             } else if (link.active) {
                 return link.title;
             }
         }
-        return "Dashboard";
+        return 'Dashboard';
     };
 
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 768);
-        window.addEventListener("resize", handleResize);
+        window.addEventListener('resize', handleResize);
         handleResize();
-        return () => window.removeEventListener("resize", handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     return (
-        <header
-            className="sticky top-0 z-30 h-16 flex items-center justify-between px-4 md:px-6
-            bg-white dark:bg-slate-900
-            border-b border-slate-200 dark:border-slate-800
-            transition-colors duration-200"
-        >
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 transition-colors duration-200 dark:border-slate-800 dark:bg-slate-900 md:px-6">
             {/* Left Section */}
             <div className="flex items-center gap-4">
                 {/* Sidebar Toggle */}
                 <button
                     onClick={toggleSidebar}
-                    className="flex p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="flex rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                     title="Toggle Sidebar"
                 >
                     <IconMenu2 size={20} strokeWidth={1.5} />
                 </button>
 
                 {/* Mobile Logo */}
-                <div className="md:hidden flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                        <span className="text-white font-bold text-xs">
-                            {storeInitial}
-                        </span>
+                <div className="flex items-center gap-2 md:hidden">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700">
+                        <span className="text-xs font-bold text-white">{storeInitial}</span>
                     </div>
                     <span className="text-lg font-bold text-slate-800 dark:text-white">
                         {storeName}
@@ -80,8 +67,8 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
                 </div>
 
                 {/* Current Page Title */}
-                <div className="hidden md:flex items-center">
-                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mr-4" />
+                <div className="hidden items-center md:flex">
+                    <div className="mr-4 h-6 w-px bg-slate-200 dark:bg-slate-700" />
                     <h1 className="text-base font-semibold text-slate-800 dark:text-slate-200">
                         {getCurrentTitle()}
                     </h1>
@@ -94,8 +81,8 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
                 <button
                     onClick={startTour}
                     disabled={tourActive}
-                    className="p-2.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
-                    title={i18n.t("tour.button")}
+                    className="rounded-xl p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                    title={i18n.t('tour.button')}
                 >
                     <IconBook size={20} strokeWidth={1.5} />
                 </button>
@@ -106,15 +93,11 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
                 {/* Theme Toggle */}
                 <button
                     onClick={themeSwitcher}
-                    className="p-2.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors"
-                    title={darkMode ? "Light Mode" : "Dark Mode"}
+                    className="rounded-xl p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                    title={darkMode ? 'Light Mode' : 'Dark Mode'}
                 >
                     {darkMode ? (
-                        <IconSun
-                            size={20}
-                            strokeWidth={1.5}
-                            className="text-amber-500"
-                        />
+                        <IconSun size={20} strokeWidth={1.5} className="text-amber-500" />
                     ) : (
                         <IconMoon size={20} strokeWidth={1.5} />
                     )}
@@ -124,7 +107,7 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
                 <Notification />
 
                 {/* Divider */}
-                <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 mx-1" />
+                <div className="mx-1 h-8 w-px bg-slate-200 dark:bg-slate-700" />
 
                 {/* User Dropdown */}
                 <AuthDropdown auth={auth} isMobile={isMobile} />

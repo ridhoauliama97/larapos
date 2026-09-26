@@ -4,14 +4,14 @@
  * @param {string} folder - Storage folder (products, categories, etc)
  * @returns {string|null} - Proper image URL or null
  */
-export function getImageUrl(image, folder = "products") {
+export function getImageUrl(image, folder = 'products') {
     if (!image) return null;
 
     // If already a full URL, return as-is
     if (
-        image.startsWith("http://") ||
-        image.startsWith("https://") ||
-        image.startsWith("/storage/")
+        image.startsWith('http://') ||
+        image.startsWith('https://') ||
+        image.startsWith('/storage/')
     ) {
         return image;
     }
@@ -26,5 +26,5 @@ export function getImageUrl(image, folder = "products") {
  * @returns {string|null}
  */
 export function getProductImageUrl(image) {
-    return getImageUrl(image, "products");
+    return getImageUrl(image, 'products');
 }

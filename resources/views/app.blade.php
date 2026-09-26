@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    {{-- Required for any native form POST built in JS (see Public/TransactionDetail.jsx).
+         The XSRF-TOKEN cookie holds an encrypted blob, not the plain token, so it
+         cannot be reused as _token. --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#4f46e5">
     <meta name="description"
         content="Larapos — sistem kasir (POS) open source untuk UMKM Indonesia. Multi-warehouse, PPN, loyalty & CRM, WhatsApp gateway, offline mode. Gratis, MIT License.">

@@ -1,19 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import Input from "@/Components/Dashboard/Input";
-import Select from "@/Components/Dashboard/Select";
-import Textarea from "@/Components/Dashboard/TextArea";
-import {
-    IconArrowLeft,
-    IconCrown,
-    IconDeviceFloppy,
-    IconInfoCircle,
-} from "@tabler/icons-react";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { useEffect, useRef, useState } from 'react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import Input from '@/Components/Dashboard/Input';
+import Select from '@/Components/Dashboard/Select';
+import Textarea from '@/Components/Dashboard/TextArea';
+import { IconArrowLeft, IconCrown, IconDeviceFloppy, IconInfoCircle } from '@tabler/icons-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
-export default function Form({ mode = "create", member = null }) {
-    const isEdit = mode === "edit";
+export default function Form({ mode = 'create', member = null }) {
+    const isEdit = mode === 'edit';
     const {
         errors,
         provinces = [],
@@ -24,16 +19,16 @@ export default function Form({ mode = "create", member = null }) {
     } = usePage().props;
 
     const { data, setData, post, processing } = useForm({
-        name: member?.name ?? "",
-        no_telp: member?.no_telp ?? "",
-        address: member?.address ?? "",
+        name: member?.name ?? '',
+        no_telp: member?.no_telp ?? '',
+        address: member?.address ?? '',
         is_loyalty_member: Boolean(member?.is_loyalty_member ?? true),
-        loyalty_tier: member?.loyalty_tier ?? "regular",
-        province_id: member?.province_id ?? "",
-        regency_id: member?.regency_id ?? "",
-        district_id: member?.district_id ?? "",
-        village_id: member?.village_id ?? "",
-        _method: isEdit ? "PUT" : "POST",
+        loyalty_tier: member?.loyalty_tier ?? 'regular',
+        province_id: member?.province_id ?? '',
+        regency_id: member?.regency_id ?? '',
+        district_id: member?.district_id ?? '',
+        village_id: member?.village_id ?? '',
+        _method: isEdit ? 'PUT' : 'POST',
     });
 
     const [regencyList, setRegencyList] = useState(regencies);
@@ -49,7 +44,7 @@ export default function Form({ mode = "create", member = null }) {
             return;
         }
 
-        const response = await axios.get(route("regions.regencies"), {
+        const response = await axios.get(route('regions.regencies'), {
             params: { province_id: provinceId },
         });
         setRegencyList(response.data);
@@ -61,7 +56,7 @@ export default function Form({ mode = "create", member = null }) {
             return;
         }
 
-        const response = await axios.get(route("regions.districts"), {
+        const response = await axios.get(route('regions.districts'), {
             params: { regency_id: regencyId },
         });
         setDistrictList(response.data);
@@ -73,7 +68,7 @@ export default function Form({ mode = "create", member = null }) {
             return;
         }
 
-        const response = await axios.get(route("regions.villages"), {
+        const response = await axios.get(route('regions.villages'), {
             params: { district_id: districtId },
         });
         setVillageList(response.data);
@@ -81,13 +76,10 @@ export default function Form({ mode = "create", member = null }) {
 
     useEffect(() => {
         if (data.province_id) {
-            if (
-                prevProvince.current &&
-                prevProvince.current !== data.province_id
-            ) {
-                setData("regency_id", "");
-                setData("district_id", "");
-                setData("village_id", "");
+            if (prevProvince.current && prevProvince.current !== data.province_id) {
+                setData('regency_id', '');
+                setData('district_id', '');
+                setData('village_id', '');
                 setDistrictList([]);
                 setVillageList([]);
             }
@@ -104,8 +96,8 @@ export default function Form({ mode = "create", member = null }) {
     useEffect(() => {
         if (data.regency_id) {
             if (prevRegency.current && prevRegency.current !== data.regency_id) {
-                setData("district_id", "");
-                setData("village_id", "");
+                setData('district_id', '');
+                setData('village_id', '');
                 setVillageList([]);
             }
             fetchDistricts(data.regency_id);
@@ -119,11 +111,8 @@ export default function Form({ mode = "create", member = null }) {
 
     useEffect(() => {
         if (data.district_id) {
-            if (
-                prevDistrict.current &&
-                prevDistrict.current !== data.district_id
-            ) {
-                setData("village_id", "");
+            if (prevDistrict.current && prevDistrict.current !== data.district_id) {
+                setData('village_id', '');
             }
             fetchVillages(data.district_id);
         } else {
@@ -136,45 +125,36 @@ export default function Form({ mode = "create", member = null }) {
     const submit = (event) => {
         event.preventDefault();
 
-        post(
-            isEdit ? route("members.update", member.id) : route("members.store"),
-            {
-                onSuccess: () =>
-                    toast.success(
-                        isEdit
-                            ? "Data member berhasil diperbarui"
-                            : "Member baru berhasil didaftarkan"
-                    ),
-                onError: () =>
-                    toast.error(
-                        isEdit
-                            ? "Gagal memperbarui data member"
-                            : "Gagal mendaftarkan member"
-                    ),
-            }
-        );
+        post(isEdit ? route('members.update', member.id) : route('members.store'), {
+            onSuccess: () =>
+                toast.success(
+                    isEdit ? 'Data member berhasil diperbarui' : 'Member baru berhasil didaftarkan'
+                ),
+            onError: () =>
+                toast.error(isEdit ? 'Gagal memperbarui data member' : 'Gagal mendaftarkan member'),
+        });
     };
 
     return (
         <>
-            <Head title={isEdit ? "Edit Member" : "Daftar Member Baru"} />
+            <Head title={isEdit ? 'Edit Member' : 'Daftar Member Baru'} />
 
             <div className="w-full">
                 <div className="mb-6">
                     <Link
-                        href={route("members.index")}
+                        href={route('members.index')}
                         className="mb-3 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600"
                     >
                         <IconArrowLeft size={16} />
                         Kembali ke Member
                     </Link>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {isEdit ? "Edit Member" : "Daftarkan Member Baru"}
+                        {isEdit ? 'Edit Member' : 'Daftarkan Member Baru'}
                     </h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
                         {isEdit
-                            ? "Kelola status, tier, dan data dasar member tanpa memutus histori transaksi maupun reward."
-                            : "Daftarkan pelanggan sebagai member agar langsung mendapatkan poin, benefit harga member, dan voucher personal."}
+                            ? 'Kelola status, tier, dan data dasar member tanpa memutus histori transaksi maupun reward.'
+                            : 'Daftarkan pelanggan sebagai member agar langsung mendapatkan poin, benefit harga member, dan voucher personal.'}
                     </p>
                 </div>
 
@@ -189,7 +169,9 @@ export default function Form({ mode = "create", member = null }) {
                                     Cara kerja member
                                 </p>
                                 <p className="mt-1 text-xs leading-6 text-slate-600 dark:text-slate-300">
-                                    Member otomatis memakai pricing khusus member, earn/redeem poin dari loyalty settings, dan bisa menerima voucher personal di CRM.
+                                    Member otomatis memakai pricing khusus member, earn/redeem poin
+                                    dari loyalty settings, dan bisa menerima voucher personal di
+                                    CRM.
                                 </p>
                             </div>
                         </div>
@@ -216,9 +198,7 @@ export default function Form({ mode = "create", member = null }) {
                                 label="Nama Member"
                                 placeholder="Masukkan nama lengkap"
                                 errors={errors.name}
-                                onChange={(event) =>
-                                    setData("name", event.target.value)
-                                }
+                                onChange={(event) => setData('name', event.target.value)}
                                 value={data.name}
                             />
                             <Input
@@ -226,9 +206,7 @@ export default function Form({ mode = "create", member = null }) {
                                 label="No. Handphone"
                                 placeholder="08xxxxxxxxxx"
                                 errors={errors.no_telp}
-                                onChange={(event) =>
-                                    setData("no_telp", event.target.value)
-                                }
+                                onChange={(event) => setData('no_telp', event.target.value)}
                                 value={data.no_telp}
                             />
                         </div>
@@ -240,7 +218,8 @@ export default function Form({ mode = "create", member = null }) {
                                         Status Member
                                     </p>
                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                        Nonaktifkan member jika benefit member perlu dihentikan tanpa menghapus histori.
+                                        Nonaktifkan member jika benefit member perlu dihentikan
+                                        tanpa menghapus histori.
                                     </p>
                                 </div>
                                 <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -248,10 +227,7 @@ export default function Form({ mode = "create", member = null }) {
                                         type="checkbox"
                                         checked={data.is_loyalty_member}
                                         onChange={(event) =>
-                                            setData(
-                                                "is_loyalty_member",
-                                                event.target.checked
-                                            )
+                                            setData('is_loyalty_member', event.target.checked)
                                         }
                                         className="h-4 w-4 rounded border-slate-300 text-primary-500"
                                     />
@@ -266,9 +242,7 @@ export default function Form({ mode = "create", member = null }) {
                                 <Select
                                     className="mt-2 w-full"
                                     value={data.loyalty_tier}
-                                    onChange={(value) =>
-                                        setData("loyalty_tier", value)
-                                    }
+                                    onChange={(value) => setData('loyalty_tier', value)}
                                     options={tierOptions}
                                 />
                                 {errors.loyalty_tier && (
@@ -293,9 +267,7 @@ export default function Form({ mode = "create", member = null }) {
                                 <Select
                                     className="mt-2 w-full"
                                     value={data.province_id}
-                                    onChange={(value) =>
-                                        setData("province_id", value)
-                                    }
+                                    onChange={(value) => setData('province_id', value)}
                                     options={provinces.map((province) => ({
                                         value: province.code,
                                         label: province.name,
@@ -316,9 +288,7 @@ export default function Form({ mode = "create", member = null }) {
                                 <Select
                                     className="mt-2 w-full"
                                     value={data.regency_id}
-                                    onChange={(value) =>
-                                        setData("regency_id", value)
-                                    }
+                                    onChange={(value) => setData('regency_id', value)}
                                     disabled={!data.province_id}
                                     options={regencyList.map((regency) => ({
                                         value: regency.code,
@@ -342,9 +312,7 @@ export default function Form({ mode = "create", member = null }) {
                                 <Select
                                     className="mt-2 w-full"
                                     value={data.district_id}
-                                    onChange={(value) =>
-                                        setData("district_id", value)
-                                    }
+                                    onChange={(value) => setData('district_id', value)}
                                     disabled={!data.regency_id}
                                     options={districtList.map((district) => ({
                                         value: district.code,
@@ -366,9 +334,7 @@ export default function Form({ mode = "create", member = null }) {
                                 <Select
                                     className="mt-2 w-full"
                                     value={data.village_id}
-                                    onChange={(value) =>
-                                        setData("village_id", value)
-                                    }
+                                    onChange={(value) => setData('village_id', value)}
                                     disabled={!data.district_id}
                                     options={villageList.map((village) => ({
                                         value: village.code,
@@ -389,9 +355,7 @@ export default function Form({ mode = "create", member = null }) {
                                 label="Alamat Detail"
                                 placeholder="Alamat lengkap member"
                                 errors={errors.address}
-                                onChange={(event) =>
-                                    setData("address", event.target.value)
-                                }
+                                onChange={(event) => setData('address', event.target.value)}
                                 value={data.address}
                                 rows={3}
                             />
@@ -400,7 +364,7 @@ export default function Form({ mode = "create", member = null }) {
 
                     <div className="flex justify-end gap-3 border-t border-slate-100 pt-6 dark:border-slate-800">
                         <Link
-                            href={route("members.index")}
+                            href={route('members.index')}
                             className="rounded-xl border border-slate-200 px-5 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
                         >
                             Batal
@@ -412,10 +376,10 @@ export default function Form({ mode = "create", member = null }) {
                         >
                             <IconDeviceFloppy size={18} />
                             {processing
-                                ? "Menyimpan..."
+                                ? 'Menyimpan...'
                                 : isEdit
-                                ? "Simpan Perubahan"
-                                : "Daftarkan Member"}
+                                  ? 'Simpan Perubahan'
+                                  : 'Daftarkan Member'}
                         </button>
                     </div>
                 </form>

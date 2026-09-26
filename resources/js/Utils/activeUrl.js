@@ -1,10 +1,10 @@
 function normalizePath(href) {
-    if (typeof href !== "string") {
+    if (typeof href !== 'string') {
         return null;
     }
 
     // route() returns an absolute URL; usePage().url is a pathname — normalize first
-    if (href.startsWith("http")) {
+    if (href.startsWith('http')) {
         try {
             return new URL(href).pathname;
         } catch {
@@ -40,7 +40,5 @@ export function resolveActiveHrefs(url, hrefs) {
 
     const maxLen = Math.max(...matches.map((m) => m.path.length));
 
-    return new Set(
-        matches.filter((m) => m.path.length === maxLen).map((m) => m.href)
-    );
+    return new Set(matches.filter((m) => m.path.length === maxLen).map((m) => m.href));
 }

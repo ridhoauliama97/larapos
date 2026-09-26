@@ -1,34 +1,33 @@
-import React from 'react'
-
-const Card = ({ icon, title, className, children }) => {
+const Card = ({ title, className, children }) => {
     return (
         <>
-            <div className={`p-4 rounded-t-lg border ${className} bg-white dark:bg-gray-950 dark:border-gray-900 `}>
-                <div className='flex items-center gap-2 font-semibold text-sm text-gray-700 dark:text-gray-200'>
+            <div
+                className={`rounded-t-lg border p-4 ${className} bg-white dark:border-gray-900 dark:bg-gray-950`}
+            >
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
                     {title}
                 </div>
             </div>
-            <div className='bg-white dark:bg-gray-950 rounded-b-lg border-t-0 dark:border-gray-900'>
+            <div className="rounded-b-lg border-t-0 bg-white dark:border-gray-900 dark:bg-gray-950">
                 {children}
             </div>
         </>
-
-    )
-}
+    );
+};
 
 const Table = ({ children }) => {
     return (
-        <div className="w-full overflow-hidden overflow-x-auto border-collapse rounded-b-lg border border-t-0 dark:border-gray-900">
-            <table className="w-full text-sm">
-                {children}
-            </table>
+        <div className="w-full border-collapse overflow-hidden overflow-x-auto rounded-b-lg border border-t-0 dark:border-gray-900">
+            <table className="w-full text-sm">{children}</table>
         </div>
     );
 };
 
 const Thead = ({ className, children }) => {
     return (
-        <thead className={`${className} border-b bg-gray-50 dark:border-gray-900 dark:bg-gray-950`}>{children}</thead>
+        <thead className={`${className} border-b bg-gray-50 dark:border-gray-900 dark:bg-gray-950`}>
+            {children}
+        </thead>
     );
 };
 
@@ -65,18 +64,16 @@ const Empty = ({ colSpan, message, children }) => {
     return (
         <tr>
             <td colSpan={colSpan}>
-                <div className="flex items-center justify-center h-96">
+                <div className="flex h-96 items-center justify-center">
                     <div className="text-center">
                         {children}
-                        <div className="mt-5">
-                            {message}
-                        </div>
+                        <div className="mt-5">{message}</div>
                     </div>
                 </div>
             </td>
         </tr>
-    )
-}
+    );
+};
 
 Table.Card = Card;
 Table.Thead = Thead;

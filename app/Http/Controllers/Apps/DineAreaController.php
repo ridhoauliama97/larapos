@@ -11,7 +11,10 @@ class DineAreaController extends Controller
 {
     public function index()
     {
-        $areas = DineArea::with('tables')->orderBy('sort_order')->get();
+        // `name` breaks ties: without it, two areas sharing a sort_order come back in
+        // whatever order the database happens to use, so the list can reshuffle between
+        // requests. Warehouses already tie-break on `code` in both controllers.
+        $areas = DineArea::with('tables')->orderBy('sort_order')->orderBy('name')->get();
 
         return Inertia::render('Dashboard/DineIn/Areas/Index', [
             'areas' => $areas,

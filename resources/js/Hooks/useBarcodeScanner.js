@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * useBarcodeScanner - Hook for handling barcode scanner input
@@ -20,18 +20,18 @@ export default function useBarcodeScanner(onScan, options = {}) {
         minLength = 3,
         maxDelay = 50,
         enabled = true,
-        ignoreInputs = ["text", "number", "search", "password"],
+        ignoreInputs = ['text', 'number', 'search', 'password'],
     } = options;
 
-    const [lastBarcode, setLastBarcode] = useState("");
+    const [lastBarcode, setLastBarcode] = useState('');
     const [isScanning, setIsScanning] = useState(false);
 
-    const bufferRef = useRef("");
+    const bufferRef = useRef('');
     const lastKeyTimeRef = useRef(0);
     const timeoutRef = useRef(null);
 
     const reset = useCallback(() => {
-        bufferRef.current = "";
+        bufferRef.current = '';
         setIsScanning(false);
     }, []);
 
@@ -43,16 +43,10 @@ export default function useBarcodeScanner(onScan, options = {}) {
             const activeElement = document.activeElement;
             if (activeElement) {
                 const tagName = activeElement.tagName.toLowerCase();
-                const inputType = activeElement
-                    .getAttribute("type")
-                    ?.toLowerCase();
+                const inputType = activeElement.getAttribute('type')?.toLowerCase();
 
-                if (tagName === "textarea") return;
-                if (
-                    tagName === "input" &&
-                    ignoreInputs.includes(inputType || "text")
-                )
-                    return;
+                if (tagName === 'textarea') return;
+                if (tagName === 'input' && ignoreInputs.includes(inputType || 'text')) return;
             }
 
             const now = Date.now();
@@ -60,20 +54,20 @@ export default function useBarcodeScanner(onScan, options = {}) {
 
             // If too much time has passed, reset buffer
             if (timeSinceLastKey > maxDelay && bufferRef.current.length > 0) {
-                bufferRef.current = "";
+                bufferRef.current = '';
             }
 
             lastKeyTimeRef.current = now;
 
             // Handle Enter key - end of barcode
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
                 if (bufferRef.current.length >= minLength) {
                     const barcode = bufferRef.current;
                     setLastBarcode(barcode);
                     setIsScanning(false);
                     onScan?.(barcode);
                 }
-                bufferRef.current = "";
+                bufferRef.current = '';
                 return;
             }
 
@@ -89,7 +83,7 @@ export default function useBarcodeScanner(onScan, options = {}) {
 
                 timeoutRef.current = setTimeout(() => {
                     // Reset if no more input
-                    bufferRef.current = "";
+                    bufferRef.current = '';
                     setIsScanning(false);
                 }, maxDelay * 3);
             }
@@ -100,10 +94,10 @@ export default function useBarcodeScanner(onScan, options = {}) {
     useEffect(() => {
         if (!enabled) return;
 
-        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener('keydown', handleKeyDown);
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
             }

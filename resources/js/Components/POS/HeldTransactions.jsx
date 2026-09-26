@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { router } from "@inertiajs/react";
+import { useState } from 'react';
+import { router } from '@inertiajs/react';
 import {
     IconClock,
     IconPlayerPlay,
@@ -7,13 +7,13 @@ import {
     IconChevronDown,
     IconChevronUp,
     IconX,
-} from "@tabler/icons-react";
-import toast from "react-hot-toast";
+} from '@tabler/icons-react';
+import toast from 'react-hot-toast';
 
 const formatPrice = (value = 0) =>
-    Number(value || 0).toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    Number(value || 0).toLocaleString('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     });
 
@@ -21,10 +21,7 @@ const formatPrice = (value = 0) =>
  * HeldTransactions - Compact badge with expandable panel
  * Takes minimal space when collapsed, expands to show list with max height
  */
-export default function HeldTransactions({
-    heldCarts = [],
-    hasActiveCart = false,
-}) {
+export default function HeldTransactions({ heldCarts = [], hasActiveCart = false }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [resumingId, setResumingId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
@@ -35,28 +32,24 @@ export default function HeldTransactions({
 
     const handleResume = (holdId) => {
         if (hasActiveCart) {
-            toast.error(
-                "Selesaikan atau tahan transaksi aktif terlebih dahulu"
-            );
+            toast.error('Selesaikan atau tahan transaksi aktif terlebih dahulu');
             return;
         }
 
         setResumingId(holdId);
 
         router.post(
-            route("transactions.resume", holdId),
+            route('transactions.resume', holdId),
             {},
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success("Transaksi dilanjutkan");
+                    toast.success('Transaksi dilanjutkan');
                     setResumingId(null);
                     setIsExpanded(false);
                 },
                 onError: (errors) => {
-                    toast.error(
-                        errors.message || "Gagal melanjutkan transaksi"
-                    );
+                    toast.error(errors.message || 'Gagal melanjutkan transaksi');
                     setResumingId(null);
                 },
             }
@@ -64,37 +57,34 @@ export default function HeldTransactions({
     };
 
     const handleDelete = (holdId) => {
-        if (!confirm("Hapus transaksi yang ditahan ini?")) return;
+        if (!confirm('Hapus transaksi yang ditahan ini?')) return;
 
         setDeletingId(holdId);
 
-        router.delete(route("transactions.clearHold", holdId), {
+        router.delete(route('transactions.clearHold', holdId), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success("Transaksi dihapus");
+                toast.success('Transaksi dihapus');
                 setDeletingId(null);
             },
             onError: () => {
-                toast.error("Gagal menghapus transaksi");
+                toast.error('Gagal menghapus transaksi');
                 setDeletingId(null);
             },
         });
     };
 
-    const totalHeldAmount = heldCarts.reduce(
-        (sum, h) => sum + Number(h.total || 0),
-        0
-    );
+    const totalHeldAmount = heldCarts.reduce((sum, h) => sum + Number(h.total || 0), 0);
 
     // Collapsed view - compact clickable badge (minimal space)
     if (!isExpanded) {
         return (
             <button
                 onClick={() => setIsExpanded(true)}
-                className="w-full px-3 py-2 flex items-center justify-between bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
+                className="flex w-full items-center justify-between border-b border-amber-200 bg-amber-50 px-3 py-2 transition-colors hover:bg-amber-100 dark:border-amber-800/50 dark:bg-amber-950/30 dark:hover:bg-amber-900/40"
             >
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-md bg-amber-500 flex items-center justify-center text-white text-xs font-bold">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-500 text-xs font-bold text-white">
                         {heldCarts.length}
                     </div>
                     <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
@@ -111,11 +101,11 @@ export default function HeldTransactions({
 
     // Expanded view - list with max height and scroll
     return (
-        <div className="border-b border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/30">
+        <div className="border-b border-amber-200 bg-amber-50 dark:border-amber-800/50 dark:bg-amber-950/30">
             {/* Header */}
-            <div className="flex items-center justify-between px-3 py-2 border-b border-amber-200/50 dark:border-amber-800/30">
+            <div className="flex items-center justify-between border-b border-amber-200/50 px-3 py-2 dark:border-amber-800/30">
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-md bg-amber-500 flex items-center justify-center text-white text-xs font-bold">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-500 text-xs font-bold text-white">
                         {heldCarts.length}
                     </div>
                     <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
@@ -124,7 +114,7 @@ export default function HeldTransactions({
                 </div>
                 <button
                     onClick={() => setIsExpanded(false)}
-                    className="w-6 h-6 rounded flex items-center justify-center hover:bg-amber-200 dark:hover:bg-amber-900/50"
+                    className="flex h-6 w-6 items-center justify-center rounded hover:bg-amber-200 dark:hover:bg-amber-900/50"
                 >
                     <IconChevronUp size={16} className="text-amber-600" />
                 </button>
@@ -135,32 +125,25 @@ export default function HeldTransactions({
                 {heldCarts.map((hold) => (
                     <div
                         key={hold.hold_id}
-                        className="px-3 py-2 border-b border-amber-100/50 dark:border-amber-900/30 last:border-0 flex items-center justify-between gap-2"
+                        className="flex items-center justify-between gap-2 border-b border-amber-100/50 px-3 py-2 last:border-0 dark:border-amber-900/30"
                     >
-                        <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-amber-800 dark:text-amber-200 truncate">
+                        <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs font-medium text-amber-800 dark:text-amber-200">
                                 {hold.label}
                             </p>
                             <p className="text-xs text-amber-600 dark:text-amber-400">
-                                {hold.items_count} item •{" "}
-                                {formatPrice(hold.total)}
+                                {hold.items_count} item • {formatPrice(hold.total)}
                             </p>
                         </div>
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => handleResume(hold.hold_id)}
-                                disabled={
-                                    resumingId === hold.hold_id || hasActiveCart
-                                }
-                                className="px-2 py-1 rounded bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium disabled:opacity-50 flex items-center gap-1"
-                                title={
-                                    hasActiveCart
-                                        ? "Kosongkan keranjang dulu"
-                                        : "Lanjutkan"
-                                }
+                                disabled={resumingId === hold.hold_id || hasActiveCart}
+                                className="flex items-center gap-1 rounded bg-amber-500 px-2 py-1 text-xs font-medium text-white hover:bg-amber-600 disabled:opacity-50"
+                                title={hasActiveCart ? 'Kosongkan keranjang dulu' : 'Lanjutkan'}
                             >
                                 {resumingId === hold.hold_id ? (
-                                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                                 ) : (
                                     <IconPlayerPlay size={12} />
                                 )}
@@ -168,7 +151,7 @@ export default function HeldTransactions({
                             <button
                                 onClick={() => handleDelete(hold.hold_id)}
                                 disabled={deletingId === hold.hold_id}
-                                className="p-1 rounded hover:bg-amber-200 dark:hover:bg-amber-900/50 text-amber-600 disabled:opacity-50"
+                                className="rounded p-1 text-amber-600 hover:bg-amber-200 disabled:opacity-50 dark:hover:bg-amber-900/50"
                             >
                                 <IconTrash size={12} />
                             </button>
@@ -185,11 +168,11 @@ export default function HeldTransactions({
  */
 export function HoldButton({ hasItems = false, onHold, isHolding = false }) {
     const [showLabelInput, setShowLabelInput] = useState(false);
-    const [label, setLabel] = useState("");
+    const [label, setLabel] = useState('');
 
     const handleHold = () => {
         onHold(label || null);
-        setLabel("");
+        setLabel('');
         setShowLabelInput(false);
     };
 
@@ -203,23 +186,23 @@ export function HoldButton({ hasItems = false, onHold, isHolding = false }) {
                     value={label}
                     onChange={(e) => setLabel(e.target.value)}
                     placeholder="Label (opsional)"
-                    className="flex-1 h-8 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm"
+                    className="h-8 flex-1 rounded-lg border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900"
                     autoFocus
                     onKeyDown={(e) => {
-                        if (e.key === "Enter") handleHold();
-                        if (e.key === "Escape") setShowLabelInput(false);
+                        if (e.key === 'Enter') handleHold();
+                        if (e.key === 'Escape') setShowLabelInput(false);
                     }}
                 />
                 <button
                     onClick={handleHold}
                     disabled={isHolding}
-                    className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold disabled:opacity-50"
+                    className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-50"
                 >
-                    {isHolding ? "..." : "OK"}
+                    {isHolding ? '...' : 'OK'}
                 </button>
                 <button
                     onClick={() => setShowLabelInput(false)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                    className="rounded-lg p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                     <IconX size={14} className="text-slate-500" />
                 </button>
@@ -230,7 +213,7 @@ export function HoldButton({ hasItems = false, onHold, isHolding = false }) {
     return (
         <button
             onClick={() => setShowLabelInput(true)}
-            className="flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg border border-dashed border-amber-400 dark:border-amber-700 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 text-xs font-medium transition-colors"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-amber-400 px-3 py-2 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30"
         >
             <IconClock size={14} />
             Tahan

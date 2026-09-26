@@ -29,26 +29,6 @@ class BankAccountController extends Controller
     }
 
     /**
-     * Create form
-     */
-    public function create()
-    {
-        return Inertia::render('Dashboard/Settings/BankAccountForm', [
-            'bankAccount' => null,
-        ]);
-    }
-
-    /**
-     * Edit form
-     */
-    public function edit(BankAccount $bankAccount)
-    {
-        return Inertia::render('Dashboard/Settings/BankAccountForm', [
-            'bankAccount' => $bankAccount,
-        ]);
-    }
-
-    /**
      * Store a new bank account
      */
     public function store(Request $request)

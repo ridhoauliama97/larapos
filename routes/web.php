@@ -127,9 +127,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::get('/regions/villages', [RegionController::class, 'villages'])->name('regions.villages');
 
     Route::resource('categories', CategoryController::class)
+        ->except(['create', 'edit'])
         ->middlewareFor(['index', 'show'], 'permission:categories-access')
-        ->middlewareFor(['create', 'store'], 'permission:categories-create')
-        ->middlewareFor(['edit', 'update'], 'permission:categories-edit')
+        ->middlewareFor('store', 'permission:categories-create')
+        ->middlewareFor('update', 'permission:categories-edit')
         ->middlewareFor('destroy', 'permission:categories-delete');
     Route::resource('products', ProductController::class)
         ->middlewareFor(['index', 'show'], 'permission:products-access')
@@ -171,9 +172,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::post('cashier-shifts/{cashierShift}/cash-movements', [CashierShiftController::class, 'storeCashMovement'])->middleware('permission:cashier-shifts-access')->name('cashier-shifts.cash-movements.store');
     Route::get('cashier-shifts/{cashierShift}/report/{type}', [CashierShiftController::class, 'printReport'])->middleware('permission:cashier-shifts-access')->name('cashier-shifts.report');
     Route::resource('customers', CustomerController::class)
+        ->except(['create', 'edit'])
         ->middlewareFor(['index', 'show'], 'permission:customers-access')
-        ->middlewareFor(['create', 'store'], 'permission:customers-create')
-        ->middlewareFor(['edit', 'update'], 'permission:customers-edit')
+        ->middlewareFor('store', 'permission:customers-create')
+        ->middlewareFor('update', 'permission:customers-edit')
         ->middlewareFor('destroy', 'permission:customers-delete');
     Route::resource('members', MemberController::class)
         ->parameters(['members' => 'member'])
@@ -305,8 +307,6 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::post('/receivables/{receivable}/share-campaign', [CrmCampaignController::class, 'shareReceivable'])->middleware('permission:crm-campaigns-create')->name('receivables.share-campaign');
     // suppliers & payables
     Route::get('/suppliers', [SupplierController::class, 'index'])->middleware('permission:suppliers-access')->name('suppliers.index');
-    Route::get('/suppliers/create', [SupplierController::class, 'create'])->middleware('permission:suppliers-access')->name('suppliers.create');
-    Route::get('/suppliers/{supplier}/edit', [SupplierController::class, 'edit'])->middleware('permission:suppliers-access')->name('suppliers.edit');
     Route::post('/suppliers', [SupplierController::class, 'store'])->middleware('permission:suppliers-access')->name('suppliers.store');
     Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->middleware('permission:suppliers-access')->name('suppliers.update');
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->middleware('permission:suppliers-access')->name('suppliers.destroy');
@@ -347,9 +347,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
 
     // settings bank accounts
     Route::get('/settings/bank-accounts', [BankAccountController::class, 'index'])->middleware('permission:payment-settings-access')->name('settings.bank-accounts.index');
-    Route::get('/settings/bank-accounts/create', [BankAccountController::class, 'create'])->middleware('permission:payment-settings-update')->name('settings.bank-accounts.create');
     Route::post('/settings/bank-accounts', [BankAccountController::class, 'store'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.store');
-    Route::get('/settings/bank-accounts/{bankAccount}/edit', [BankAccountController::class, 'edit'])->middleware('permission:payment-settings-update')->name('settings.bank-accounts.edit');
     Route::put('/settings/bank-accounts/{bankAccount}', [BankAccountController::class, 'update'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.update');
     Route::delete('/settings/bank-accounts/{bankAccount}', [BankAccountController::class, 'destroy'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.destroy');
     Route::patch('/settings/bank-accounts/{bankAccount}/toggle', [BankAccountController::class, 'toggleActive'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.toggle');

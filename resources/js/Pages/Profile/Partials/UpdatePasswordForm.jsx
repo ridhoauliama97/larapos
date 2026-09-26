@@ -1,42 +1,33 @@
-import React from "react";
-import { useForm } from "@inertiajs/react";
-import toast from "react-hot-toast";
-import { IconLock } from "@tabler/icons-react";
-import Input from "@/Components/Dashboard/Input";
+import { useForm } from '@inertiajs/react';
+import toast from 'react-hot-toast';
+import { IconLock } from '@tabler/icons-react';
+import Input from '@/Components/Dashboard/Input';
 
 export default function UpdatePasswordForm() {
-    const {
-        data,
-        setData,
-        errors,
-        put,
-        reset,
-        processing,
-        recentlySuccessful,
-    } = useForm({
-        current_password: "",
-        password: "",
-        password_confirmation: "",
+    const { data, setData, errors, put, reset, processing, recentlySuccessful } = useForm({
+        current_password: '',
+        password: '',
+        password_confirmation: '',
     });
 
     const updatePassword = (e) => {
         e.preventDefault();
 
-        put(route("password.update"), {
+        put(route('password.update'), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-                toast.success("Kata sandi diperbarui");
+                toast.success('Kata sandi diperbarui');
             },
             onError: (errors) => {
                 if (errors.password) {
-                    reset("password", "password_confirmation");
-                    document.getElementById("new_password")?.focus();
+                    reset('password', 'password_confirmation');
+                    document.getElementById('new_password')?.focus();
                 }
 
                 if (errors.current_password) {
-                    reset("current_password");
-                    document.getElementById("current_password")?.focus();
+                    reset('current_password');
+                    document.getElementById('current_password')?.focus();
                 }
             },
         });
@@ -45,13 +36,12 @@ export default function UpdatePasswordForm() {
     return (
         <section>
             <header className="mb-6">
-                <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                     <IconLock size={16} />
                     Ubah Kata Sandi
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Gunakan kata sandi yang panjang dan tidak dipakai di tempat
-                    lain.
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Gunakan kata sandi yang panjang dan tidak dipakai di tempat lain.
                 </p>
             </header>
 
@@ -62,9 +52,7 @@ export default function UpdatePasswordForm() {
                     label="Kata Sandi Saat Ini"
                     placeholder="Kata sandi saat ini"
                     value={data.current_password}
-                    onChange={(e) =>
-                        setData("current_password", e.target.value)
-                    }
+                    onChange={(e) => setData('current_password', e.target.value)}
                     errors={errors.current_password}
                     autoComplete="current-password"
                 />
@@ -74,7 +62,7 @@ export default function UpdatePasswordForm() {
                     label="Kata Sandi Baru"
                     placeholder="Kata sandi baru"
                     value={data.password}
-                    onChange={(e) => setData("password", e.target.value)}
+                    onChange={(e) => setData('password', e.target.value)}
                     errors={errors.password}
                     autoComplete="new-password"
                 />
@@ -84,9 +72,7 @@ export default function UpdatePasswordForm() {
                     label="Konfirmasi Kata Sandi Baru"
                     placeholder="Ulangi kata sandi baru"
                     value={data.password_confirmation}
-                    onChange={(e) =>
-                        setData("password_confirmation", e.target.value)
-                    }
+                    onChange={(e) => setData('password_confirmation', e.target.value)}
                     errors={errors.password_confirmation}
                     autoComplete="new-password"
                 />
@@ -100,9 +86,9 @@ export default function UpdatePasswordForm() {
                     <button
                         type="submit"
                         disabled={processing}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-5 py-2.5 font-medium text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
                     >
-                        {processing ? "Menyimpan..." : "Simpan Kata Sandi"}
+                        {processing ? 'Menyimpan...' : 'Simpan Kata Sandi'}
                     </button>
                 </div>
             </form>

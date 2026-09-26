@@ -12,6 +12,49 @@ const statusBadge = (status) => {
 };
 
 export default function TransactionDetail({ transaction, token }) {
+    const [submitting, setSubmitting] = React.useState(false);
+
+    /**
+     * Posts to the payment route with a native form.
+     *
+     * `router.post` is deliberately avoided: the controller redirects to the
+     * gateway's external `payment_url`, and a native form guarantees a full-page
+     * hand-off instead of an Inertia round-trip.
+     *
+     * The form MUST carry Laravel's CSRF token or the POST fails with 419. The
+     * token has to come from the `csrf-token` meta tag rendered by app.blade.php.
+     * The XSRF-TOKEN cookie is NOT usable here: Laravel encrypts it, so the value
+     * is a base64 blob rather than the plain session token.
+     */
+    const submitPayment = () => {
+        const csrfToken = document.querySelector(
+            'meta[name="csrf-token"]'
+        )?.content;
+
+        if (!csrfToken) {
+            alert("Sesi kedaluwarsa. Silakan muat ulang halaman.");
+            return;
+        }
+
+        setSubmitting(true);
+
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = route("portal.receivable.pay", [
+            transaction.receivable.id,
+            { token },
+        ]);
+
+        const tokenInput = document.createElement("input");
+        tokenInput.type = "hidden";
+        tokenInput.name = "_token";
+        tokenInput.value = csrfToken;
+        form.appendChild(tokenInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    };
+
     return (
         <>
             <Head title={`Invoice ${transaction.invoice}`} />
@@ -64,22 +107,14 @@ export default function TransactionDetail({ transaction, token }) {
                                     <span className="text-amber-700">Jatuh tempo: {formatDate(transaction.receivable.due_date)}</span>
                                     <span className="font-bold text-amber-900">{formatPrice(transaction.receivable.remaining)}</span>
                                 </div>
-                                <a
-                                    href={route("portal.receivable.pay", [transaction.receivable.id, { token }])}
-                                    as="button"
-                                    method="post"
-                                    className="block w-full text-center px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        const form = document.createElement("form");
-                                        form.method = "POST";
-                                        form.action = route("portal.receivable.pay", [transaction.receivable.id, { token }]);
-                                        document.body.appendChild(form);
-                                        form.submit();
-                                    }}
+                                <button
+                                    type="button"
+                                    disabled={submitting}
+                                    className="block w-full text-center px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors border-0 cursor-pointer"
+                                    onClick={() => submitPayment()}
                                 >
-                                    Bayar Sekarang
-                                </a>
+                                    {submitting ? "Memproses..." : "Bayar Sekarang"}
+                                </button>
                             </div>
                         )}
                     </div>

@@ -1,34 +1,28 @@
-import React from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link, router } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import Table from "@/Components/Dashboard/Table";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import { useAuthorization } from "@/Utils/authorization";
-import {
-    IconCirclePlus,
-    IconClipboardCheck,
-    IconEye,
-    IconSearch,
-} from "@tabler/icons-react";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link, router } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import Table from '@/Components/Dashboard/Table';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import { useAuthorization } from '@/Utils/authorization';
+import { IconCirclePlus, IconClipboardCheck, IconEye, IconSearch } from '@tabler/icons-react';
 
 function formatDateTime(value) {
-    if (!value) return "-";
+    if (!value) return '-';
 
-    return new Intl.DateTimeFormat("id-ID", {
-        dateStyle: "medium",
-        timeStyle: "short",
+    return new Intl.DateTimeFormat('id-ID', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
     }).format(new Date(value));
 }
 
 export default function Index({ stockOpnames, filters, warehouses = [] }) {
     const { can } = useAuthorization();
-    const canCreateStockOpnames = can("stock-opnames-create");
+    const canCreateStockOpnames = can('stock-opnames-create');
 
     const handleFilterChange = (key, value) => {
         router.get(
-            route("stock-opnames.index"),
+            route('stock-opnames.index'),
             {
                 ...filters,
                 [key]: value,
@@ -56,9 +50,9 @@ export default function Index({ stockOpnames, filters, warehouses = [] }) {
                 {canCreateStockOpnames && (
                     <Button
                         type="link"
-                        href={route("stock-opnames.create")}
+                        href={route('stock-opnames.create')}
                         icon={<IconCirclePlus size={18} strokeWidth={1.5} />}
-                        className="bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                        className="bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600"
                         label="Buat Sesi Opname"
                     />
                 )}
@@ -68,10 +62,8 @@ export default function Index({ stockOpnames, filters, warehouses = [] }) {
                 <div className="relative">
                     <input
                         type="text"
-                        value={filters.search || ""}
-                        onChange={(event) =>
-                            handleFilterChange("search", event.target.value)
-                        }
+                        value={filters.search || ''}
+                        onChange={(event) => handleFilterChange('search', event.target.value)}
                         placeholder="Cari kode sesi..."
                         className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                     />
@@ -81,21 +73,21 @@ export default function Index({ stockOpnames, filters, warehouses = [] }) {
                 </div>
 
                 <Select
-                    value={filters.status || ""}
-                    onChange={(value) => handleFilterChange("status", value)}
+                    value={filters.status || ''}
+                    onChange={(value) => handleFilterChange('status', value)}
                     options={[
-                        { value: "", label: "Semua Status" },
-                        { value: "draft", label: "Draft" },
-                        { value: "finalized", label: "Finalized" },
+                        { value: '', label: 'Semua Status' },
+                        { value: 'draft', label: 'Draft' },
+                        { value: 'finalized', label: 'Finalized' },
                     ]}
                     size="sm"
                 />
 
                 <Select
-                    value={filters.warehouse_id || ""}
-                    onChange={(value) => handleFilterChange("warehouse_id", value)}
+                    value={filters.warehouse_id || ''}
+                    onChange={(value) => handleFilterChange('warehouse_id', value)}
                     options={[
-                        { value: "", label: "Semua Gudang" },
+                        { value: '', label: 'Semua Gudang' },
                         ...warehouses.map((w) => ({
                             value: w.id,
                             label: `${w.code} — ${w.name}`,
@@ -107,18 +99,14 @@ export default function Index({ stockOpnames, filters, warehouses = [] }) {
                 <div className="grid grid-cols-2 gap-3">
                     <input
                         type="date"
-                        value={filters.date_from || ""}
-                        onChange={(event) =>
-                            handleFilterChange("date_from", event.target.value)
-                        }
+                        value={filters.date_from || ''}
+                        onChange={(event) => handleFilterChange('date_from', event.target.value)}
                         className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                     />
                     <input
                         type="date"
-                        value={filters.date_to || ""}
-                        onChange={(event) =>
-                            handleFilterChange("date_to", event.target.value)
-                        }
+                        value={filters.date_to || ''}
+                        onChange={(event) => handleFilterChange('date_to', event.target.value)}
                         className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                     />
                 </div>
@@ -149,33 +137,33 @@ export default function Index({ stockOpnames, filters, warehouses = [] }) {
                                                 {stockOpname.code}
                                             </p>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                {stockOpname.notes || "Tanpa catatan"}
+                                                {stockOpname.notes || 'Tanpa catatan'}
                                             </p>
                                         </div>
                                     </Table.Td>
                                     <Table.Td>
                                         <span
                                             className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                                                stockOpname.status === "finalized"
-                                                    ? "bg-success-100 text-success-700 dark:bg-success-950/40 dark:text-success-400"
-                                                    : "bg-warning-100 text-warning-700 dark:bg-warning-950/40 dark:text-warning-400"
+                                                stockOpname.status === 'finalized'
+                                                    ? 'bg-success-100 text-success-700 dark:bg-success-950/40 dark:text-success-400'
+                                                    : 'bg-warning-100 text-warning-700 dark:bg-warning-950/40 dark:text-warning-400'
                                             }`}
                                         >
-                                            {stockOpname.status === "finalized"
-                                                ? "Finalized"
-                                                : "Draft"}
+                                            {stockOpname.status === 'finalized'
+                                                ? 'Finalized'
+                                                : 'Draft'}
                                         </span>
                                     </Table.Td>
                                     <Table.Td>{stockOpname.items_count}</Table.Td>
-                                    <Table.Td>{stockOpname.creator?.name || "-"}</Table.Td>
+                                    <Table.Td>{stockOpname.creator?.name || '-'}</Table.Td>
                                     <Table.Td>
                                         {stockOpname.finalized_at
-                                            ? `${stockOpname.finalizer?.name || "-"} • ${formatDateTime(stockOpname.finalized_at)}`
-                                            : "-"}
+                                            ? `${stockOpname.finalizer?.name || '-'} • ${formatDateTime(stockOpname.finalized_at)}`
+                                            : '-'}
                                     </Table.Td>
                                     <Table.Td className="text-center">
                                         <Link
-                                            href={route("stock-opnames.show", stockOpname.id)}
+                                            href={route('stock-opnames.show', stockOpname.id)}
                                             className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-600 transition hover:border-primary-300 hover:text-primary-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-primary-700 dark:hover:text-primary-400"
                                         >
                                             <IconEye size={18} />
@@ -201,9 +189,7 @@ export default function Index({ stockOpnames, filters, warehouses = [] }) {
                 </Table>
             </Table.Card>
 
-            {stockOpnames.last_page > 1 && (
-                <Pagination links={stockOpnames.links} />
-            )}
+            {stockOpnames.last_page > 1 && <Pagination links={stockOpnames.links} />}
         </>
     );
 }

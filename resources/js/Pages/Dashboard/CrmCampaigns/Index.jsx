@@ -1,28 +1,37 @@
-import React from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link, router } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import Table from "@/Components/Dashboard/Table";
-import { IconBroadcast, IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useAuthorization } from "@/Utils/authorization";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link, router } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import Table from '@/Components/Dashboard/Table';
+import { IconBroadcast, IconCirclePlus, IconPencil, IconTrash } from '@tabler/icons-react';
+import { useAuthorization } from '@/Utils/authorization';
 
 const statusBadge = (status) => {
     const classes = {
-        draft: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-        ready: "bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-300",
-        processed: "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400",
-        cancelled: "bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300",
+        draft: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+        ready: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-300',
+        processed: 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400',
+        cancelled: 'bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300',
     };
 
-    return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${classes[status] || classes.draft}`}>{status}</span>;
+    return (
+        <span
+            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${classes[status] || classes.draft}`}
+        >
+            {status}
+        </span>
+    );
 };
 
 export default function Index({ campaigns, filters }) {
     const { can } = useAuthorization();
     const handleFilterChange = (key, value) => {
-        router.get(route("crm-campaigns.index"), { ...filters, [key]: value }, { preserveState: true, replace: true });
+        router.get(
+            route('crm-campaigns.index'),
+            { ...filters, [key]: value },
+            { preserveState: true, replace: true }
+        );
     };
 
     return (
@@ -31,17 +40,20 @@ export default function Index({ campaigns, filters }) {
             <div className="w-full">
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">CRM Campaigns</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                            CRM Campaigns
+                        </h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Kelola promo broadcast, reminder, dan share invoice berbasis audience CRM.
+                            Kelola promo broadcast, reminder, dan share invoice berbasis audience
+                            CRM.
                         </p>
                     </div>
-                    {can("crm-campaigns-create") && (
+                    {can('crm-campaigns-create') && (
                         <Button
                             type="link"
-                            href={route("crm-campaigns.create")}
+                            href={route('crm-campaigns.create')}
                             icon={<IconCirclePlus size={18} />}
-                            className="bg-primary-500 text-white hover:bg-primary-600 shadow-lg shadow-primary-500/30"
+                            className="bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600"
                             label="Buat Campaign"
                         />
                     )}
@@ -51,42 +63,38 @@ export default function Index({ campaigns, filters }) {
                     <div className="grid gap-3 md:grid-cols-2">
                         <Select
                             size="sm"
-                            value={filters.type || ""}
-                            onChange={(value) =>
-                                handleFilterChange("type", value)
-                            }
+                            value={filters.type || ''}
+                            onChange={(value) => handleFilterChange('type', value)}
                             options={[
-                                { value: "", label: "Semua Tipe" },
+                                { value: '', label: 'Semua Tipe' },
                                 {
-                                    value: "promo_broadcast",
-                                    label: "Promo Broadcast",
+                                    value: 'promo_broadcast',
+                                    label: 'Promo Broadcast',
                                 },
                                 {
-                                    value: "invoice_share",
-                                    label: "Invoice Share",
+                                    value: 'invoice_share',
+                                    label: 'Invoice Share',
                                 },
                                 {
-                                    value: "due_date_reminder",
-                                    label: "Due Date Reminder",
+                                    value: 'due_date_reminder',
+                                    label: 'Due Date Reminder',
                                 },
                                 {
-                                    value: "repeat_order_reminder",
-                                    label: "Repeat Order Reminder",
+                                    value: 'repeat_order_reminder',
+                                    label: 'Repeat Order Reminder',
                                 },
                             ]}
                         />
                         <Select
                             size="sm"
-                            value={filters.status || ""}
-                            onChange={(value) =>
-                                handleFilterChange("status", value)
-                            }
+                            value={filters.status || ''}
+                            onChange={(value) => handleFilterChange('status', value)}
                             options={[
-                                { value: "", label: "Semua Status" },
-                                { value: "draft", label: "Draft" },
-                                { value: "ready", label: "Ready" },
-                                { value: "processed", label: "Processed" },
-                                { value: "cancelled", label: "Cancelled" },
+                                { value: '', label: 'Semua Status' },
+                                { value: 'draft', label: 'Draft' },
+                                { value: 'ready', label: 'Ready' },
+                                { value: 'processed', label: 'Processed' },
+                                { value: 'cancelled', label: 'Cancelled' },
                             ]}
                         />
                     </div>
@@ -108,11 +116,14 @@ export default function Index({ campaigns, filters }) {
                                 campaigns.data.map((campaign) => (
                                     <tr key={campaign.id}>
                                         <Table.Td>
-                                            <Link href={route("crm-campaigns.show", campaign.id)} className="font-semibold text-slate-800 hover:text-primary-600 dark:text-slate-100">
+                                            <Link
+                                                href={route('crm-campaigns.show', campaign.id)}
+                                                className="font-semibold text-slate-800 hover:text-primary-600 dark:text-slate-100"
+                                            >
                                                 {campaign.name}
                                             </Link>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                Dibuat oleh {campaign.creator?.name || "-"}
+                                                Dibuat oleh {campaign.creator?.name || '-'}
                                             </p>
                                         </Table.Td>
                                         <Table.Td>{campaign.type}</Table.Td>
@@ -120,18 +131,24 @@ export default function Index({ campaigns, filters }) {
                                         <Table.Td>{campaign.logs_count}</Table.Td>
                                         <Table.Td className="text-center">
                                             <div className="flex items-center justify-center gap-2">
-                                                {can("crm-campaigns-update") && (
+                                                {can('crm-campaigns-update') && (
                                                     <Link
-                                                        href={route("crm-campaigns.edit", campaign.id)}
+                                                        href={route(
+                                                            'crm-campaigns.edit',
+                                                            campaign.id
+                                                        )}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300"
                                                     >
                                                         <IconPencil size={16} />
                                                     </Link>
                                                 )}
-                                                {can("crm-campaigns-delete") && (
+                                                {can('crm-campaigns-delete') && (
                                                     <Button
                                                         type="delete"
-                                                        url={route("crm-campaigns.destroy", campaign.id)}
+                                                        url={route(
+                                                            'crm-campaigns.destroy',
+                                                            campaign.id
+                                                        )}
                                                         icon={<IconTrash size={16} />}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-300"
                                                     />

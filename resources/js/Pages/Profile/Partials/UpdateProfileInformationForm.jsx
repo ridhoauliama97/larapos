@@ -1,28 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useForm, usePage } from "@inertiajs/react";
-import toast from "react-hot-toast";
+import { useEffect, useRef, useState } from 'react';
+import { Link, useForm, usePage } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 import {
     IconCamera,
     IconDeviceFloppy,
     IconPencilCog,
     IconUserCircle,
     IconX,
-} from "@tabler/icons-react";
-import ImageCropper from "@/Components/Dashboard/ImageCropper";
-import Input from "@/Components/Dashboard/Input";
+} from '@tabler/icons-react';
+import ImageCropper from '@/Components/Dashboard/ImageCropper';
+import Input from '@/Components/Dashboard/Input';
 
 export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, post, errors, processing, reset, clearErrors } =
-        useForm({
-            name: user.name,
-            email: user.email,
-            avatar: null,
-            // PHP cannot parse multipart bodies on PATCH, so the request is sent as
-            // POST with a spoofed method (avoids Inertia+file uploads being dropped)
-            _method: "patch",
-        });
+    const { data, setData, post, errors, processing, reset, clearErrors } = useForm({
+        name: user.name,
+        email: user.email,
+        avatar: null,
+        // PHP cannot parse multipart bodies on PATCH, so the request is sent as
+        // POST with a spoofed method (avoids Inertia+file uploads being dropped)
+        _method: 'patch',
+    });
 
     const [isEditing, setIsEditing] = useState(false);
     const originalAvatar = user.avatar || null;
@@ -37,13 +36,11 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                 URL.revokeObjectURL(objectUrlRef.current);
             }
         },
-        [],
+        []
     );
 
     const initial =
-        user.name?.charAt(0)?.toUpperCase() ||
-        user.email?.charAt(0)?.toUpperCase() ||
-        "?";
+        user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || '?';
 
     const startEditing = () => {
         clearErrors();
@@ -60,7 +57,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
             name: user.name,
             email: user.email,
             avatar: null,
-            _method: "patch",
+            _method: 'patch',
         });
         clearErrors();
         setPreview(user.avatar || null);
@@ -73,7 +70,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
         }
 
         objectUrlRef.current = URL.createObjectURL(file);
-        setData("avatar", file);
+        setData('avatar', file);
         setPreview(objectUrlRef.current);
         setCropperFile(null);
     };
@@ -81,12 +78,12 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
     const submit = (e) => {
         e.preventDefault();
 
-        post(route("profile.update"), {
+        post(route('profile.update'), {
             preserveScroll: true,
             onSuccess: () => {
-                reset("avatar");
+                reset('avatar');
                 setIsEditing(false);
-                toast.success("Profil diperbarui");
+                toast.success('Profil diperbarui');
             },
         });
     };
@@ -94,13 +91,13 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
     return (
         <section>
             <form onSubmit={submit}>
-                <header className="mb-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <header className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                     <div>
-                        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                        <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                             <IconUserCircle size={16} />
                             Informasi Profil
                         </h2>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                             Perbarui data pribadi dan foto profil Anda.
                         </p>
                     </div>
@@ -122,7 +119,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                 <div className="space-y-6">
                     {/* Foto profil */}
                     <div className="flex items-center gap-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-800/50">
-                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                             {preview ? (
                                 <img
                                     src={preview}
@@ -145,9 +142,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                             {isEditing && (
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        fileInputRef.current?.click()
-                                    }
+                                    onClick={() => fileInputRef.current?.click()}
                                     className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                                 >
                                     <IconCamera size={14} />
@@ -155,9 +150,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                                 </button>
                             )}
                             {errors.avatar && (
-                                <p className="mt-1 text-xs text-danger-500">
-                                    {errors.avatar}
-                                </p>
+                                <p className="mt-1 text-xs text-danger-500">{errors.avatar}</p>
                             )}
                         </div>
                         <input
@@ -172,19 +165,19 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                                     setCropperFile(file);
                                 }
 
-                                event.target.value = "";
+                                event.target.value = '';
                             }}
                         />
                     </div>
 
                     {/* Data pribadi */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <Input
                             type="text"
                             label="Nama Lengkap"
                             placeholder="Nama pengguna"
                             value={data.name}
-                            onChange={(e) => setData("name", e.target.value)}
+                            onChange={(e) => setData('name', e.target.value)}
                             errors={errors.name}
                             disabled={!isEditing}
                             className="disabled:cursor-not-allowed disabled:opacity-70"
@@ -195,7 +188,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                             label="Email"
                             placeholder="email@contoh.com"
                             value={data.email}
-                            onChange={(e) => setData("email", e.target.value)}
+                            onChange={(e) => setData('email', e.target.value)}
                             errors={errors.email}
                             disabled={!isEditing}
                             className="disabled:cursor-not-allowed disabled:opacity-70"
@@ -205,16 +198,16 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
 
                     {mustVerifyEmail && user.email_verified_at === null && (
                         <div className="rounded-xl border border-warning-200 bg-warning-50 px-4 py-3 text-xs text-warning-600 dark:border-warning-800 dark:bg-warning-900/20 dark:text-warning-400">
-                            Email belum diverifikasi.{" "}
+                            Email belum diverifikasi.{' '}
                             <Link
-                                href={route("verification.send")}
+                                href={route('verification.send')}
                                 method="post"
                                 as="button"
                                 className="font-semibold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-warning-500/40"
                             >
                                 Kirim ulang tautan verifikasi
                             </Link>
-                            {status === "verification-link-sent" && (
+                            {status === 'verification-link-sent' && (
                                 <p className="mt-1 font-medium text-success-600 dark:text-success-400">
                                     Tautan verifikasi baru sudah dikirim.
                                 </p>
@@ -238,7 +231,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                                 className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
                             >
                                 <IconDeviceFloppy size={16} />
-                                {processing ? "Menyimpan..." : "Simpan"}
+                                {processing ? 'Menyimpan...' : 'Simpan'}
                             </button>
                         </div>
                     )}

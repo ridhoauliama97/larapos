@@ -1,4 +1,4 @@
-import { usePage } from "@inertiajs/react";
+import { usePage } from '@inertiajs/react';
 
 export function resolveAuthorizationState(auth = {}) {
     return {

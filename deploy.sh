@@ -6,6 +6,7 @@
 #   ./deploy.sh --no-build    start stack without rebuilding images
 #   ./deploy.sh migrate-sqlite  copy local SQLite data into the PostgreSQL volume (one-off)
 #   ./deploy.sh pdf-check     verify the bundled Gotenberg PDF engine (health + conversion)
+#   ./deploy.sh gotenberg     start/ensure a local Gotenberg engine for the dev server (:8000)
 #   ./deploy.sh logs|status|down|shell|tinker
 set -euo pipefail
 
@@ -40,8 +41,25 @@ case "$CMD" in
   tinker) exec "${COMPOSE[@]}" exec app php artisan tinker ;;
   migrate-sqlite) ;;
   pdf-check) ;;
-  *) die "Unknown command '$CMD'. Try: deploy.sh [logs|status|down|shell|tinker|migrate-sqlite|pdf-check] [--seed] [--no-build]" ;;
+  gotenberg) ;;
+  *) die "Unknown command '$CMD'. Try: deploy.sh [logs|status|down|shell|tinker|migrate-sqlite|pdf-check|gotenberg] [--seed] [--no-build]" ;;
 esac
+
+# ---------- local Gotenberg engine for dev (localhost:8000 has no bundled engine) ----------
+if [ "$CMD" = "gotenberg" ]; then
+  if docker ps --format '{{.Names}}' | grep -qx gotenberg-local; then
+    ok "gotenberg-local already running on :3000"
+  else
+    if docker ps -a --format '{{.Names}}' | grep -qx gotenberg-local; then
+      docker start gotenberg-local >/dev/null
+    else
+      docker run --rm -d --name gotenberg-local -p 3000:3000 gotenberg/gotenberg:8 >/dev/null
+    fi
+    sleep 2
+    ok "gotenberg-local started (dev server on :8000 can now render PDFs). Stop it later with: docker stop gotenberg-local"
+  fi
+  exit 0
+fi
 
 # ---------- prerequisites ----------
 command -v docker >/dev/null 2>&1 || die "docker not found in PATH"
@@ -157,4 +175,4 @@ if [ "$CMD" = "pdf-check" ]; then
 fi
 
 ok "Deploy complete — $APP_URL"
-printf '  status:   ./deploy.sh ps\n  logs:     ./deploy.sh logs\n  pdf:      ./deploy.sh pdf-check\n  shell:    ./deploy.sh shell\n'
+printf '  status:   ./deploy.sh status\n  logs:     ./deploy.sh logs\n  pdf:      ./deploy.sh pdf-check\n  shell:    ./deploy.sh shell\n'

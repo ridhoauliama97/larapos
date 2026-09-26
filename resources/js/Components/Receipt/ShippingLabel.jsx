@@ -1,52 +1,26 @@
-import React from "react";
-import {
-    IconMapPin,
-    IconPhone,
-    IconUser,
-    IconPackage,
-    IconCalendar,
-    IconInvoice,
-} from "@tabler/icons-react";
+import { IconMapPin, IconPhone, IconUser, IconPackage } from '@tabler/icons-react';
+import SimpleBarcode from '@/Components/Receipt/SimpleBarcode';
 
 export default function ShippingLabel({ transaction, store = {} }) {
     const formatPrice = (price = 0) =>
-        Number(price || 0).toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
+        Number(price || 0).toLocaleString('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
             minimumFractionDigits: 0,
         });
 
     const formatDate = (value) => {
-        if (!value) return "-";
+        if (!value) return '-';
         const d = new Date(value);
-        return d.toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
+        return d.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
         });
     };
 
-    const SimpleBarcode = ({ value }) => {
-        const bars = (value || "").split("").map((char, idx) => {
-            const weight = (char.charCodeAt(0) + idx * 17) % 4;
-            return 2 + weight;
-        });
-
-        return (
-            <div className="flex items-end gap-[1px] mt-1 justify-center sm:justify-end">
-                {bars.map((w, i) => (
-                    <span
-                        key={i}
-                        style={{ width: `${w}px` }}
-                        className="h-8 bg-black block"
-                    />
-                ))}
-            </div>
-        );
-    };
-
-    const storeName = store?.name || "TOKO";
-    const storeInitial = storeName?.[0] || "T";
+    const storeName = store?.name || 'TOKO';
+    const storeInitial = storeName?.[0] || 'T';
     const storeLogo = store?.logo;
     const customer = transaction?.customer || {};
     const region = [
@@ -56,10 +30,10 @@ export default function ShippingLabel({ transaction, store = {} }) {
         customer.province_name,
     ]
         .filter(Boolean)
-        .join(", ");
+        .join(', ');
 
     return (
-        <div className="w-full flex justify-center py-4 sm:py-0">
+        <div className="flex w-full justify-center py-4 sm:py-0">
             <style>
                 {`
                     @media print {
@@ -85,38 +59,52 @@ export default function ShippingLabel({ transaction, store = {} }) {
             </style>
 
             <div
-                className="shipping-label-container bg-white border-2 border-slate-300 rounded-2xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between"
+                className="shipping-label-container relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 border-slate-300 bg-white p-6 shadow-sm"
                 style={{
-                    width: "150mm",
-                    minHeight: "100mm",
+                    width: '150mm',
+                    minHeight: '100mm',
                 }}
             >
                 {/* Decorative Side Bar (Commerce Style) */}
-                <div className="absolute left-0 top-0 bottom-0 w-2 bg-primary-600 print:hidden" />
+                <div className="absolute bottom-0 left-0 top-0 w-2 bg-primary-600 print:hidden" />
 
                 <div>
                     {/* Header Section */}
-                    <div className="grid grid-cols-[1fr,auto] gap-4 border-b-2 border-dashed border-slate-200 pb-4 mb-4">
+                    <div className="mb-4 grid grid-cols-[1fr,auto] gap-4 border-b-2 border-dashed border-slate-200 pb-4">
                         <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center p-2 border border-slate-100 flex-shrink-0">
+                            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 p-2">
                                 {storeLogo ? (
-                                    <img src={storeLogo} alt={storeName} className="max-w-full max-h-full object-contain" />
+                                    <img
+                                        src={storeLogo}
+                                        alt={storeName}
+                                        className="max-h-full max-w-full object-contain"
+                                    />
                                 ) : (
-                                    <span className="text-2xl font-black text-primary-600">{storeInitial}</span>
+                                    <span className="text-2xl font-black text-primary-600">
+                                        {storeInitial}
+                                    </span>
                                 )}
                             </div>
                             <div className="min-w-0">
-                                <h2 className="text-xl font-bold text-slate-900 leading-tight truncate">{storeName}</h2>
-                                <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                                    <IconPhone size={14} /> {store.phone || "-"}
+                                <h2 className="truncate text-xl font-bold leading-tight text-slate-900">
+                                    {storeName}
+                                </h2>
+                                <p className="mt-1 flex items-center gap-1 text-xs text-slate-500">
+                                    <IconPhone size={14} /> {store.phone || '-'}
                                 </p>
                             </div>
                         </div>
 
-                        <div className="text-right border-l pl-4 border-slate-200">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">No. Invoice</span>
-                            <p className="text-xl font-black text-primary-600 tabular-nums">{transaction?.invoice}</p>
-                            <p className="text-xs text-slate-500 font-medium">{formatDate(transaction?.created_at)}</p>
+                        <div className="border-l border-slate-200 pl-4 text-right">
+                            <span className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                No. Invoice
+                            </span>
+                            <p className="text-xl font-black tabular-nums text-primary-600">
+                                {transaction?.invoice}
+                            </p>
+                            <p className="text-xs font-medium text-slate-500">
+                                {formatDate(transaction?.created_at)}
+                            </p>
                         </div>
                     </div>
 
@@ -126,19 +114,28 @@ export default function ShippingLabel({ transaction, store = {} }) {
                         <div className="space-y-3">
                             <div className="flex items-center gap-2 text-primary-600">
                                 <IconUser size={18} />
-                                <span className="text-xs font-bold uppercase tracking-wider">Penerima</span>
+                                <span className="text-xs font-bold uppercase tracking-wider">
+                                    Penerima
+                                </span>
                             </div>
                             <div className="pl-1">
-                                <h3 className="text-lg font-bold text-slate-900">{customer.name || "Pelanggan Umum"}</h3>
-                                <p className="text-sm font-semibold text-slate-700 mt-1">{customer.phone || ""}</p>
-                                <div className="flex gap-2 mt-2">
-                                    <IconMapPin size={16} className="text-slate-400 shrink-0 mt-0.5" />
-                                    <p className="text-xs text-slate-600 leading-relaxed italic uppercase">
-                                        {customer.address || "Ambil di Toko"}
+                                <h3 className="text-lg font-bold text-slate-900">
+                                    {customer.name || 'Pelanggan Umum'}
+                                </h3>
+                                <p className="mt-1 text-sm font-semibold text-slate-700">
+                                    {customer.phone || ''}
+                                </p>
+                                <div className="mt-2 flex gap-2">
+                                    <IconMapPin
+                                        size={16}
+                                        className="mt-0.5 shrink-0 text-slate-400"
+                                    />
+                                    <p className="text-xs uppercase italic leading-relaxed text-slate-600">
+                                        {customer.address || 'Ambil di Toko'}
                                     </p>
                                 </div>
                                 {region && (
-                                    <p className="text-[11px] text-slate-500 mt-1 uppercase">
+                                    <p className="mt-1 text-[11px] uppercase text-slate-500">
                                         {region}
                                     </p>
                                 )}
@@ -146,18 +143,26 @@ export default function ShippingLabel({ transaction, store = {} }) {
                         </div>
 
                         {/* Right Side: Order Summary */}
-                        <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                            <div className="flex items-center gap-2 text-slate-500 mb-3">
+                        <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                            <div className="mb-3 flex items-center gap-2 text-slate-500">
                                 <IconPackage size={18} />
-                                <span className="text-xs font-bold uppercase tracking-wider">Isi Paket</span>
+                                <span className="text-xs font-bold uppercase tracking-wider">
+                                    Isi Paket
+                                </span>
                             </div>
                             <div className="space-y-2">
-                                <div className="text-[11px] text-slate-600 line-clamp-3 font-medium leading-relaxed">
-                                    {transaction?.details?.map(item => `${item.product?.title} (x${item.qty})`).join(", ")}
+                                <div className="line-clamp-3 text-[11px] font-medium leading-relaxed text-slate-600">
+                                    {transaction?.details
+                                        ?.map((item) => `${item.product?.title} (x${item.qty})`)
+                                        .join(', ')}
                                 </div>
-                                <div className="pt-2 border-t border-slate-200 flex justify-between items-center">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Total Bayar</span>
-                                    <span className="text-sm font-black text-slate-900">{formatPrice(transaction?.grand_total)}</span>
+                                <div className="flex items-center justify-between border-t border-slate-200 pt-2">
+                                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                                        Total Bayar
+                                    </span>
+                                    <span className="text-sm font-black text-slate-900">
+                                        {formatPrice(transaction?.grand_total)}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -165,13 +170,19 @@ export default function ShippingLabel({ transaction, store = {} }) {
                 </div>
 
                 {/* Footer Barcode */}
-                <div className="flex justify-between items-end mt-4 pt-4 border-t-2 border-slate-100">
-                    <div className="text-[10px] text-slate-400 font-medium italic">
+                <div className="mt-4 flex items-end justify-between border-t-2 border-slate-100 pt-4">
+                    <div className="text-[10px] font-medium italic text-slate-400">
                         Dicetak pada: {new Date().toLocaleString('id-ID')}
                     </div>
                     <div className="flex flex-col items-end">
-                        <SimpleBarcode value={transaction?.invoice} />
-                        <span className="text-[10px] font-bold text-slate-800 tracking-[3px] mt-1 mr-1 uppercase">
+                        <SimpleBarcode
+                            value={transaction?.invoice}
+                            divisor={4}
+                            className="mt-1 justify-center sm:justify-end"
+                            barClassName="h-8 bg-black"
+                            gapClassName="gap-[1px]"
+                        />
+                        <span className="mr-1 mt-1 text-[10px] font-bold uppercase tracking-[3px] text-slate-800">
                             {transaction?.invoice}
                         </span>
                     </div>

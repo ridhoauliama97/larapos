@@ -64,12 +64,18 @@ class HandleInertiaRequests extends Middleware
                 ->orderByDesc('updated_at')
                 ->limit(10)
                 ->get(['id', 'title', 'stock', 'updated_at'])
-                ->map(function ($product) {
+                ->map(function ($product) use ($request) {
                     return [
                         'id' => $product->id,
                         'title' => $product->title,
                         'stock' => (int) $product->stock,
                         'time' => optional($product->updated_at)->diffForHumans(),
+                        // Gated because the notification list itself is not
+                        // permission-filtered — without this a user without
+                        // `products-access` would be sent to a 403.
+                        'url' => $request->user()->can('products-access')
+                            ? route('products.edit', $product->id)
+                            : null,
                     ];
                 });
 
@@ -80,13 +86,18 @@ class HandleInertiaRequests extends Middleware
                 ->orderBy('expired_at')
                 ->limit(10)
                 ->get()
-                ->map(function ($batch) {
+                ->map(function ($batch) use ($request) {
                     return [
                         'id' => $batch->id,
                         'title' => $batch->product?->title,
                         'batch_number' => $batch->batch_number,
                         'stock' => (int) $batch->stock,
                         'time' => optional($batch->expired_at)->diffForHumans(),
+                        // There is no batch page in the app, so the closest useful
+                        // destination is the owning product's edit screen.
+                        'url' => $batch->product_id && $request->user()->can('products-access')
+                            ? route('products.edit', $batch->product_id)
+                            : null,
                     ];
                 });
 
@@ -102,7 +113,7 @@ class HandleInertiaRequests extends Middleware
                 ->orderBy('due_date')
                 ->limit(5)
                 ->get(['id', 'invoice', 'customer_id', 'due_date', 'total', 'paid', 'status'])
-                ->map(function ($item) {
+                ->map(function ($item) use ($request) {
                     $remaining = max(0, ($item->total ?? 0) - ($item->paid ?? 0));
 
                     return [
@@ -112,6 +123,9 @@ class HandleInertiaRequests extends Middleware
                         'time' => optional($item->due_date)->diffForHumans(),
                         'status' => $item->status,
                         'aging_bucket' => $item->aging_bucket,
+                        'url' => $request->user()->can('receivables-access')
+                            ? route('receivables.show', $item->id)
+                            : null,
                     ];
                 });
 
@@ -121,7 +135,7 @@ class HandleInertiaRequests extends Middleware
                 ->orderBy('due_date')
                 ->limit(5)
                 ->get(['id', 'document_number', 'due_date', 'total', 'paid', 'status'])
-                ->map(function ($item) {
+                ->map(function ($item) use ($request) {
                     $remaining = max(0, ($item->total ?? 0) - ($item->paid ?? 0));
 
                     return [
@@ -131,6 +145,9 @@ class HandleInertiaRequests extends Middleware
                         'time' => optional($item->due_date)->diffForHumans(),
                         'status' => $item->status,
                         'aging_bucket' => $item->aging_bucket,
+                        'url' => $request->user()->can('payables-access')
+                            ? route('payables.show', $item->id)
+                            : null,
                     ];
                 });
 

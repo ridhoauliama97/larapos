@@ -48,20 +48,11 @@ class CustomerController extends Controller
         // return inertia
         return Inertia::render('Dashboard/Customers/Index', [
             'customers' => $customers,
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        $provinces = Province::select('code', 'name')->orderBy('name')->get();
-
-        return Inertia::render('Dashboard/Customers/Create', [
-            'provinces' => $provinces,
+            // The add/edit form now lives in a Drawer on this page. Only the province
+            // list and the loyalty tiers are needed up front — the regency/district/
+            // village levels are fetched from regions.* when a parent is picked or a
+            // row is opened.
+            'provinces' => Province::select('code', 'name')->orderBy('name')->get(),
             'tierOptions' => $this->loyaltyService->tierOptions(),
         ]);
     }
@@ -183,35 +174,6 @@ class CustomerController extends Controller
                 'errors' => [],
             ], 500);
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function edit(Customer $customer)
-    {
-        $provinces = Province::select('code', 'name')->orderBy('name')->get();
-        $regencies = $customer->province_id
-            ? City::where('province_code', $customer->province_id)->select('code', 'name')->orderBy('name')->get()
-            : [];
-        $districts = $customer->regency_id
-            ? District::where('city_code', $customer->regency_id)->select('code', 'name')->orderBy('name')->get()
-            : [];
-        $villages = $customer->district_id
-            ? Village::where('district_code', $customer->district_id)->select('code', 'name')->orderBy('name')->get()
-            : [];
-
-        return Inertia::render('Dashboard/Customers/Edit', [
-            'customer' => $customer,
-            'tierOptions' => $this->loyaltyService->tierOptions(),
-            'provinces' => $provinces,
-            'regencies' => $regencies,
-            'districts' => $districts,
-            'villages' => $villages,
-        ]);
     }
 
     /**

@@ -1,45 +1,45 @@
-import React, { useEffect, useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
+import { useEffect, useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
 
 const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     }).format(value);
 
 const formatDate = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
 export default function Index({ salesReturns, filters }) {
     const [form, setForm] = useState({
-        code: filters.code || "",
-        invoice: filters.invoice || "",
-        date_from: filters.date_from || "",
-        date_to: filters.date_to || "",
-        return_type: filters.return_type || "",
+        code: filters.code || '',
+        invoice: filters.invoice || '',
+        date_from: filters.date_from || '',
+        date_to: filters.date_to || '',
+        return_type: filters.return_type || '',
     });
 
     useEffect(() => {
         setForm({
-            code: filters.code || "",
-            invoice: filters.invoice || "",
-            date_from: filters.date_from || "",
-            date_to: filters.date_to || "",
-            return_type: filters.return_type || "",
+            code: filters.code || '',
+            invoice: filters.invoice || '',
+            date_from: filters.date_from || '',
+            date_to: filters.date_to || '',
+            return_type: filters.return_type || '',
         });
     }, [filters]);
 
     const submit = (event) => {
         event.preventDefault();
-        router.get(route("sales-returns.index"), form, {
+        router.get(route('sales-returns.index'), form, {
             preserveScroll: true,
             preserveState: true,
         });
@@ -63,7 +63,7 @@ export default function Index({ salesReturns, filters }) {
 
                 <form
                     onSubmit={submit}
-                    className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 md:grid-cols-2 xl:grid-cols-5 dark:border-slate-800 dark:bg-slate-900"
+                    className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-2 xl:grid-cols-5"
                 >
                     <input
                         type="text"
@@ -121,9 +121,9 @@ export default function Index({ salesReturns, filters }) {
                                 }))
                             }
                             options={[
-                                { value: "", label: "Semua metode" },
-                                { value: "refund_cash", label: "Refund Tunai" },
-                                { value: "store_credit", label: "Saldo Toko" },
+                                { value: '', label: 'Semua metode' },
+                                { value: 'refund_cash', label: 'Refund Tunai' },
+                                { value: 'store_credit', label: 'Saldo Toko' },
                             ]}
                             size="sm"
                             className="flex-1"
@@ -159,43 +159,36 @@ export default function Index({ salesReturns, filters }) {
                                             {item.code}
                                         </td>
                                         <td className="px-4 py-4">
-                                            {item.transaction?.invoice || "-"}
+                                            {item.transaction?.invoice || '-'}
+                                        </td>
+                                        <td className="px-4 py-4">{formatDate(item.created_at)}</td>
+                                        <td className="px-4 py-4">
+                                            {item.customer?.name || 'Umum'}
                                         </td>
                                         <td className="px-4 py-4">
-                                            {formatDate(item.created_at)}
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            {item.customer?.name || "Umum"}
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            {item.return_type === "store_credit"
-                                                ? "Saldo Toko"
-                                                : "Refund Tunai"}
+                                            {item.return_type === 'store_credit'
+                                                ? 'Saldo Toko'
+                                                : 'Refund Tunai'}
                                         </td>
                                         <td className="px-4 py-4 text-right font-medium text-slate-900 dark:text-white">
-                                            {formatCurrency(
-                                                item.total_return_amount
-                                            )}
+                                            {formatCurrency(item.total_return_amount)}
                                         </td>
                                         <td className="px-4 py-4 text-center">
                                             <span
                                                 className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                                                    item.status === "completed"
-                                                        ? "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400"
-                                                        : "bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400"
+                                                    item.status === 'completed'
+                                                        ? 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400'
+                                                        : 'bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400'
                                                 }`}
                                             >
-                                                {item.status === "completed"
-                                                    ? "Completed"
-                                                    : "Draft"}
+                                                {item.status === 'completed'
+                                                    ? 'Completed'
+                                                    : 'Draft'}
                                             </span>
                                         </td>
                                         <td className="px-4 py-4 text-center">
                                             <Link
-                                                href={route(
-                                                    "sales-returns.show",
-                                                    item.id
-                                                )}
+                                                href={route('sales-returns.show', item.id)}
                                                 className="inline-flex rounded-lg bg-primary-50 px-3 py-2 text-xs font-semibold text-primary-700 hover:bg-primary-100 dark:bg-primary-950/40 dark:text-primary-300"
                                             >
                                                 Lihat
@@ -217,9 +210,7 @@ export default function Index({ salesReturns, filters }) {
                     </table>
                 </div>
 
-                {salesReturns.links?.length > 3 && (
-                    <Pagination links={salesReturns.links} />
-                )}
+                {salesReturns.links?.length > 3 && <Pagination links={salesReturns.links} />}
             </div>
         </>
     );

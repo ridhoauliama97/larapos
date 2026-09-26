@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import Modal from "@/Components/Dashboard/Modal";
-import { IconCrop, IconMinus, IconPlus, IconRefresh } from "@tabler/icons-react";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Modal from '@/Components/Dashboard/Modal';
+import { IconCrop, IconMinus, IconPlus, IconRefresh } from '@tabler/icons-react';
 
 const VIEWPORT = 320;
 const OUTPUT_SIZE = 1000;
@@ -21,12 +21,8 @@ export default function ImageCropper({
     const drag = useRef(null);
 
     const coverScale = useCallback(
-        (img) =>
-            Math.max(
-                VIEWPORT / img.naturalWidth,
-                VIEWPORT / img.naturalHeight,
-            ),
-        [],
+        (img) => Math.max(VIEWPORT / img.naturalWidth, VIEWPORT / img.naturalHeight),
+        []
     );
 
     const displayed = useCallback(
@@ -39,7 +35,7 @@ export default function ImageCropper({
                 height: img.naturalHeight * scale,
             };
         },
-        [coverScale],
+        [coverScale]
     );
 
     const clampOffset = useCallback(
@@ -48,13 +44,10 @@ export default function ImageCropper({
 
             return {
                 x: Math.max(Math.min(0, VIEWPORT - width), Math.min(0, next.x)),
-                y: Math.max(
-                    Math.min(0, VIEWPORT - height),
-                    Math.min(0, next.y),
-                ),
+                y: Math.max(Math.min(0, VIEWPORT - height), Math.min(0, next.y)),
             };
         },
-        [displayed],
+        [displayed]
     );
 
     const centerOffset = useCallback(
@@ -66,7 +59,7 @@ export default function ImageCropper({
                 y: (VIEWPORT - height) / 2,
             });
         },
-        [displayed, clampOffset],
+        [displayed, clampOffset]
     );
 
     useEffect(() => {
@@ -109,10 +102,7 @@ export default function ImageCropper({
             return;
         }
 
-        const level = Math.max(
-            MIN_ZOOM,
-            Math.min(MAX_ZOOM, Math.round(next * 100) / 100),
-        );
+        const level = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.round(next * 100) / 100));
         const before = displayed(image, zoom);
 
         // keep the image point under the viewport centre stable while zooming
@@ -125,7 +115,7 @@ export default function ImageCropper({
             clampOffset(image, level, {
                 x: VIEWPORT / 2 - centerX * after.scale,
                 y: VIEWPORT / 2 - centerY * after.scale,
-            }),
+            })
         );
     };
 
@@ -153,11 +143,7 @@ export default function ImageCropper({
     };
 
     const onPointerMove = (event) => {
-        if (
-            !image ||
-            !drag.current ||
-            drag.current.pointerId !== event.pointerId
-        ) {
+        if (!image || !drag.current || drag.current.pointerId !== event.pointerId) {
             return;
         }
 
@@ -165,7 +151,7 @@ export default function ImageCropper({
             clampOffset(image, zoom, {
                 x: drag.current.origin.x + (event.clientX - drag.current.startX),
                 y: drag.current.origin.y + (event.clientY - drag.current.startY),
-            }),
+            })
         );
     };
 
@@ -185,12 +171,12 @@ export default function ImageCropper({
 
         const { scale } = displayed(image, zoom);
         const sourceSize = VIEWPORT / scale;
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         canvas.width = OUTPUT_SIZE;
         canvas.height = OUTPUT_SIZE;
 
-        const context = canvas.getContext("2d");
-        context.imageSmoothingQuality = "high";
+        const context = canvas.getContext('2d');
+        context.imageSmoothingQuality = 'high';
         context.drawImage(
             image,
             -offset.x / scale,
@@ -200,16 +186,13 @@ export default function ImageCropper({
             0,
             0,
             OUTPUT_SIZE,
-            OUTPUT_SIZE,
+            OUTPUT_SIZE
         );
 
         const type =
-            file.type === "image/png" || file.type === "image/webp"
-                ? file.type
-                : "image/jpeg";
-        const extension =
-            type === "image/png" ? "png" : type === "image/webp" ? "webp" : "jpg";
-        const baseName = (file.name || "gambar").replace(/\.[^.]+$/, "");
+            file.type === 'image/png' || file.type === 'image/webp' ? file.type : 'image/jpeg';
+        const extension = type === 'image/png' ? 'png' : type === 'image/webp' ? 'webp' : 'jpg';
+        const baseName = (file.name || 'gambar').replace(/\.[^.]+$/, '');
 
         canvas.toBlob(
             (blob) => {
@@ -224,26 +207,19 @@ export default function ImageCropper({
                 onApply(
                     new File([blob], `${baseName}-crop.${extension}`, {
                         type,
-                    }),
+                    })
                 );
             },
             type,
-            0.92,
+            0.92
         );
     };
 
-    const isGif = file?.type === "image/gif";
-    const { width, height } = image
-        ? displayed(image, zoom)
-        : { width: 0, height: 0 };
+    const isGif = file?.type === 'image/gif';
+    const { width, height } = image ? displayed(image, zoom) : { width: 0, height: 0 };
 
     return (
-        <Modal
-            show={open}
-            onClose={onCancel}
-            title="Atur gambar"
-            maxWidth="lg"
-        >
+        <Modal show={open} onClose={onCancel} title="Atur gambar" maxWidth="lg">
             <div className="space-y-4">
                 <div
                     onPointerDown={onPointerDown}
@@ -261,9 +237,9 @@ export default function ImageCropper({
                             style={{
                                 width: `${width}px`,
                                 height: `${height}px`,
-                                maxWidth: "none",
+                                maxWidth: 'none',
                                 transform: `translate(${offset.x}px, ${offset.y}px)`,
-                                transformOrigin: "top left",
+                                transformOrigin: 'top left',
                             }}
                         />
                     )}
@@ -285,9 +261,7 @@ export default function ImageCropper({
                         max={MAX_ZOOM}
                         step={0.01}
                         value={zoom}
-                        onChange={(event) =>
-                            setZoomLevel(Number(event.target.value))
-                        }
+                        onChange={(event) => setZoomLevel(Number(event.target.value))}
                         aria-label="Zoom gambar"
                         className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-primary-500 dark:bg-slate-700"
                     />
@@ -310,10 +284,9 @@ export default function ImageCropper({
                 </div>
 
                 <p className="text-xs leading-relaxed text-slate-400 dark:text-slate-500">
-                    Geser gambar untuk mengatur posisi, gunakan slider untuk
-                    zoom. Hasil crop berbentuk persegi (1:1).
-                    {isGif &&
-                        " GIF akan menjadi gambar statis setelah di-crop."}
+                    Geser gambar untuk mengatur posisi, gunakan slider untuk zoom. Hasil crop
+                    berbentuk persegi (1:1).
+                    {isGif && ' GIF akan menjadi gambar statis setelah di-crop.'}
                 </p>
 
                 <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
@@ -340,7 +313,7 @@ export default function ImageCropper({
                         className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
                     >
                         <IconCrop size={16} />
-                        {busy ? "Memproses..." : "Simpan crop"}
+                        {busy ? 'Memproses...' : 'Simpan crop'}
                     </button>
                 </div>
             </div>

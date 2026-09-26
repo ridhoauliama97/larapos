@@ -1,0 +1,7 @@
+node_modules
+public
+storage
+vendor
+package-lock.json
+whatsapp-service
+resources/js/ziggy.js

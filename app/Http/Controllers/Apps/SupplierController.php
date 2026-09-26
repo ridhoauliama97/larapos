@@ -29,13 +29,10 @@ class SupplierController extends Controller
 
         return Inertia::render('Dashboard/Suppliers/Index', [
             'suppliers' => $suppliers,
-        ]);
-    }
-
-    public function create()
-    {
-        return Inertia::render('Dashboard/Suppliers/Create', [
-            'provinces' => Province::select('code', 'name')->orderBy('name')->get(),
+            // The add/edit form now lives in a Drawer on this page. Only the province
+            // list is needed up front — the regency/district/village levels are
+            // fetched from regions.* when a parent is picked or a row is opened.
+            'provinces' => $this->provinces(),
         ]);
     }
 
@@ -60,17 +57,6 @@ class SupplierController extends Controller
         ]);
 
         return to_route('suppliers.index')->with('success', 'Supplier berhasil ditambahkan.');
-    }
-
-    public function edit(Supplier $supplier)
-    {
-        return Inertia::render('Dashboard/Suppliers/Edit', [
-            'supplier' => $supplier,
-            'provinces' => $this->provinces(),
-            'regencies' => $this->regencies($supplier->province_id),
-            'districts' => $this->districts($supplier->regency_id),
-            'villages' => $this->villages($supplier->district_id),
-        ]);
     }
 
     public function update(Request $request, Supplier $supplier)

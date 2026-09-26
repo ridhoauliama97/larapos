@@ -1,40 +1,34 @@
-import React, { useMemo } from "react";
-import { Head, Link, router } from "@inertiajs/react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import Table from "@/Components/Dashboard/Table";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import { IconEye, IconFileSearch } from "@tabler/icons-react";
+import { useMemo } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import Table from '@/Components/Dashboard/Table';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import { IconEye, IconFileSearch } from '@tabler/icons-react';
 
 const formatDateTime = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
-              timeStyle: "short",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
-export default function Index({
-    auditLogs,
-    filters,
-    users = [],
-    modules = [],
-    events = [],
-}) {
+export default function Index({ auditLogs, filters, users = [], modules = [], events = [] }) {
     const currentFilters = useMemo(
         () => ({
-            user_id: filters?.user_id || "",
-            module: filters?.module || "",
-            event: filters?.event || "",
-            date_from: filters?.date_from || "",
-            date_to: filters?.date_to || "",
-            search: filters?.search || "",
+            user_id: filters?.user_id || '',
+            module: filters?.module || '',
+            event: filters?.event || '',
+            date_from: filters?.date_from || '',
+            date_to: filters?.date_to || '',
+            search: filters?.search || '',
         }),
         [filters]
     );
 
     const updateFilters = (nextFilters) => {
-        router.get(route("audit-logs.index"), nextFilters, {
+        router.get(route('audit-logs.index'), nextFilters, {
             preserveState: true,
             replace: true,
         });
@@ -64,7 +58,7 @@ export default function Index({
                         })
                     }
                     options={[
-                        { value: "", label: "Semua Aktor" },
+                        { value: '', label: 'Semua Aktor' },
                         ...users.map((user) => ({
                             value: user.id,
                             label: user.name,
@@ -82,7 +76,7 @@ export default function Index({
                         })
                     }
                     options={[
-                        { value: "", label: "Semua Modul" },
+                        { value: '', label: 'Semua Modul' },
                         ...modules.map((module) => ({
                             value: module,
                             label: module,
@@ -100,7 +94,7 @@ export default function Index({
                         })
                     }
                     options={[
-                        { value: "", label: "Semua Event" },
+                        { value: '', label: 'Semua Event' },
                         ...events.map((eventName) => ({
                             value: eventName,
                             label: eventName,
@@ -171,10 +165,10 @@ export default function Index({
                                     <Table.Td>
                                         <div>
                                             <p className="font-medium text-slate-800 dark:text-slate-200">
-                                                {log.user?.name || "System"}
+                                                {log.user?.name || 'System'}
                                             </p>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                {log.user?.email || "-"}
+                                                {log.user?.email || '-'}
                                             </p>
                                         </div>
                                     </Table.Td>
@@ -184,11 +178,11 @@ export default function Index({
                                             {log.event}
                                         </span>
                                     </Table.Td>
-                                    <Table.Td>{log.target_label || "-"}</Table.Td>
+                                    <Table.Td>{log.target_label || '-'}</Table.Td>
                                     <Table.Td>{log.description}</Table.Td>
                                     <Table.Td className="text-center">
                                         <Link
-                                            href={route("audit-logs.show", log.id)}
+                                            href={route('audit-logs.show', log.id)}
                                             className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                                         >
                                             <IconEye size={14} />
@@ -198,10 +192,7 @@ export default function Index({
                                 </tr>
                             ))
                         ) : (
-                            <Table.Empty
-                                colSpan={7}
-                                message="Belum ada data audit log."
-                            />
+                            <Table.Empty colSpan={7} message="Belum ada data audit log." />
                         )}
                     </Table.Tbody>
                 </Table>

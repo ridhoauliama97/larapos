@@ -1,18 +1,18 @@
-import React, { useEffect, useId, useRef, useState } from "react";
-import { IconPhoto, IconReplace, IconX } from "@tabler/icons-react";
+import { useId, useRef, useState } from 'react';
+import { IconPhoto, IconReplace, IconX } from '@tabler/icons-react';
 
-const DEFAULT_ACCEPT = "image/jpeg,image/png,image/webp";
+const DEFAULT_ACCEPT = 'image/jpeg,image/png,image/webp';
 
 export default function ImageDropzone({
     preview,
     original = null,
     onSelect,
     onReset = null,
-    hint = "JPG, PNG, atau WebP. Maksimal 2 MB.",
+    hint = 'JPG, PNG, atau WebP. Maksimal 2 MB.',
     error,
-    aspect = "aspect-[4/3]",
+    aspect = 'aspect-[4/3]',
     accept = DEFAULT_ACCEPT,
-    shape = "rounded",
+    shape = 'rounded',
     disabled = false,
 }) {
     const inputId = useId();
@@ -44,12 +44,9 @@ export default function ImageDropzone({
         handleFiles(event.dataTransfer.files);
     };
 
-    const descriptionIds = [
-        error ? `${inputId}-error` : null,
-        `${inputId}-hint`,
-    ]
+    const descriptionIds = [error ? `${inputId}-error` : null, `${inputId}-hint`]
         .filter(Boolean)
-        .join(" ");
+        .join(' ');
 
     return (
         <div className="flex flex-col gap-3">
@@ -64,14 +61,14 @@ export default function ImageDropzone({
                 onDrop={handleDrop}
                 disabled={disabled}
                 aria-describedby={descriptionIds}
-                className={`relative block ${aspect} w-full overflow-hidden border text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60 ${
-                    shape === "circle" ? "rounded-full" : "rounded-xl"
+                className={`relative block ${aspect} w-full overflow-hidden border text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none ${
+                    shape === 'circle' ? 'rounded-full' : 'rounded-xl'
                 } ${
                     error
-                        ? "border-danger-400 bg-danger-50 dark:border-danger-500/60 dark:bg-danger-500/10"
+                        ? 'border-danger-400 bg-danger-50 dark:border-danger-500/60 dark:bg-danger-500/10'
                         : dragging
-                          ? "border-primary-400 bg-primary-50 dark:border-primary-500/60 dark:bg-primary-500/10"
-                          : "border-slate-200 bg-slate-50 hover:border-primary-300 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-primary-500/40"
+                          ? 'border-primary-400 bg-primary-50 dark:border-primary-500/60 dark:bg-primary-500/10'
+                          : 'border-slate-200 bg-slate-50 hover:border-primary-300 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-primary-500/40'
                 }`}
             >
                 {hasPreview ? (
@@ -96,10 +93,7 @@ export default function ImageDropzone({
             </button>
 
             <div className="flex items-start justify-between gap-3">
-                <p
-                    id={`${inputId}-hint`}
-                    className="sr-only"
-                >
+                <p id={`${inputId}-hint`} className="sr-only">
                     {hint}
                 </p>
 
@@ -124,7 +118,7 @@ export default function ImageDropzone({
                             className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-danger-500/40 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-400 dark:hover:bg-danger-500/10 dark:hover:text-danger-400"
                         >
                             <IconX size={14} />
-                            {original ? "Batalkan" : "Hapus"}
+                            {original ? 'Batalkan' : 'Hapus'}
                         </button>
                     )}
                 </div>
@@ -149,7 +143,7 @@ export default function ImageDropzone({
                 disabled={disabled}
                 onChange={(event) => {
                     handleFiles(event.target.files);
-                    event.target.value = "";
+                    event.target.value = '';
                 }}
             />
         </div>

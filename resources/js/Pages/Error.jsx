@@ -1,5 +1,4 @@
-import React from "react";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link } from '@inertiajs/react';
 import {
     IconAlertTriangle,
     IconArrowLeft,
@@ -7,43 +6,44 @@ import {
     IconLock,
     IconRefresh,
     IconServerOff,
-} from "@tabler/icons-react";
-import { useTheme } from "@/Context/ThemeSwitcherContext";
+} from '@tabler/icons-react';
+import { useTheme } from '@/Context/ThemeSwitcherContext';
 
 const errorContent = {
     401: {
-        title: "Autentikasi Dibutuhkan",
-        description: "Sesi atau akses Anda tidak valid. Silakan masuk kembali untuk melanjutkan.",
+        title: 'Autentikasi Dibutuhkan',
+        description: 'Sesi atau akses Anda tidak valid. Silakan masuk kembali untuk melanjutkan.',
         icon: IconLock,
     },
     403: {
-        title: "Akses Ditolak",
-        description: "Anda tidak memiliki izin untuk membuka halaman ini.",
+        title: 'Akses Ditolak',
+        description: 'Anda tidak memiliki izin untuk membuka halaman ini.',
         icon: IconLock,
     },
     404: {
-        title: "Halaman Tidak Ditemukan",
-        description: "Halaman yang Anda cari tidak tersedia, dipindahkan, atau URL yang dimasukkan tidak tepat.",
+        title: 'Halaman Tidak Ditemukan',
+        description:
+            'Halaman yang Anda cari tidak tersedia, dipindahkan, atau URL yang dimasukkan tidak tepat.',
         icon: IconAlertTriangle,
     },
     419: {
-        title: "Sesi Kedaluwarsa",
-        description: "Sesi keamanan telah berakhir. Muat ulang halaman lalu coba kembali.",
+        title: 'Sesi Kedaluwarsa',
+        description: 'Sesi keamanan telah berakhir. Muat ulang halaman lalu coba kembali.',
         icon: IconRefresh,
     },
     429: {
-        title: "Terlalu Banyak Permintaan",
-        description: "Permintaan Anda dibatasi sementara. Tunggu sebentar sebelum mencoba lagi.",
+        title: 'Terlalu Banyak Permintaan',
+        description: 'Permintaan Anda dibatasi sementara. Tunggu sebentar sebelum mencoba lagi.',
         icon: IconAlertTriangle,
     },
     500: {
-        title: "Terjadi Kesalahan Server",
-        description: "Ada gangguan pada sistem. Silakan coba lagi dalam beberapa saat.",
+        title: 'Terjadi Kesalahan Server',
+        description: 'Ada gangguan pada sistem. Silakan coba lagi dalam beberapa saat.',
         icon: IconServerOff,
     },
     503: {
-        title: "Layanan Sementara Tidak Tersedia",
-        description: "Aplikasi sedang dalam pemeliharaan atau belum siap melayani permintaan ini.",
+        title: 'Layanan Sementara Tidak Tersedia',
+        description: 'Aplikasi sedang dalam pemeliharaan atau belum siap melayani permintaan ini.',
         icon: IconServerOff,
     },
 };
@@ -82,7 +82,7 @@ export default function Error({ status, homeUrl, homeLabel }) {
                             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-600 backdrop-blur transition hover:border-primary-300 hover:text-primary-600 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:border-primary-700 dark:hover:text-primary-400"
                         >
                             <span className="h-2.5 w-2.5 rounded-full bg-primary-500" />
-                            {darkMode ? "Mode Terang" : "Mode Gelap"}
+                            {darkMode ? 'Mode Terang' : 'Mode Gelap'}
                         </button>
                     </div>
 
@@ -138,7 +138,8 @@ export default function Error({ status, homeUrl, homeLabel }) {
                                                 {status}
                                             </div>
                                             <div className="mt-4 rounded-2xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-400">
-                                                Pastikan URL, hak akses, atau status layanan sudah sesuai sebelum mencoba lagi.
+                                                Pastikan URL, hak akses, atau status layanan sudah
+                                                sesuai sebelum mencoba lagi.
                                             </div>
                                         </div>
                                     </div>

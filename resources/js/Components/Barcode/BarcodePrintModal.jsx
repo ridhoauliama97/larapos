@@ -1,12 +1,7 @@
-import React, { useState, useRef } from "react";
-import Select from "@/Components/Dashboard/Select";
-import { BarcodeLabelGrid } from "./BarcodeLabel";
-import {
-    IconX,
-    IconPrinter,
-    IconBarcode,
-    IconTruck,
-} from "@tabler/icons-react";
+import { useState, useRef } from 'react';
+import Select from '@/Components/Dashboard/Select';
+import { BarcodeLabelGrid } from './BarcodeLabel';
+import { IconX, IconPrinter, IconBarcode, IconTruck } from '@tabler/icons-react';
 
 /**
  * BarcodePrintModal - Modal for printing barcode labels
@@ -17,7 +12,7 @@ export default function BarcodePrintModal({
     products = [],
     singleProduct = null,
 }) {
-    const [size, setSize] = useState("70x50");
+    const [size, setSize] = useState('70x50');
     const [showPrice, setShowPrice] = useState(true);
     const [showOngkir, setShowOngkir] = useState(false);
     const [ongkirAmount, setOngkirAmount] = useState(0);
@@ -30,7 +25,7 @@ export default function BarcodePrintModal({
         const printContent = printRef.current;
         if (!printContent) return;
 
-        const printWindow = window.open("", "_blank");
+        const printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
@@ -98,41 +93,41 @@ export default function BarcodePrintModal({
             <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
             {/* Modal */}
-            <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="relative max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                         <IconBarcode size={24} className="text-primary-500" />
                         <h2 className="text-lg font-bold text-slate-800 dark:text-white">
                             Cetak Barcode
                         </h2>
-                        <span className="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-medium rounded-full">
+                        <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
                             {productsToPrint.length} produk
                         </span>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
                     >
                         <IconX size={20} className="text-slate-500" />
                     </button>
                 </div>
 
                 {/* Options */}
-                <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="border-b border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                         {/* Size */}
                         <div>
-                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
                                 Ukuran Label
                             </label>
                             <Select
                                 value={size}
                                 onChange={(value) => setSize(value)}
                                 options={[
-                                    { value: "50x30", label: "50 x 30 mm" },
-                                    { value: "70x50", label: "70 x 50 mm" },
-                                    { value: "100x50", label: "100 x 50 mm" },
+                                    { value: '50x30', label: '50 x 30 mm' },
+                                    { value: '70x50', label: '70 x 50 mm' },
+                                    { value: '100x50', label: '100 x 50 mm' },
                                 ]}
                                 className="w-full"
                             />
@@ -140,7 +135,7 @@ export default function BarcodePrintModal({
 
                         {/* Copies */}
                         <div>
-                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
                                 Jumlah per Produk
                             </label>
                             <input
@@ -148,10 +143,8 @@ export default function BarcodePrintModal({
                                 min="1"
                                 max="100"
                                 value={copies}
-                                onChange={(e) =>
-                                    setCopies(Number(e.target.value))
-                                }
-                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+                                onChange={(e) => setCopies(Number(e.target.value))}
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
                             />
                         </div>
 
@@ -162,7 +155,7 @@ export default function BarcodePrintModal({
                                 id="showPrice"
                                 checked={showPrice}
                                 onChange={(e) => setShowPrice(e.target.checked)}
-                                className="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500"
+                                className="h-4 w-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500"
                             />
                             <label
                                 htmlFor="showPrice"
@@ -178,10 +171,8 @@ export default function BarcodePrintModal({
                                 type="checkbox"
                                 id="showOngkir"
                                 checked={showOngkir}
-                                onChange={(e) =>
-                                    setShowOngkir(e.target.checked)
-                                }
-                                className="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500"
+                                onChange={(e) => setShowOngkir(e.target.checked)}
+                                className="h-4 w-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500"
                             />
                             <label
                                 htmlFor="showOngkir"
@@ -195,33 +186,28 @@ export default function BarcodePrintModal({
                     {/* Ongkir Amount */}
                     {showOngkir && (
                         <div className="mt-3">
-                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
-                                <IconTruck size={14} className="inline mr-1" />
+                            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                                <IconTruck size={14} className="mr-1 inline" />
                                 Nominal Ongkir
                             </label>
                             <input
                                 type="number"
                                 min="0"
                                 value={ongkirAmount}
-                                onChange={(e) =>
-                                    setOngkirAmount(Number(e.target.value))
-                                }
+                                onChange={(e) => setOngkirAmount(Number(e.target.value))}
                                 placeholder="Contoh: 15000"
-                                className="w-48 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+                                className="w-48 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
                             />
                         </div>
                     )}
                 </div>
 
                 {/* Preview */}
-                <div
-                    className="p-4 overflow-auto"
-                    style={{ maxHeight: "400px" }}
-                >
-                    <p className="text-xs text-slate-500 mb-3">Preview:</p>
+                <div className="overflow-auto p-4" style={{ maxHeight: '400px' }}>
+                    <p className="mb-3 text-xs text-slate-500">Preview:</p>
                     <div
                         ref={printRef}
-                        className="bg-white p-4 border border-dashed border-slate-300 rounded-lg"
+                        className="rounded-lg border border-dashed border-slate-300 bg-white p-4"
                     >
                         <BarcodeLabelGrid
                             products={productsToPrint}
@@ -235,16 +221,16 @@ export default function BarcodePrintModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-3 p-4 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-end gap-3 border-t border-slate-200 p-4 dark:border-slate-800">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium transition-colors"
+                        className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
                     >
                         Batal
                     </button>
                     <button
                         onClick={handlePrint}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors"
+                        className="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
                     >
                         <IconPrinter size={18} />
                         Cetak

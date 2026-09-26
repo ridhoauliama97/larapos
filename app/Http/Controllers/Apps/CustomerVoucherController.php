@@ -143,10 +143,13 @@ class CustomerVoucherController extends Controller
                 Rule::unique('customer_vouchers', 'code')->ignore($voucher?->id),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'discount_type' => ['required', Rule::in([
-                CustomerVoucher::TYPE_FIXED_AMOUNT,
-                CustomerVoucher::TYPE_PERCENTAGE,
-            ])],
+            'discount_type' => [
+                'required',
+                Rule::in([
+                    CustomerVoucher::TYPE_FIXED_AMOUNT,
+                    CustomerVoucher::TYPE_PERCENTAGE,
+                ]),
+            ],
             'discount_value' => ['required', 'numeric', 'min:0.01'],
             'minimum_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
