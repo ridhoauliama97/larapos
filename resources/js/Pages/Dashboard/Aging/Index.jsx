@@ -4,7 +4,6 @@ import {
     IconAlertTriangle,
     IconChartBar,
     IconClock,
-    IconCurrencyDollar,
     IconReceipt,
     IconTruck,
 } from '@tabler/icons-react';
@@ -15,17 +14,6 @@ const formatCurrency = (value = 0) =>
         currency: 'IDR',
         minimumFractionDigits: 0,
     }).format(value);
-
-const formatDate = (value) => {
-    if (!value) return '-';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return value;
-    return d.toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-    });
-};
 
 const agingBucketLabel = (bucket) => {
     const map = {

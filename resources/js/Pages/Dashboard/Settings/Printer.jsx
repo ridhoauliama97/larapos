@@ -7,7 +7,7 @@ import { IconPrinter } from '@tabler/icons-react';
 import { requestPrinter, disconnectPrinter, printReceipt, kickDrawer } from '@/Utils/escpos';
 
 export default function Printer({ settings }) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing } = useForm({
         printer_auto_print: settings.printer_auto_print || false,
         printer_paper_size: settings.printer_paper_size || '80mm',
     });

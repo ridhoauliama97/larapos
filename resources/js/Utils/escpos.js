@@ -86,17 +86,15 @@ export async function requestPrinter() {
     if (device.configuration === null) {
         await device.selectConfiguration(1);
     }
-    // Find the first printer-class interface + its OUT endpoint
+    // Find the first printer-class interface. The OUT endpoint is resolved later by
+    // the re-attach path, which stores it on the cached device as `_endpoint`.
     let interfaceNumber = null;
-    let endpointNumber = null;
     for (const config of device.configurations) {
         for (const iface of config.interfaces) {
             for (const alt of iface.alternates) {
                 if (alt.interfaceClass === 7) {
                     // USB printer class
                     interfaceNumber = iface.interfaceNumber;
-                    endpointNumber =
-                        alt.endpoints.find((e) => e.direction === 'out')?.endpointNumber ?? null;
                 }
             }
         }
@@ -109,7 +107,6 @@ export async function requestPrinter() {
                     const out = alt.endpoints.find((e) => e.direction === 'out');
                     if (out && interfaceNumber === null) {
                         interfaceNumber = iface.interfaceNumber;
-                        endpointNumber = out.endpointNumber;
                     }
                 }
             }

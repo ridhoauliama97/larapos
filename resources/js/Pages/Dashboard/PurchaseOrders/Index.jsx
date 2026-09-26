@@ -5,14 +5,7 @@ import Table from '@/Components/Dashboard/Table';
 import Pagination from '@/Components/Dashboard/Pagination';
 import Select from '@/Components/Dashboard/Select';
 import { useAuthorization } from '@/Utils/authorization';
-import { IconCirclePlus, IconEye, IconSearch, IconShoppingCart, IconX } from '@tabler/icons-react';
-
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-    }).format(value);
+import { IconCirclePlus, IconEye, IconSearch, IconShoppingCart } from '@tabler/icons-react';
 
 const statusBadge = (status) => {
     const base = 'inline-flex rounded-full px-2.5 py-1 text-xs font-semibold';

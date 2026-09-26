@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import InputSelect from '@/Components/Dashboard/InputSelect';
-import Button from '@/Components/Dashboard/Button';
-import Table from '@/Components/Dashboard/Table';
 import Pagination from '@/Components/Dashboard/Pagination';
 import {
     IconCoin,
@@ -15,7 +13,6 @@ import {
     IconFilter,
     IconX,
     IconSearch,
-    IconCalendar,
 } from '@tabler/icons-react';
 
 // Summary Card Component
@@ -61,7 +58,7 @@ const formatCurrency = (value = 0) =>
 
 const castFilterString = (value) => (typeof value === 'number' ? String(value) : (value ?? ''));
 
-const Sales = ({ transactions, summary, filters, cashiers, customers, warehouses = [] }) => {
+const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
     const [showFilters, setShowFilters] = useState(false);
     const [filterData, setFilterData] = useState({
         ...defaultFilterState,

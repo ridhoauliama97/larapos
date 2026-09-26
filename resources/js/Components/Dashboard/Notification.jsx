@@ -397,6 +397,10 @@ export default function Notification() {
         handleOpenItem(item);
     };
 
+    // Rendered as a plain call, not <NotificationList />: a component defined inside
+    // render is a new type every pass, so React unmounts and remounts the whole list
+    // (losing state and scroll position) on each parent render. Same convention as
+    // Utils/Menu.jsx. It holds no state of its own — it only closes over this scope.
     const NotificationList = () => (
         <div className="flex max-h-80 w-full flex-col items-start gap-3 overflow-y-auto pr-1">
             {displayData.length === 0 && (
@@ -536,9 +540,7 @@ export default function Notification() {
                                     />
                                 </div>
                             </div>
-                            <div className="p-4">
-                                <NotificationList />
-                            </div>
+                            <div className="p-4">{NotificationList()}</div>
                         </Menu.Items>
                     </Transition>
                 </Menu>
@@ -570,7 +572,7 @@ export default function Notification() {
                         </div>
                         <div className="p-4">
                             <div className="flex h-screen flex-col items-start gap-3 overflow-y-auto">
-                                <NotificationList />
+                                {NotificationList()}
                             </div>
                         </div>
                     </div>

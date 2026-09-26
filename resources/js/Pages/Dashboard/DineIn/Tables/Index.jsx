@@ -8,7 +8,6 @@ import {
     IconPencilCog,
     IconTrash,
     IconDownload,
-    IconPlus,
 } from '@tabler/icons-react';
 import Table from '@/Components/Dashboard/Table';
 import Modal from '@/Components/Dashboard/Modal';
@@ -25,7 +24,7 @@ const shapeOptions = [
 ];
 
 function TableShape({ table, onDragStart, isSelected, onClick }) {
-    const { shape, name, capacity, is_active } = table;
+    const { shape, name, is_active } = table;
     const colorClass = is_active
         ? isSelected
             ? 'fill-primary-500'

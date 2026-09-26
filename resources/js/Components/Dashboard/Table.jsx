@@ -1,4 +1,4 @@
-const Card = ({ icon, title, className, children }) => {
+const Card = ({ title, className, children }) => {
     return (
         <>
             <div

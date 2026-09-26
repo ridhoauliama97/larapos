@@ -1,14 +1,11 @@
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import {
-    IconBooks,
     IconBox,
-    IconCategory,
     IconChartArrowsVertical,
     IconChartBar,
     IconChartBarPopular,
     IconChartInfographic,
-    IconCirclePlus,
     IconClockHour6,
     IconClipboardCheck,
     IconCreditCard,
@@ -19,12 +16,10 @@ import {
     IconGift,
     IconLayout2,
     IconBuildingStore,
-    IconSchool,
     IconShoppingCart,
     IconTable,
     IconUserBolt,
     IconUserShield,
-    IconUserSquare,
     IconUsers,
     IconUsersPlus,
     IconFileInvoice,

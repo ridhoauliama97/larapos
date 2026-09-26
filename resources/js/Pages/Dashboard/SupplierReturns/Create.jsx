@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
 import Select from '@/Components/Dashboard/Select';
 import { IconArrowLeft, IconPlus, IconTrash, IconTruckReturn } from '@tabler/icons-react';
@@ -14,7 +14,6 @@ const formatCurrency = (value = 0) =>
     }).format(value);
 
 export default function Create({ suppliers, goodsReceivings, products }) {
-    const { errors } = usePage().props;
     const { data, setData, post, processing } = useForm({
         supplier_id: '',
         goods_receiving_id: '',

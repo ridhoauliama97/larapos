@@ -142,7 +142,6 @@ export default function Index() {
         data,
         setData,
         delete: destroy,
-        reset,
     } = useForm({
         selectedUser: [],
     });

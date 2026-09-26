@@ -54,7 +54,7 @@ export default function Whatsapp({ settings, waStatus }) {
             await axios.post(route('settings.whatsapp.start'));
             setPolling(true);
             setStatus((s) => ({ ...s, starting: true }));
-        } catch (e) {
+        } catch {
             toast.error('Gagal menghubungkan');
         }
     };
@@ -64,7 +64,7 @@ export default function Whatsapp({ settings, waStatus }) {
             await axios.post(route('settings.whatsapp.disconnect'));
             setStatus({ connected: false, phone: null, qr: null, starting: false });
             toast.success('Koneksi diputuskan');
-        } catch (e) {
+        } catch {
             toast.error('Gagal memutuskan koneksi');
         }
     };
@@ -83,7 +83,7 @@ export default function Whatsapp({ settings, waStatus }) {
         try {
             await axios.post(route('settings.whatsapp.test'), { target: testNumber });
             toast.success('Pesan test terkirim!');
-        } catch (e) {
+        } catch {
             toast.error('Gagal mengirim');
         }
     };

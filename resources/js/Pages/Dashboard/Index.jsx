@@ -1,6 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import SetupChecklist from '@/Components/Dashboard/SetupChecklist';
@@ -194,7 +193,6 @@ export default function Dashboard({
     activeShifts = [],
     setupChecklist = {},
 }) {
-    const { t } = useTranslation();
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 

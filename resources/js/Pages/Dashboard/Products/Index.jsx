@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
 import {
     IconCirclePlus,
@@ -11,7 +11,6 @@ import {
     IconList,
     IconPhoto,
     IconPackage,
-    IconSearch,
     IconBarcode,
     IconPrinter,
     IconUpload,
@@ -33,17 +32,7 @@ const formatCurrency = (value = 0) =>
     }).format(value);
 
 // Product Card for Grid View
-function ProductCard({
-    product,
-    index,
-    currentPage,
-    perPage,
-    isSelected,
-    onToggle,
-    canUpdate,
-    canDelete,
-}) {
-    const rowNumber = index + 1 + (currentPage - 1) * perPage;
+function ProductCard({ product, isSelected, onToggle, canUpdate, canDelete }) {
     const lowStock = product.stock > 0 && product.stock <= 5;
     const outOfStock = product.stock === 0;
     const isComposite = product.is_composite;
@@ -368,13 +357,10 @@ export default function Index({ products }) {
                     viewMode === 'grid' ? (
                         /* Grid View */
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                            {products.data.map((product, i) => (
+                            {products.data.map((product) => (
                                 <ProductCard
                                     key={product.id}
                                     product={product}
-                                    index={i}
-                                    currentPage={products.current_page}
-                                    perPage={products.per_page}
                                     isSelected={isProductSelected(product.id)}
                                     onToggle={toggleProductSelection}
                                     canUpdate={canEditProducts}

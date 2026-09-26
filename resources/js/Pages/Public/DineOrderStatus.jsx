@@ -42,7 +42,7 @@ export default function DineOrderStatus({ order, table, storeName }) {
                         }
                     }
                     setPollError(null);
-                } catch (e) {
+                } catch {
                     attempts += 1;
                     if (attempts >= MAX_ATTEMPTS) {
                         clearInterval(interval);

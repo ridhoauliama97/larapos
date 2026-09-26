@@ -4,7 +4,6 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import POSLayout from '@/Layouts/POSLayout';
 import ProductGrid from '@/Components/POS/ProductGrid';
-import CartPanel from '@/Components/POS/CartPanel';
 import CustomerSelect from '@/Components/POS/CustomerSelect';
 import NumpadModal from '@/Components/POS/NumpadModal';
 import Select from '@/Components/Dashboard/Select';
@@ -15,20 +14,16 @@ import { useAuthorization } from '@/Utils/authorization';
 import {
     queueTransaction,
     getPendingTransactions,
-    getPendingCount,
     removePendingTransaction,
 } from '@/Utils/offlineDb';
 import {
-    IconUser,
     IconShoppingCart,
     IconReceipt,
     IconKeyboard,
-    IconBarcode,
     IconTrash,
     IconCash,
     IconCreditCard,
     IconBuildingBank,
-    IconAlertTriangle,
     IconWallet,
 } from '@tabler/icons-react';
 
@@ -54,7 +49,7 @@ export default function Index({
     bankAccounts = [],
     loyaltyTierOptions = [],
 }) {
-    const { auth, errors, flash, lowStockNotifications = [], activeCashierShift } = usePage().props;
+    const { errors, flash, activeCashierShift } = usePage().props;
     const { can } = useAuthorization();
     const canOpenShift = can('cashier-shifts-open');
 
@@ -74,9 +69,7 @@ export default function Index({
     // State
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [isSearching, setIsSearching] = useState(false);
     const [addingProductId, setAddingProductId] = useState(null);
-    const [removingItemId, setRemovingItemId] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(defaultCustomer);
     const [pricingPreview, setPricingPreview] = useState(initialPricingPreview);
     const [isLoadingPricing, setIsLoadingPricing] = useState(false);
@@ -97,7 +90,6 @@ export default function Index({
     const [selectedVoucherId, setSelectedVoucherId] = useState('');
     const [openingCashInput, setOpeningCashInput] = useState('');
     const [shiftNotesInput, setShiftNotesInput] = useState('');
-    const [pendingSyncCount, setPendingSyncCount] = useState(0);
     const normalizedSelectedCategory = selectedCategory === null ? null : Number(selectedCategory);
     const pricingItemsByCartId = useMemo(() => {
         const items = pricingPreview?.items || [];
@@ -148,12 +140,10 @@ export default function Index({
         [products]
     );
 
-    const { isScanning } = useBarcodeScanner(handleBarcodeScan, {
+    useBarcodeScanner(handleBarcodeScan, {
         enabled: true,
         minLength: 3,
     });
-
-    const LowStockAlerts = () => null;
 
     // Calculations
     const discountPercent = useMemo(() => {
@@ -196,10 +186,6 @@ export default function Index({
     );
     const taxTotal = useMemo(
         () => Number(pricingPreview?.summary?.tax_total ?? 0),
-        [pricingPreview]
-    );
-    const subtotal = useMemo(
-        () => Number(pricingPreview?.summary?.subtotal_after_promo ?? 0),
         [pricingPreview]
     );
     const payable = useMemo(
@@ -373,23 +359,16 @@ export default function Index({
     };
 
     // Handle update cart quantity
-    const [updatingCartId, setUpdatingCartId] = useState(null);
-
     const handleUpdateQty = (cartId, newQty) => {
         if (newQty < 1) return;
-        setUpdatingCartId(cartId);
 
         router.patch(
             route('transactions.updateCart', cartId),
             { qty: newQty },
             {
                 preserveScroll: true,
-                onSuccess: () => {
-                    setUpdatingCartId(null);
-                },
                 onError: (errors) => {
                     toast.error(errors?.message || 'Gagal update quantity');
-                    setUpdatingCartId(null);
                 },
             }
         );
@@ -437,14 +416,6 @@ export default function Index({
     };
 
     // Pending offline transactions
-    const refreshPendingCount = useCallback(async () => {
-        try {
-            setPendingSyncCount(await getPendingCount());
-        } catch {
-            // IndexedDB unavailable
-        }
-    }, []);
-
     const flushPendingTransactions = useCallback(async () => {
         if (!navigator.onLine) return;
 
@@ -475,13 +446,11 @@ export default function Index({
                     : `Sinkronisasi gagal (${status ?? 'jaringan'}). ${pending.length} transaksi masih tersimpan dan akan dicoba lagi.`,
                 { duration: 8000 }
             );
-            await refreshPendingCount();
             return;
         }
 
         const results = data?.data?.results || [];
         let synced = 0;
-        let failed = 0;
 
         for (let i = 0; i < results.length; i++) {
             const result = results[i];
@@ -491,7 +460,6 @@ export default function Index({
                 await removePendingTransaction(row.id);
                 synced++;
             } else {
-                failed++;
                 toast.error(`Sync gagal: ${result.reason || 'kesalahan tidak diketahui'}`);
             }
         }
@@ -502,18 +470,14 @@ export default function Index({
             });
             router.reload({ only: ['carts', 'carts_total'] });
         }
-
-        await refreshPendingCount();
-    }, [refreshPendingCount]);
+    }, []);
 
     // Flush pending transactions on mount (if online)
     useEffect(() => {
-        refreshPendingCount();
-
         if (navigator.onLine) {
             flushPendingTransactions().catch(() => {});
         }
-    }, [refreshPendingCount, flushPendingTransactions]);
+    }, [flushPendingTransactions]);
 
     // Flush on reconnect
     useEffect(() => {
@@ -570,17 +534,13 @@ export default function Index({
 
     // Handle remove from cart
     const handleRemoveFromCart = (cartId) => {
-        setRemovingItemId(cartId);
-
         router.delete(route('transactions.destroyCart', cartId), {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success('Item dihapus dari keranjang');
-                setRemovingItemId(null);
             },
             onError: () => {
                 toast.error('Gagal menghapus item');
-                setRemovingItemId(null);
             },
         });
     };
@@ -644,7 +604,6 @@ export default function Index({
             // queue flushes and the page reloads carts (see the sync effect above).
             queueTransaction(payload)
                 .then(() => {
-                    refreshPendingCount();
                     setPricingPreview(initialPricingPreview);
                     toast.success(
                         'Transaksi disimpan offline. Keranjang akan kosong setelah tersinkronisasi.'
@@ -844,7 +803,6 @@ export default function Index({
                         }
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
-                        isSearching={isSearching}
                         onAddToCart={handleAddToCart}
                         addingProductId={addingProductId}
                         searchInputRef={searchInputRef}
@@ -915,9 +873,6 @@ export default function Index({
                                     {carts.map((item) =>
                                         (() => {
                                             const pricingItem = pricingItemsByCartId[item.id];
-                                            const baseLineTotal = Number(
-                                                pricingItem?.line_base_total ?? item.price ?? 0
-                                            );
                                             const effectiveLineTotal = Number(
                                                 pricingItem?.line_total ?? item.price ?? 0
                                             );

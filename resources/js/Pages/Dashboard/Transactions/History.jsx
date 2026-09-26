@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Head, router, Link, usePage } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import Button from '@/Components/Dashboard/Button';
-import Table from '@/Components/Dashboard/Table';
 import Pagination from '@/Components/Dashboard/Pagination';
 import Select from '@/Components/Dashboard/Select';
 import { useAuthorization } from '@/Utils/authorization';
@@ -10,7 +8,6 @@ import {
     IconDatabaseOff,
     IconSearch,
     IconHistory,
-    IconCalendar,
     IconReceipt,
     IconPrinter,
     IconFilter,

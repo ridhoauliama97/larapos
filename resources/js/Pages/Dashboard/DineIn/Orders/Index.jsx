@@ -1,15 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
-import {
-    IconClock,
-    IconCheck,
-    IconX,
-    IconEye,
-    IconDatabaseOff,
-    IconRefresh,
-} from '@tabler/icons-react';
-import Table from '@/Components/Dashboard/Table';
+import { IconClock, IconCheck, IconX, IconDatabaseOff } from '@tabler/icons-react';
 import { useAuthorization } from '@/Utils/authorization';
 import toast from 'react-hot-toast';
 
@@ -47,7 +39,6 @@ const PAY_CONFIG = {
 };
 
 export default function Index({ orders }) {
-    const { auth } = usePage().props;
     const { can } = useAuthorization();
     const canProcess = can('dine-orders-process');
 

@@ -1,8 +1,7 @@
 import { Link } from '@inertiajs/react';
-import { IconShoppingCart, IconBrandGithub, IconStar, IconArrowRight } from '@tabler/icons-react';
+import { IconShoppingCart, IconStar } from '@tabler/icons-react';
 
 const GITHUB_URL = 'https://github.com/ridhoauliama97/larapos';
-const DOCS_URL = `${GITHUB_URL}/blob/main/docs/getting-started.md`;
 
 export const NAV_LINKS = [
     { label: 'Fitur', href: '/fitur' },
