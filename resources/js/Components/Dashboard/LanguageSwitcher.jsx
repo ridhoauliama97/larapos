@@ -1,25 +1,25 @@
-import { useState } from "react";
-import { usePage, router } from "@inertiajs/react";
-import { IconLanguage } from "@tabler/icons-react";
-import { Menu, Transition } from "@headlessui/react";
-import i18n from "@/i18n";
+import { useState } from 'react';
+import { usePage, router } from '@inertiajs/react';
+import { IconLanguage } from '@tabler/icons-react';
+import { Menu, Transition } from '@headlessui/react';
+import i18n from '@/i18n';
 
 const FLAGS = {
-    id: "🇮🇩",
-    en: "🇬🇧",
+    id: '🇮🇩',
+    en: '🇬🇧',
 };
 
 export default function LanguageSwitcher() {
     const { locale } = usePage().props;
     const [busy, setBusy] = useState(false);
 
-    const options = (locale?.available ?? ["id", "en"]).map((code) => ({
+    const options = (locale?.available ?? ['id', 'en']).map((code) => ({
         code,
         name: locale?.names?.[code] ?? code.toUpperCase(),
-        flag: FLAGS[code] ?? "🏳️",
+        flag: FLAGS[code] ?? '🏳️',
     }));
 
-    const current = locale?.current ?? "id";
+    const current = locale?.current ?? 'id';
 
     const handleChange = (code) => {
         if (busy || code === current) {
@@ -29,7 +29,7 @@ export default function LanguageSwitcher() {
         setBusy(true);
 
         router.post(
-            route("language.switch"),
+            route('language.switch'),
             { locale: code },
             {
                 preserveScroll: true,
@@ -39,18 +39,18 @@ export default function LanguageSwitcher() {
                     document.documentElement.lang = code;
                 },
                 onFinish: () => setBusy(false),
-            },
+            }
         );
     };
 
     return (
         <Menu as="div" className="relative">
             <Menu.Button
-                className="flex items-center gap-2 p-2.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors"
+                className="flex items-center gap-2 rounded-xl p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                 title="Change Language"
             >
                 <IconLanguage size={20} strokeWidth={1.5} />
-                <span className="hidden lg:inline text-sm font-medium">
+                <span className="hidden text-sm font-medium lg:inline">
                     {current.toUpperCase()}
                 </span>
             </Menu.Button>
@@ -63,9 +63,9 @@ export default function LanguageSwitcher() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-xl bg-white dark:bg-slate-800 shadow-lg ring-1 ring-slate-200 dark:ring-slate-700 focus:outline-none overflow-hidden">
+                <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-slate-200 focus:outline-none dark:bg-slate-800 dark:ring-slate-700">
                     <div className="p-1">
-                        <div className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                             Select Language
                         </div>
                         {options.map((lang) => (
@@ -75,24 +75,18 @@ export default function LanguageSwitcher() {
                                         onClick={() => handleChange(lang.code)}
                                         disabled={busy}
                                         className={`${
-                                            active
-                                                ? "bg-slate-100 dark:bg-slate-700"
-                                                : ""
+                                            active ? 'bg-slate-100 dark:bg-slate-700' : ''
                                         } ${
                                             current === lang.code
-                                                ? "bg-primary-50 dark:bg-primary-900/20"
-                                                : ""
-                                        } flex w-full items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 rounded-lg transition-colors disabled:opacity-50`}
+                                                ? 'bg-primary-50 dark:bg-primary-900/20'
+                                                : ''
+                                        } flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 transition-colors disabled:opacity-50 dark:text-slate-200`}
                                     >
-                                        <span className="text-lg">
-                                            {lang.flag}
-                                        </span>
-                                        <span className="flex-1 text-left">
-                                            {lang.name}
-                                        </span>
+                                        <span className="text-lg">{lang.flag}</span>
+                                        <span className="flex-1 text-left">{lang.name}</span>
                                         {current === lang.code && (
                                             <svg
-                                                className="w-4 h-4 text-primary-600"
+                                                className="h-4 w-4 text-primary-600"
                                                 fill="none"
                                                 viewBox="0 0 24 24"
                                                 stroke="currentColor"

@@ -1,6 +1,6 @@
-import { useRef } from "react";
-import JsBarcode from "jsbarcode";
-import { useEffect } from "react";
+import { useRef } from 'react';
+import JsBarcode from 'jsbarcode';
+import { useEffect } from 'react';
 
 /**
  * BarcodeLabel Component
@@ -8,7 +8,7 @@ import { useEffect } from "react";
  */
 export default function BarcodeLabel({
     product,
-    size = "50x30", // '50x30' | '70x50' | '100x50'
+    size = '50x30', // '50x30' | '70x50' | '100x50'
     showPrice = true,
     showOngkir = false,
     ongkirAmount = 0,
@@ -16,50 +16,50 @@ export default function BarcodeLabel({
     const barcodeRef = useRef(null);
 
     const sizes = {
-        "50x30": {
-            width: "50mm",
-            height: "30mm",
+        '50x30': {
+            width: '50mm',
+            height: '30mm',
             barcodeWidth: 1.5,
             barcodeHeight: 40,
         },
-        "70x50": {
-            width: "70mm",
-            height: "50mm",
+        '70x50': {
+            width: '70mm',
+            height: '50mm',
             barcodeWidth: 2,
             barcodeHeight: 50,
         },
-        "100x50": {
-            width: "100mm",
-            height: "50mm",
+        '100x50': {
+            width: '100mm',
+            height: '50mm',
             barcodeWidth: 2.5,
             barcodeHeight: 60,
         },
     };
 
-    const currentSize = sizes[size] || sizes["50x30"];
+    const currentSize = sizes[size] || sizes['50x30'];
 
     useEffect(() => {
         if (barcodeRef.current && product?.barcode) {
             try {
                 JsBarcode(barcodeRef.current, product.barcode, {
-                    format: "CODE128",
+                    format: 'CODE128',
                     width: currentSize.barcodeWidth,
                     height: currentSize.barcodeHeight,
                     displayValue: true,
                     fontSize: 12,
                     margin: 5,
-                    background: "#ffffff",
+                    background: '#ffffff',
                 });
             } catch (e) {
-                console.error("Barcode generation error:", e);
+                console.error('Barcode generation error:', e);
             }
         }
     }, [product?.barcode, currentSize]);
 
     const formatPrice = (value = 0) =>
-        value.toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
+        value.toLocaleString('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
             minimumFractionDigits: 0,
         });
 
@@ -67,17 +67,17 @@ export default function BarcodeLabel({
 
     return (
         <div
-            className="barcode-label bg-white border border-slate-300 p-2 flex flex-col items-center justify-center"
+            className="barcode-label flex flex-col items-center justify-center border border-slate-300 bg-white p-2"
             style={{
                 width: currentSize.width,
                 height: currentSize.height,
-                pageBreakInside: "avoid",
+                pageBreakInside: 'avoid',
             }}
         >
             {/* Product Name */}
             <p
-                className="text-center font-semibold text-slate-800 leading-tight mb-1 line-clamp-2"
-                style={{ fontSize: size === "50x30" ? "10px" : "12px" }}
+                className="mb-1 line-clamp-2 text-center font-semibold leading-tight text-slate-800"
+                style={{ fontSize: size === '50x30' ? '10px' : '12px' }}
             >
                 {product.title}
             </p>
@@ -88,8 +88,8 @@ export default function BarcodeLabel({
             {/* Price */}
             {showPrice && (
                 <p
-                    className="font-bold text-slate-900 mt-1"
-                    style={{ fontSize: size === "50x30" ? "12px" : "14px" }}
+                    className="mt-1 font-bold text-slate-900"
+                    style={{ fontSize: size === '50x30' ? '12px' : '14px' }}
                 >
                     {formatPrice(product.sell_price)}
                 </p>
@@ -98,8 +98,8 @@ export default function BarcodeLabel({
             {/* Ongkir */}
             {showOngkir && ongkirAmount > 0 && (
                 <p
-                    className="text-slate-500 mt-0.5"
-                    style={{ fontSize: size === "50x30" ? "8px" : "10px" }}
+                    className="mt-0.5 text-slate-500"
+                    style={{ fontSize: size === '50x30' ? '8px' : '10px' }}
                 >
                     + Ongkir {formatPrice(ongkirAmount)}
                 </p>
@@ -113,30 +113,28 @@ export default function BarcodeLabel({
  */
 export function BarcodeLabelGrid({
     products = [],
-    size = "50x30",
+    size = '50x30',
     showPrice = true,
     showOngkir = false,
     ongkirAmount = 0,
     copies = 1,
 }) {
     // Generate array with copies
-    const labelsToRender = products.flatMap((product) =>
-        Array(copies).fill(product)
-    );
+    const labelsToRender = products.flatMap((product) => Array(copies).fill(product));
 
     const gridCols = {
-        "50x30": "repeat(4, 50mm)",
-        "70x50": "repeat(3, 70mm)",
-        "100x50": "repeat(2, 100mm)",
+        '50x30': 'repeat(4, 50mm)',
+        '70x50': 'repeat(3, 70mm)',
+        '100x50': 'repeat(2, 100mm)',
     };
 
     return (
         <div
             className="barcode-grid"
             style={{
-                display: "grid",
-                gridTemplateColumns: gridCols[size] || gridCols["50x30"],
-                gap: "2mm",
+                display: 'grid',
+                gridTemplateColumns: gridCols[size] || gridCols['50x30'],
+                gap: '2mm',
             }}
         >
             {labelsToRender.map((product, index) => (

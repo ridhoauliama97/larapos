@@ -1,16 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, useForm, usePage, Link } from "@inertiajs/react";
-import Input from "@/Components/Dashboard/Input";
-import ImageDropzone from "@/Components/Dashboard/ImageDropzone";
-import Textarea from "@/Components/Dashboard/TextArea";
-import toast from "react-hot-toast";
-import {
-    IconCategory,
-    IconDeviceFloppy,
-    IconArrowLeft,
-    IconPhoto,
-} from "@tabler/icons-react";
+import { useEffect, useRef, useState } from 'react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
+import Input from '@/Components/Dashboard/Input';
+import ImageDropzone from '@/Components/Dashboard/ImageDropzone';
+import Textarea from '@/Components/Dashboard/TextArea';
+import toast from 'react-hot-toast';
+import { IconCategory, IconDeviceFloppy, IconArrowLeft, IconPhoto } from '@tabler/icons-react';
 
 export default function Edit({ category }) {
     const { errors } = usePage().props;
@@ -18,9 +13,9 @@ export default function Edit({ category }) {
 
     const { data, setData, post, processing, transform } = useForm({
         name: category.name,
-        description: category.description ?? "",
-        image: "",
-        _method: "PUT",
+        description: category.description ?? '',
+        image: '',
+        _method: 'PUT',
     });
 
     const [imagePreview, setImagePreview] = useState(originalImage);
@@ -32,7 +27,7 @@ export default function Edit({ category }) {
                 URL.revokeObjectURL(objectUrlRef.current);
             }
         },
-        [],
+        []
     );
 
     const handleSelect = (file) => {
@@ -41,7 +36,7 @@ export default function Edit({ category }) {
         }
 
         objectUrlRef.current = URL.createObjectURL(file);
-        setData("image", file);
+        setData('image', file);
         setImagePreview(objectUrlRef.current);
     };
 
@@ -51,7 +46,7 @@ export default function Edit({ category }) {
             objectUrlRef.current = null;
         }
 
-        setData("image", "");
+        setData('image', '');
         setImagePreview(originalImage);
     };
 
@@ -64,9 +59,9 @@ export default function Edit({ category }) {
             return image ? { ...rest, image } : rest;
         });
 
-        post(route("categories.update", category.id), {
-            onSuccess: () => toast.success("Kategori berhasil diperbarui"),
-            onError: () => toast.error("Gagal memperbarui kategori"),
+        post(route('categories.update', category.id), {
+            onSuccess: () => toast.success('Kategori berhasil diperbarui'),
+            onError: () => toast.error('Gagal memperbarui kategori'),
         });
     };
 
@@ -76,25 +71,25 @@ export default function Edit({ category }) {
 
             <div className="mb-6">
                 <Link
-                    href={route("categories.index")}
-                    className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600 mb-3"
+                    href={route('categories.index')}
+                    className="mb-3 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600"
                 >
                     <IconArrowLeft size={16} />
                     Kembali ke Kategori
                 </Link>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
                     <IconCategory size={28} className="text-primary-500" />
                     Edit Kategori
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">{category.name}</p>
+                <p className="mt-1 text-sm text-slate-500">{category.name}</p>
             </div>
 
             <form onSubmit={submit}>
                 <div className="max-w-3xl">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                             <div>
-                                <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                                <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                     <IconPhoto size={16} />
                                     Gambar
                                 </h3>
@@ -114,40 +109,34 @@ export default function Edit({ category }) {
                                     label="Nama Kategori"
                                     placeholder="Masukkan nama"
                                     errors={errors.name}
-                                    onChange={(e) =>
-                                        setData("name", e.target.value)
-                                    }
+                                    onChange={(e) => setData('name', e.target.value)}
                                     value={data.name}
                                 />
                                 <Textarea
                                     label="Deskripsi"
                                     placeholder="Deskripsi kategori"
                                     errors={errors.description}
-                                    onChange={(e) =>
-                                        setData("description", e.target.value)
-                                    }
+                                    onChange={(e) => setData('description', e.target.value)}
                                     value={data.description}
                                     rows={5}
                                 />
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-6 dark:border-slate-800">
                             <Link
-                                href={route("categories.index")}
-                                className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors"
+                                href={route('categories.index')}
+                                className="rounded-xl border border-slate-200 px-5 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
                             >
                                 Batal
                             </Link>
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors disabled:opacity-50"
+                                className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-5 py-2.5 font-medium text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
                             >
                                 <IconDeviceFloppy size={18} />
-                                {processing
-                                    ? "Menyimpan..."
-                                    : "Simpan Perubahan"}
+                                {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                             </button>
                         </div>
                     </div>

@@ -1,24 +1,24 @@
-import { Head, Link } from "@inertiajs/react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
+import { Head, Link } from '@inertiajs/react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import {
     IconArrowLeft,
     IconDeviceDesktopAnalytics,
     IconHistory,
     IconUser,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
 const formatDateTime = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
-              timeStyle: "short",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
 const renderValue = (value) => {
-    if (value === null || value === undefined || value === "") return "-";
-    if (typeof value === "boolean") return value ? "true" : "false";
-    if (Array.isArray(value) || typeof value === "object") {
+    if (value === null || value === undefined || value === '') return '-';
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
+    if (Array.isArray(value) || typeof value === 'object') {
         return JSON.stringify(value, null, 2);
     }
 
@@ -75,7 +75,7 @@ export default function Show({ auditLog }) {
                         </p>
                     </div>
                     <Link
-                        href={route("audit-logs.index")}
+                        href={route('audit-logs.index')}
                         className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                     >
                         <IconArrowLeft size={18} />
@@ -98,10 +98,10 @@ export default function Show({ auditLog }) {
                             Aktor
                         </p>
                         <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
-                            {auditLog.user?.name || "System"}
+                            {auditLog.user?.name || 'System'}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                            {auditLog.user?.email || "-"}
+                            {auditLog.user?.email || '-'}
                         </p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
@@ -109,10 +109,10 @@ export default function Show({ auditLog }) {
                             Target
                         </p>
                         <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
-                            {auditLog.target_label || "-"}
+                            {auditLog.target_label || '-'}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                            {auditLog.auditable_type || "-"}#{auditLog.auditable_id || "-"}
+                            {auditLog.auditable_type || '-'}#{auditLog.auditable_id || '-'}
                         </p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
@@ -121,10 +121,10 @@ export default function Show({ auditLog }) {
                             Client
                         </p>
                         <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
-                            {auditLog.ip_address || "-"}
+                            {auditLog.ip_address || '-'}
                         </p>
                         <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
-                            {auditLog.user_agent || "-"}
+                            {auditLog.user_agent || '-'}
                         </p>
                     </div>
                 </div>
@@ -154,9 +154,7 @@ export default function Show({ auditLog }) {
                 </div>
 
                 <div className="space-y-3">
-                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                        Meta
-                    </h2>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Meta</h2>
                     <KeyValueTable data={auditLog.meta || {}} />
                 </div>
             </div>

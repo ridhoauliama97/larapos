@@ -8,8 +8,8 @@ function textBytes(text) {
     return Array.from(new TextEncoder().encode(text));
 }
 
-function buildReceiptBytes(data, paperSize = "80mm") {
-    const width = paperSize === "58mm" ? 32 : 48;
+function buildReceiptBytes(data, paperSize = '80mm') {
+    const width = paperSize === '58mm' ? 32 : 48;
     const bytes = [];
 
     // Init: ESC @, codepage off, no upside down
@@ -17,53 +17,53 @@ function buildReceiptBytes(data, paperSize = "80mm") {
 
     const center = (text) => {
         const pad = Math.max(0, Math.floor((width - text.length) / 2));
-        bytes.push(...textBytes(" ".repeat(pad) + text + "\n"));
+        bytes.push(...textBytes(' '.repeat(pad) + text + '\n'));
     };
     const leftRight = (l, r) => {
         const space = Math.max(1, width - l.length - r.length);
-        bytes.push(...textBytes(l + " ".repeat(space) + r + "\n"));
+        bytes.push(...textBytes(l + ' '.repeat(space) + r + '\n'));
     };
     const line = () => {
-        bytes.push(...textBytes("-".repeat(width) + "\n"));
+        bytes.push(...textBytes('-'.repeat(width) + '\n'));
     };
     const emphasize = (on) => {
         bytes.push(ESC, 0x45, on ? 0x01 : 0x00);
     };
 
     emphasize(true);
-    center(data.store_name || "TOKO");
+    center(data.store_name || 'TOKO');
     emphasize(false);
     if (data.store_address) center(data.store_address.slice(0, width));
     if (data.store_phone) center(`Telp: ${data.store_phone}`);
     line();
-    leftRight(`#${data.invoice}`, data.created_at || "");
-    if (data.cashier) leftRight("Kasir", data.cashier);
-    if (data.customer_name) leftRight("Pelanggan", data.customer_name);
-    if (data.order_type_label) leftRight("Tipe", data.order_type_label);
+    leftRight(`#${data.invoice}`, data.created_at || '');
+    if (data.cashier) leftRight('Kasir', data.cashier);
+    if (data.customer_name) leftRight('Pelanggan', data.customer_name);
+    if (data.order_type_label) leftRight('Tipe', data.order_type_label);
     line();
 
     for (const item of data.items || []) {
         const name = `${item.qty}x ${item.name}`.slice(0, width);
-        bytes.push(...textBytes(name + "\n"));
-        leftRight("", data.money(item.price));
+        bytes.push(...textBytes(name + '\n'));
+        leftRight('', data.money(item.price));
     }
 
     line();
-    leftRight("Subtotal", data.money(data.subtotal));
-    if (data.discount_total > 0) leftRight("Diskon", `-${data.money(data.discount_total)}`);
-    if (data.tax_total > 0) leftRight("PPN", data.money(data.tax_total));
-    if (data.shipping_cost > 0) leftRight("Ongkir", data.money(data.shipping_cost));
+    leftRight('Subtotal', data.money(data.subtotal));
+    if (data.discount_total > 0) leftRight('Diskon', `-${data.money(data.discount_total)}`);
+    if (data.tax_total > 0) leftRight('PPN', data.money(data.tax_total));
+    if (data.shipping_cost > 0) leftRight('Ongkir', data.money(data.shipping_cost));
     emphasize(true);
-    leftRight("TOTAL", data.money(data.grand_total));
+    leftRight('TOTAL', data.money(data.grand_total));
     emphasize(false);
     line();
-    if (data.payment_method_label) leftRight("Bayar", data.payment_method_label);
-    if (data.cash_received != null) leftRight("Tunai", data.money(data.cash_received));
-    if (data.change > 0) leftRight("Kembali", data.money(data.change));
+    if (data.payment_method_label) leftRight('Bayar', data.payment_method_label);
+    if (data.cash_received != null) leftRight('Tunai', data.money(data.cash_received));
+    if (data.change > 0) leftRight('Kembali', data.money(data.change));
     if (data.note) bytes.push(...textBytes(`Cat: ${data.note.slice(0, width * 2)}\n`));
     line();
-    center(data.footer || "Terima kasih!");
-    bytes.push(...textBytes("\n\n"));
+    center(data.footer || 'Terima kasih!');
+    bytes.push(...textBytes('\n\n'));
 
     // Cut: GS V 66 0
     bytes.push(GS, 0x56, 0x42, 0x00);
@@ -77,7 +77,7 @@ function drawerKickBytes(pin = 2) {
 
 export async function requestPrinter() {
     if (!navigator.usb) {
-        throw new Error("WebUSB tidak didukung browser ini. Gunakan Chrome/Edge.");
+        throw new Error('WebUSB tidak didukung browser ini. Gunakan Chrome/Edge.');
     }
     const device = await navigator.usb.requestDevice({
         filters: [],
@@ -95,7 +95,8 @@ export async function requestPrinter() {
                 if (alt.interfaceClass === 7) {
                     // USB printer class
                     interfaceNumber = iface.interfaceNumber;
-                    endpointNumber = alt.endpoints.find((e) => e.direction === "out")?.endpointNumber ?? null;
+                    endpointNumber =
+                        alt.endpoints.find((e) => e.direction === 'out')?.endpointNumber ?? null;
                 }
             }
         }
@@ -105,7 +106,7 @@ export async function requestPrinter() {
         for (const config of device.configurations) {
             for (const iface of config.interfaces) {
                 for (const alt of iface.alternates) {
-                    const out = alt.endpoints.find((e) => e.direction === "out");
+                    const out = alt.endpoints.find((e) => e.direction === 'out');
                     if (out && interfaceNumber === null) {
                         interfaceNumber = iface.interfaceNumber;
                         endpointNumber = out.endpointNumber;
@@ -116,7 +117,7 @@ export async function requestPrinter() {
     }
     if (interfaceNumber === null) {
         await device.close();
-        throw new Error("Tidak ditemukan interface printer pada perangkat ini.");
+        throw new Error('Tidak ditemukan interface printer pada perangkat ini.');
     }
     await device.claimInterface(interfaceNumber);
     return device;
@@ -127,7 +128,7 @@ async function getPrinter() {
         return getPrinter.cached;
     }
     // Re-attach to previously granted device
-    if (!navigator.usb) throw new Error("WebUSB tidak didukung browser ini.");
+    if (!navigator.usb) throw new Error('WebUSB tidak didukung browser ini.');
     const devices = await navigator.usb.getDevices();
     if (devices.length === 0) return null;
     const device = devices[0];
@@ -139,7 +140,7 @@ async function getPrinter() {
     let endpointNumber = null;
     for (const iface of device.configuration.interfaces) {
         for (const alt of iface.alternates) {
-            const out = alt.endpoints.find((e) => e.direction === "out");
+            const out = alt.endpoints.find((e) => e.direction === 'out');
             if (out) {
                 interfaceNumber = iface.interfaceNumber;
                 endpointNumber = out.endpointNumber;
@@ -147,7 +148,7 @@ async function getPrinter() {
         }
     }
     if (interfaceNumber === null) {
-        throw new Error("Tidak ditemukan interface printer.");
+        throw new Error('Tidak ditemukan interface printer.');
     }
     await device.claimInterface(interfaceNumber);
     getPrinter.cached = device;
@@ -157,7 +158,7 @@ async function getPrinter() {
 
 export async function printBytes(bytes) {
     const device = await getPrinter();
-    if (!device) throw new Error("Printer belum terhubung.");
+    if (!device) throw new Error('Printer belum terhubung.');
     await device.transferOut(device._endpoint ?? 1, bytes);
 }
 

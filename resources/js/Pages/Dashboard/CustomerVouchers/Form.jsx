@@ -1,11 +1,7 @@
-import { Head, useForm } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import Select from "@/Components/Dashboard/Select";
-import {
-    IconArrowLeft,
-    IconCreditCard,
-    IconDeviceFloppy,
-} from "@tabler/icons-react";
+import { Head, useForm } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import Select from '@/Components/Dashboard/Select';
+import { IconArrowLeft, IconCreditCard, IconDeviceFloppy } from '@tabler/icons-react';
 
 function InputError({ message }) {
     if (!message) return null;
@@ -13,61 +9,49 @@ function InputError({ message }) {
     return <p className="mt-1 text-xs text-rose-500">{message}</p>;
 }
 
-export default function Form({ mode = "create", voucher = null, customers = [] }) {
-    const isEdit = mode === "edit";
+export default function Form({ mode = 'create', voucher = null, customers = [] }) {
+    const isEdit = mode === 'edit';
     const { data, setData, post, put, processing, errors } = useForm({
-        customer_id: voucher?.customer_id ? String(voucher.customer_id) : "",
-        code: voucher?.code ?? "",
-        name: voucher?.name ?? "",
-        discount_type: voucher?.discount_type ?? "fixed_amount",
-        discount_value: voucher?.discount_value
-            ? String(voucher.discount_value)
-            : "",
-        minimum_order: voucher?.minimum_order
-            ? String(voucher.minimum_order)
-            : "0",
+        customer_id: voucher?.customer_id ? String(voucher.customer_id) : '',
+        code: voucher?.code ?? '',
+        name: voucher?.name ?? '',
+        discount_type: voucher?.discount_type ?? 'fixed_amount',
+        discount_value: voucher?.discount_value ? String(voucher.discount_value) : '',
+        minimum_order: voucher?.minimum_order ? String(voucher.minimum_order) : '0',
         is_active: Boolean(voucher?.is_active ?? true),
-        starts_at: voucher?.starts_at
-            ? new Date(voucher.starts_at).toISOString().slice(0, 16)
-            : "",
+        starts_at: voucher?.starts_at ? new Date(voucher.starts_at).toISOString().slice(0, 16) : '',
         expires_at: voucher?.expires_at
             ? new Date(voucher.expires_at).toISOString().slice(0, 16)
-            : "",
-        notes: voucher?.notes ?? "",
+            : '',
+        notes: voucher?.notes ?? '',
     });
 
     const submit = (event) => {
         event.preventDefault();
 
         if (isEdit) {
-            put(route("customer-vouchers.update", voucher.id));
+            put(route('customer-vouchers.update', voucher.id));
             return;
         }
 
-        post(route("customer-vouchers.store"));
+        post(route('customer-vouchers.store'));
     };
 
     return (
         <>
-            <Head
-                title={
-                    isEdit ? "Edit Voucher Customer" : "Buat Voucher Customer"
-                }
-            />
+            <Head title={isEdit ? 'Edit Voucher Customer' : 'Buat Voucher Customer'} />
 
             <div className="w-full">
                 <div className="mb-6">
                     <Button
                         type="link"
-                        href={route("customer-vouchers.index")}
+                        href={route('customer-vouchers.index')}
                         icon={<IconArrowLeft size={18} />}
                         className="mb-3 border-none bg-transparent px-0 text-slate-500 shadow-none hover:bg-transparent hover:text-primary-600 dark:text-slate-400"
                         label="Kembali ke voucher customer"
                     />
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {isEdit
-                            ? "Edit Voucher Customer"
-                            : "Buat Voucher Customer"}
+                        {isEdit ? 'Edit Voucher Customer' : 'Buat Voucher Customer'}
                     </h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
                         Distribusikan voucher promosi untuk pelanggan tertentu.
@@ -98,17 +82,13 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <Select
                                     className="w-full"
                                     value={data.customer_id}
-                                    onChange={(value) =>
-                                        setData("customer_id", value)
-                                    }
+                                    onChange={(value) => setData('customer_id', value)}
                                     options={customers.map((customer) => ({
                                         value: customer.id,
-                                        label: `${customer.name} | ${
-                                            customer.no_telp || "-"
-                                        } | ${
+                                        label: `${customer.name} | ${customer.no_telp || '-'} | ${
                                             customer.is_loyalty_member
                                                 ? `${customer.loyalty_tier} / ${customer.loyalty_points} poin`
-                                                : "non-member"
+                                                : 'non-member'
                                         }`,
                                     }))}
                                     placeholder="Pilih pelanggan"
@@ -124,10 +104,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                     type="text"
                                     value={data.code}
                                     onChange={(event) =>
-                                        setData(
-                                            "code",
-                                            event.target.value.toUpperCase()
-                                        )
+                                        setData('code', event.target.value.toUpperCase())
                                     }
                                     placeholder="Kosongkan untuk generate otomatis"
                                     className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
@@ -142,9 +119,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <input
                                     type="text"
                                     value={data.name}
-                                    onChange={(event) =>
-                                        setData("name", event.target.value)
-                                    }
+                                    onChange={(event) => setData('name', event.target.value)}
                                     placeholder="Contoh: Voucher Member Mei"
                                     className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                 />
@@ -166,17 +141,15 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <Select
                                     className="w-full"
                                     value={data.discount_type}
-                                    onChange={(value) =>
-                                        setData("discount_type", value)
-                                    }
+                                    onChange={(value) => setData('discount_type', value)}
                                     options={[
                                         {
-                                            value: "fixed_amount",
-                                            label: "Potongan Nominal",
+                                            value: 'fixed_amount',
+                                            label: 'Potongan Nominal',
                                         },
                                         {
-                                            value: "percentage",
-                                            label: "Persentase (%)",
+                                            value: 'percentage',
+                                            label: 'Persentase (%)',
                                         },
                                     ]}
                                 />
@@ -193,7 +166,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                     step="0.01"
                                     value={data.discount_value}
                                     onChange={(event) =>
-                                        setData("discount_value", event.target.value)
+                                        setData('discount_value', event.target.value)
                                     }
                                     className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                 />
@@ -209,7 +182,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                     min="0"
                                     value={data.minimum_order}
                                     onChange={(event) =>
-                                        setData("minimum_order", event.target.value)
+                                        setData('minimum_order', event.target.value)
                                     }
                                     className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                 />
@@ -222,7 +195,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                         type="checkbox"
                                         checked={data.is_active}
                                         onChange={(event) =>
-                                            setData("is_active", event.target.checked)
+                                            setData('is_active', event.target.checked)
                                         }
                                         className="h-4 w-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500/20"
                                     />
@@ -239,9 +212,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <input
                                     type="datetime-local"
                                     value={data.starts_at}
-                                    onChange={(event) =>
-                                        setData("starts_at", event.target.value)
-                                    }
+                                    onChange={(event) => setData('starts_at', event.target.value)}
                                     className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                 />
                                 <InputError message={errors.starts_at} />
@@ -254,9 +225,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <input
                                     type="datetime-local"
                                     value={data.expires_at}
-                                    onChange={(event) =>
-                                        setData("expires_at", event.target.value)
-                                    }
+                                    onChange={(event) => setData('expires_at', event.target.value)}
                                     className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                 />
                                 <InputError message={errors.expires_at} />
@@ -269,9 +238,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                                 <textarea
                                     rows="4"
                                     value={data.notes}
-                                    onChange={(event) =>
-                                        setData("notes", event.target.value)
-                                    }
+                                    onChange={(event) => setData('notes', event.target.value)}
                                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                 />
                                 <InputError message={errors.notes} />
@@ -282,7 +249,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                     <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                         <Button
                             type="link"
-                            href={route("customer-vouchers.index")}
+                            href={route('customer-vouchers.index')}
                             className="border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
                             label="Batal"
                         />
@@ -291,7 +258,7 @@ export default function Form({ mode = "create", voucher = null, customers = [] }
                             disabled={processing}
                             icon={<IconDeviceFloppy size={18} />}
                             className="bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-60"
-                            label={processing ? "Menyimpan..." : "Simpan"}
+                            label={processing ? 'Menyimpan...' : 'Simpan'}
                         />
                     </div>
                 </form>

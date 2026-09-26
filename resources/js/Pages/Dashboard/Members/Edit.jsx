@@ -1,5 +1,5 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import Form from "./Form";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import Form from './Form';
 
 export default function Edit({ member }) {
     return <Form mode="edit" member={member} />;

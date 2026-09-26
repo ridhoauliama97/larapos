@@ -1,16 +1,26 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link, router } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import Table from "@/Components/Dashboard/Table";
-import { IconCirclePlus, IconPencil, IconSearch, IconTrash, IconUsersGroup } from "@tabler/icons-react";
-import { useAuthorization } from "@/Utils/authorization";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link, router } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import Table from '@/Components/Dashboard/Table';
+import {
+    IconCirclePlus,
+    IconPencil,
+    IconSearch,
+    IconTrash,
+    IconUsersGroup,
+} from '@tabler/icons-react';
+import { useAuthorization } from '@/Utils/authorization';
 
 export default function Index({ segments, filters }) {
     const { can } = useAuthorization();
     const handleFilterChange = (key, value) => {
-        router.get(route("customer-segments.index"), { ...filters, [key]: value }, { preserveState: true, replace: true });
+        router.get(
+            route('customer-segments.index'),
+            { ...filters, [key]: value },
+            { preserveState: true, replace: true }
+        );
     };
 
     return (
@@ -20,17 +30,19 @@ export default function Index({ segments, filters }) {
             <div className="w-full">
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Customer Segments</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                            Customer Segments
+                        </h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
                             Kelola tag manual dan auto segment untuk CRM dan automation.
                         </p>
                     </div>
-                    {can("customer-segments-create") && (
+                    {can('customer-segments-create') && (
                         <Button
                             type="link"
-                            href={route("customer-segments.create")}
+                            href={route('customer-segments.create')}
                             icon={<IconCirclePlus size={18} />}
-                            className="bg-primary-500 text-white hover:bg-primary-600 shadow-lg shadow-primary-500/30"
+                            className="bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600"
                             label="Buat Segment"
                         />
                     )}
@@ -41,8 +53,10 @@ export default function Index({ segments, filters }) {
                         <div className="relative md:col-span-2">
                             <input
                                 type="text"
-                                value={filters.search || ""}
-                                onChange={(event) => handleFilterChange("search", event.target.value)}
+                                value={filters.search || ''}
+                                onChange={(event) =>
+                                    handleFilterChange('search', event.target.value)
+                                }
                                 placeholder="Cari nama segment..."
                                 className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                             />
@@ -52,14 +66,12 @@ export default function Index({ segments, filters }) {
                         </div>
                         <Select
                             size="sm"
-                            value={filters.type || ""}
-                            onChange={(value) =>
-                                handleFilterChange("type", value)
-                            }
+                            value={filters.type || ''}
+                            onChange={(value) => handleFilterChange('type', value)}
                             options={[
-                                { value: "", label: "Semua Tipe" },
-                                { value: "manual", label: "Manual" },
-                                { value: "auto", label: "Auto" },
+                                { value: '', label: 'Semua Tipe' },
+                                { value: 'manual', label: 'Manual' },
+                                { value: 'auto', label: 'Auto' },
                             ]}
                         />
                     </div>
@@ -82,7 +94,7 @@ export default function Index({ segments, filters }) {
                                     <tr key={segment.id}>
                                         <Table.Td>
                                             <Link
-                                                href={route("customer-segments.show", segment.id)}
+                                                href={route('customer-segments.show', segment.id)}
                                                 className="font-semibold text-slate-800 hover:text-primary-600 dark:text-slate-100"
                                             >
                                                 {segment.name}
@@ -98,24 +110,32 @@ export default function Index({ segments, filters }) {
                                         </Table.Td>
                                         <Table.Td>{segment.memberships_count}</Table.Td>
                                         <Table.Td>
-                                            <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${segment.is_active ? "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"}`}>
-                                                {segment.is_active ? "Aktif" : "Nonaktif"}
+                                            <span
+                                                className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${segment.is_active ? 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}
+                                            >
+                                                {segment.is_active ? 'Aktif' : 'Nonaktif'}
                                             </span>
                                         </Table.Td>
                                         <Table.Td className="text-center">
                                             <div className="flex items-center justify-center gap-2">
-                                                {can("customer-segments-update") && (
+                                                {can('customer-segments-update') && (
                                                     <Link
-                                                        href={route("customer-segments.edit", segment.id)}
+                                                        href={route(
+                                                            'customer-segments.edit',
+                                                            segment.id
+                                                        )}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300"
                                                     >
                                                         <IconPencil size={16} />
                                                     </Link>
                                                 )}
-                                                {can("customer-segments-delete") && (
+                                                {can('customer-segments-delete') && (
                                                     <Button
                                                         type="delete"
-                                                        url={route("customer-segments.destroy", segment.id)}
+                                                        url={route(
+                                                            'customer-segments.destroy',
+                                                            segment.id
+                                                        )}
                                                         icon={<IconTrash size={16} />}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-300"
                                                     />

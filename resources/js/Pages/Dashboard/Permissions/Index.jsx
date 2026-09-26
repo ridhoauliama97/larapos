@@ -1,24 +1,21 @@
-import { useState } from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, usePage } from "@inertiajs/react";
+import { useState } from 'react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, usePage } from '@inertiajs/react';
 import {
     IconDatabaseOff,
     IconKey,
     IconLayoutGrid,
     IconList,
     IconShield,
-} from "@tabler/icons-react";
-import Search from "@/Components/Dashboard/Search";
-import Table from "@/Components/Dashboard/Table";
-import Pagination from "@/Components/Dashboard/Pagination";
-import {
-    permissionModule,
-    prettifyModule,
-} from "@/Utils/permissionModules";
+} from '@tabler/icons-react';
+import Search from '@/Components/Dashboard/Search';
+import Table from '@/Components/Dashboard/Table';
+import Pagination from '@/Components/Dashboard/Pagination';
+import { permissionModule, prettifyModule } from '@/Utils/permissionModules';
 
 export default function Index() {
     const { permissions } = usePage().props;
-    const [viewMode, setViewMode] = useState("list");
+    const [viewMode, setViewMode] = useState('list');
     const rows = permissions.data ?? [];
 
     return (
@@ -27,9 +24,9 @@ export default function Index() {
 
             {/* Header */}
             <div className="mb-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
                             <IconKey size={28} className="text-primary-500" />
                             Hak Akses
                         </h1>
@@ -41,31 +38,28 @@ export default function Index() {
             </div>
 
             {/* Toolbar */}
-            <div className="mb-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+            <div className="mb-4 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
                 <div className="w-full sm:w-80">
-                    <Search
-                        url={route("permissions.index")}
-                        placeholder="Cari hak akses..."
-                    />
+                    <Search url={route('permissions.index')} placeholder="Cari hak akses..." />
                 </div>
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => setViewMode("grid")}
-                        className={`p-2.5 rounded-lg transition-colors ${
-                            viewMode === "grid"
-                                ? "bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400"
-                                : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        onClick={() => setViewMode('grid')}
+                        className={`rounded-lg p-2.5 transition-colors ${
+                            viewMode === 'grid'
+                                ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400'
+                                : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                         title="Grid View"
                     >
                         <IconLayoutGrid size={20} />
                     </button>
                     <button
-                        onClick={() => setViewMode("list")}
-                        className={`p-2.5 rounded-lg transition-colors ${
-                            viewMode === "list"
-                                ? "bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400"
-                                : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        onClick={() => setViewMode('list')}
+                        className={`rounded-lg p-2.5 transition-colors ${
+                            viewMode === 'list'
+                                ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400'
+                                : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                         title="List View"
                     >
@@ -76,21 +70,21 @@ export default function Index() {
 
             {/* Content */}
             {rows.length ? (
-                viewMode === "grid" ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                viewMode === 'grid' ? (
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                         {rows.map((permission, i) => (
                             <div
                                 key={permission.id || i}
-                                className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-md hover:border-primary-300 dark:hover:border-primary-700 transition-all"
+                                className="rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-primary-700"
                             >
                                 <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center shrink-0">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/50">
                                         <IconShield
                                             size={16}
                                             className="text-primary-600 dark:text-primary-400"
                                         />
                                     </div>
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
+                                    <span className="truncate text-sm font-medium text-slate-700 dark:text-slate-300">
                                         {permission.name}
                                     </span>
                                 </div>
@@ -111,7 +105,7 @@ export default function Index() {
                                 {rows.map((permission, i) => (
                                     <tr
                                         key={permission.id || i}
-                                        className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                                        className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
                                     >
                                         <Table.Td className="text-center">
                                             {++i +
@@ -123,7 +117,7 @@ export default function Index() {
                                                 <IconShield
                                                     size={16}
                                                     strokeWidth={1.5}
-                                                    className="text-primary-500 shrink-0"
+                                                    className="shrink-0 text-primary-500"
                                                 />
                                                 <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
                                                     {permission.name}
@@ -132,11 +126,7 @@ export default function Index() {
                                         </Table.Td>
                                         <Table.Td>
                                             <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                                                {prettifyModule(
-                                                    permissionModule(
-                                                        permission.name,
-                                                    ),
-                                                )}
+                                                {prettifyModule(permissionModule(permission.name))}
                                             </span>
                                         </Table.Td>
                                     </tr>
@@ -146,15 +136,11 @@ export default function Index() {
                     </Table.Card>
                 )
             ) : (
-                <div className="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-                        <IconDatabaseOff
-                            size={32}
-                            className="text-slate-400"
-                            strokeWidth={1.5}
-                        />
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 dark:border-slate-800 dark:bg-slate-900">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                        <IconDatabaseOff size={32} className="text-slate-400" strokeWidth={1.5} />
                     </div>
-                    <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-1">
+                    <h3 className="mb-1 text-lg font-medium text-slate-800 dark:text-slate-200">
                         Belum Ada Hak Akses
                     </h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -163,9 +149,7 @@ export default function Index() {
                 </div>
             )}
 
-            {permissions.last_page !== 1 && (
-                <Pagination links={permissions.links} />
-            )}
+            {permissions.last_page !== 1 && <Pagination links={permissions.links} />}
         </>
     );
 }

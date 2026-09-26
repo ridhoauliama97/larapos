@@ -1,7 +1,7 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, useForm } from "@inertiajs/react";
-import { IconDeviceFloppy, IconGift, IconMedal } from "@tabler/icons-react";
-import toast from "react-hot-toast";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, useForm } from '@inertiajs/react';
+import { IconDeviceFloppy, IconGift, IconMedal } from '@tabler/icons-react';
+import toast from 'react-hot-toast';
 
 const formatNumber = (value) => String(value ?? 0);
 
@@ -19,10 +19,10 @@ export default function Loyalty({ settings }) {
 
     const submit = (event) => {
         event.preventDefault();
-        post(route("settings.loyalty.update"), {
+        post(route('settings.loyalty.update'), {
             preserveScroll: true,
-            onSuccess: () => toast.success("Pengaturan loyalty disimpan"),
-            onError: () => toast.error("Gagal menyimpan pengaturan loyalty"),
+            onSuccess: () => toast.success('Pengaturan loyalty disimpan'),
+            onError: () => toast.error('Gagal menyimpan pengaturan loyalty'),
         });
     };
 
@@ -69,7 +69,7 @@ export default function Loyalty({ settings }) {
                                         type="checkbox"
                                         checked={data.enable_earn}
                                         onChange={(event) =>
-                                            setData("enable_earn", event.target.checked)
+                                            setData('enable_earn', event.target.checked)
                                         }
                                         className="h-4 w-4 rounded border-slate-300 text-primary-500"
                                     />
@@ -82,10 +82,7 @@ export default function Loyalty({ settings }) {
                                         type="checkbox"
                                         checked={data.enable_redeem}
                                         onChange={(event) =>
-                                            setData(
-                                                "enable_redeem",
-                                                event.target.checked
-                                            )
+                                            setData('enable_redeem', event.target.checked)
                                         }
                                         className="h-4 w-4 rounded border-slate-300 text-primary-500"
                                     />
@@ -100,10 +97,7 @@ export default function Loyalty({ settings }) {
                                         min="1"
                                         value={data.earn_rate_amount}
                                         onChange={(event) =>
-                                            setData(
-                                                "earn_rate_amount",
-                                                event.target.value
-                                            )
+                                            setData('earn_rate_amount', event.target.value)
                                         }
                                         className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                     />
@@ -123,10 +117,7 @@ export default function Loyalty({ settings }) {
                                         min="1"
                                         value={data.redeem_point_value}
                                         onChange={(event) =>
-                                            setData(
-                                                "redeem_point_value",
-                                                event.target.value
-                                            )
+                                            setData('redeem_point_value', event.target.value)
                                         }
                                         className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                     />
@@ -163,9 +154,9 @@ export default function Loyalty({ settings }) {
                                         <input
                                             type="number"
                                             min="0"
-                                            value={data.tiers[tier.key] || ""}
+                                            value={data.tiers[tier.key] || ''}
                                             onChange={(event) =>
-                                                setData("tiers", {
+                                                setData('tiers', {
                                                     ...data.tiers,
                                                     [tier.key]: event.target.value,
                                                 })
@@ -188,7 +179,7 @@ export default function Loyalty({ settings }) {
                             className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-5 py-2.5 font-medium text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
                         >
                             <IconDeviceFloppy size={18} />
-                            {processing ? "Menyimpan..." : "Simpan Pengaturan"}
+                            {processing ? 'Menyimpan...' : 'Simpan Pengaturan'}
                         </button>
                     </div>
                 </form>

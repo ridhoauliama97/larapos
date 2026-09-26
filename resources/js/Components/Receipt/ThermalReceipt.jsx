@@ -1,4 +1,3 @@
-
 /**
  * ThermalReceipt - Receipt template optimized for thermal printers (58mm/80mm)
  *
@@ -11,35 +10,30 @@
  */
 export default function ThermalReceipt({
     transaction,
-    storeName = "TOKO ANDA",
-    storeAddress = "",
-    storePhone = "",
-    storeEmail = "",
-    storeWebsite = "",
+    storeName = 'TOKO ANDA',
+    storeAddress = '',
+    storePhone = '',
+    storeEmail = '',
+    storeWebsite = '',
 }) {
     const formatPrice = (price = 0) => {
-        return "Rp " + Number(price || 0).toLocaleString("id-ID");
+        return 'Rp ' + Number(price || 0).toLocaleString('id-ID');
     };
 
     const formatDate = (value) => {
-        return new Date(value).toLocaleString("id-ID", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
+        return new Date(value).toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
         });
     };
 
     const items = transaction?.details ?? [];
-    const promoDiscount = items.reduce(
-        (sum, item) => sum + Number(item.discount_total || 0),
-        0
-    );
+    const promoDiscount = items.reduce((sum, item) => sum + Number(item.discount_total || 0), 0);
     const loyaltyDiscount = Number(transaction?.loyalty_discount_total || 0);
-    const voucherDiscount = Number(
-        transaction?.customer_voucher_discount || 0
-    );
+    const voucherDiscount = Number(transaction?.customer_voucher_discount || 0);
 
     // Calculate totals
     const subtotal =
@@ -57,31 +51,26 @@ export default function ThermalReceipt({
     const change = transaction?.change || 0;
 
     const paymentLabels = {
-        cash: "TUNAI",
-        midtrans: "MIDTRANS",
-        xendit: "XENDIT",
+        cash: 'TUNAI',
+        midtrans: 'MIDTRANS',
+        xendit: 'XENDIT',
     };
-    const paymentMethod =
-        paymentLabels[transaction?.payment_method?.toLowerCase()] || "TUNAI";
+    const paymentMethod = paymentLabels[transaction?.payment_method?.toLowerCase()] || 'TUNAI';
 
     // Line separator
-    const line = "=".repeat(32);
-    const dashLine = "-".repeat(32);
+    const line = '='.repeat(32);
+    const dashLine = '-'.repeat(32);
 
     const SimpleBarcode = ({ value }) => {
-        const bars = (value || "").split("").map((char, idx) => {
+        const bars = (value || '').split('').map((char, idx) => {
             const weight = (char.charCodeAt(0) + idx * 17) % 5;
             return 2 + weight;
         });
 
         return (
-            <div className="flex items-end justify-center gap-[2px] mt-2">
+            <div className="mt-2 flex items-end justify-center gap-[2px]">
                 {bars.map((w, i) => (
-                    <span
-                        key={i}
-                        style={{ width: `${w}px` }}
-                        className="h-10 bg-black block"
-                    />
+                    <span key={i} style={{ width: `${w}px` }} className="block h-10 bg-black" />
                 ))}
             </div>
         );
@@ -90,10 +79,10 @@ export default function ThermalReceipt({
     return (
         <div
             className="thermal-receipt font-mono text-xs leading-tight"
-            style={{ width: "80mm", padding: "4mm" }}
+            style={{ width: '80mm', padding: '4mm' }}
         >
             {/* Store Header */}
-            <div className="text-center mb-2">
+            <div className="mb-2 text-center">
                 <p className="text-sm font-bold">{storeName}</p>
                 {storeAddress && <p className="text-xs">{storeAddress}</p>}
                 {storePhone && <p className="text-xs">Telp: {storePhone}</p>}
@@ -115,11 +104,11 @@ export default function ThermalReceipt({
                 </div>
                 <div className="flex justify-between">
                     <span>Kasir:</span>
-                    <span>{transaction?.cashier?.name || "-"}</span>
+                    <span>{transaction?.cashier?.name || '-'}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Pelanggan:</span>
-                    <span>{transaction?.customer?.name || "Umum"}</span>
+                    <span>{transaction?.customer?.name || 'Umum'}</span>
                 </div>
             </div>
 
@@ -130,28 +119,23 @@ export default function ThermalReceipt({
                 {items.map((item, index) => {
                     const qty = Number(item.qty) || 1;
                     const itemTotal = Number(item.price) || 0;
-                    const unitPrice =
-                        Number(item.unit_price || 0) || itemTotal / qty;
-                    const baseUnitPrice =
-                        Number(item.base_unit_price || 0) || unitPrice;
+                    const unitPrice = Number(item.unit_price || 0) || itemTotal / qty;
+                    const baseUnitPrice = Number(item.base_unit_price || 0) || unitPrice;
 
                     return (
                         <div key={item.id || index} className="mb-1">
-                            <p className="font-medium truncate">
-                                {item.product?.title}
-                            </p>
-                            {Number(item.discount_total || 0) > 0 &&
-                                baseUnitPrice > unitPrice && (
-                                    <div className="flex justify-between text-[10px] text-slate-500">
-                                        <span>
-                                            Promo:{" "}
-                                            {item.pricing_group_label ||
-                                                item.pricing_rule_name ||
-                                                "Promo"}
-                                        </span>
-                                        <span>{formatPrice(baseUnitPrice)}</span>
-                                    </div>
-                                )}
+                            <p className="truncate font-medium">{item.product?.title}</p>
+                            {Number(item.discount_total || 0) > 0 && baseUnitPrice > unitPrice && (
+                                <div className="flex justify-between text-[10px] text-slate-500">
+                                    <span>
+                                        Promo:{' '}
+                                        {item.pricing_group_label ||
+                                            item.pricing_rule_name ||
+                                            'Promo'}
+                                    </span>
+                                    <span>{formatPrice(baseUnitPrice)}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between">
                                 <span>
                                     {qty}x @ {formatPrice(unitPrice)}
@@ -207,7 +191,7 @@ export default function ThermalReceipt({
                         <span>{formatPrice(transaction?.tax_total)}</span>
                     </div>
                 )}
-                <div className="flex justify-between font-bold text-sm">
+                <div className="flex justify-between text-sm font-bold">
                     <span>TOTAL</span>
                     <span>{formatPrice(total)}</span>
                 </div>
@@ -232,11 +216,11 @@ export default function ThermalReceipt({
             <pre className="whitespace-pre-wrap">{line}</pre>
 
             {/* Footer */}
-            <div className="text-center mt-2">
+            <div className="mt-2 text-center">
                 <p className="text-xs">Terima kasih</p>
                 <p className="text-xs">Barang yang sudah dibeli</p>
                 <p className="text-xs">tidak dapat ditukar/dikembalikan</p>
-                <p className="text-xs mt-1">#{transaction?.invoice}</p>
+                <p className="mt-1 text-xs">#{transaction?.invoice}</p>
                 <SimpleBarcode value={transaction?.invoice} />
             </div>
 
@@ -264,49 +248,40 @@ export default function ThermalReceipt({
  */
 export function ThermalReceipt58mm({
     transaction,
-    storeName = "TOKO",
-    storePhone = "",
-    storeEmail = "",
-    storeWebsite = "",
+    storeName = 'TOKO',
+    storePhone = '',
+    storeEmail = '',
+    storeWebsite = '',
 }) {
     const formatPrice = (price = 0) => {
-        return "Rp" + Number(price || 0).toLocaleString("id-ID");
+        return 'Rp' + Number(price || 0).toLocaleString('id-ID');
     };
 
     const formatTime = (value) => {
-        return new Date(value).toLocaleString("id-ID", {
-            day: "2-digit",
-            month: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
+        return new Date(value).toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
         });
     };
 
     const items = transaction?.details ?? [];
-    const promoDiscount = items.reduce(
-        (sum, item) => sum + Number(item.discount_total || 0),
-        0
-    );
+    const promoDiscount = items.reduce((sum, item) => sum + Number(item.discount_total || 0), 0);
     const loyaltyDiscount = Number(transaction?.loyalty_discount_total || 0);
-    const voucherDiscount = Number(
-        transaction?.customer_voucher_discount || 0
-    );
-    const line = "-".repeat(24);
+    const voucherDiscount = Number(transaction?.customer_voucher_discount || 0);
+    const line = '-'.repeat(24);
 
     const SimpleBarcode = ({ value }) => {
-        const bars = (value || "").split("").map((char, idx) => {
+        const bars = (value || '').split('').map((char, idx) => {
             const weight = (char.charCodeAt(0) + idx * 17) % 4;
             return 2 + weight;
         });
 
         return (
-            <div className="flex items-end gap-[2px] mt-2 justify-center">
+            <div className="mt-2 flex items-end justify-center gap-[2px]">
                 {bars.map((w, i) => (
-                    <span
-                        key={i}
-                        style={{ width: `${w}px` }}
-                        className="h-8 bg-black block"
-                    />
+                    <span key={i} style={{ width: `${w}px` }} className="block h-8 bg-black" />
                 ))}
             </div>
         );
@@ -315,7 +290,7 @@ export function ThermalReceipt58mm({
     return (
         <div
             className="thermal-receipt-58 font-mono text-xs"
-            style={{ width: "58mm", padding: "2mm" }}
+            style={{ width: '58mm', padding: '2mm' }}
         >
             <div className="text-center">
                 <p className="font-bold">{storeName}</p>
@@ -331,22 +306,18 @@ export function ThermalReceipt58mm({
 
             {items.map((item, i) => {
                 const qty = Number(item.qty) || 1;
-                const unitPrice =
-                    Number(item.unit_price || 0) ||
-                    Number(item.price || 0) / qty;
-                const baseUnitPrice =
-                    Number(item.base_unit_price || 0) || unitPrice;
+                const unitPrice = Number(item.unit_price || 0) || Number(item.price || 0) / qty;
+                const baseUnitPrice = Number(item.base_unit_price || 0) || unitPrice;
 
                 return (
                     <div key={i} className="mb-1">
                         <p className="truncate">{item.product?.title}</p>
-                        {Number(item.discount_total || 0) > 0 &&
-                            baseUnitPrice > unitPrice && (
-                                <div className="flex justify-between text-[9px] text-slate-500">
-                                    <span>Promo</span>
-                                    <span>{formatPrice(baseUnitPrice)}</span>
-                                </div>
-                            )}
+                        {Number(item.discount_total || 0) > 0 && baseUnitPrice > unitPrice && (
+                            <div className="flex justify-between text-[9px] text-slate-500">
+                                <span>Promo</span>
+                                <span>{formatPrice(baseUnitPrice)}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between">
                             <span>
                                 {item.qty}x @ {formatPrice(unitPrice)}

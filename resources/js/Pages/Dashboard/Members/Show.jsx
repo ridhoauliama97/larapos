@@ -1,5 +1,5 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link } from "@inertiajs/react";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link } from '@inertiajs/react';
 import {
     IconArrowLeft,
     IconCoins,
@@ -9,22 +9,22 @@ import {
     IconPencil,
     IconReceipt,
     IconTags,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
 const formatPrice = (value = 0) =>
-    Number(value || 0).toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    Number(value || 0).toLocaleString('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     });
 
 const formatDateTime = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
-              timeStyle: "short",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
 export default function Show({
     member,
@@ -48,7 +48,7 @@ export default function Show({
             <div className="w-full">
                 <div className="mb-6">
                     <Link
-                        href={route("members.index")}
+                        href={route('members.index')}
                         className="mb-3 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600"
                     >
                         <IconArrowLeft size={16} />
@@ -63,26 +63,24 @@ export default function Show({
                                 </h1>
                                 <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                                     <IconCrown size={14} />
-                                    {member.loyalty_tier || "regular"}
+                                    {member.loyalty_tier || 'regular'}
                                 </span>
                                 <span
                                     className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                                         member.is_loyalty_member
-                                            ? "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400"
-                                            : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                                            ? 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400'
+                                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                     }`}
                                 >
-                                    {member.is_loyalty_member
-                                        ? "Aktif"
-                                        : "Nonaktif"}
+                                    {member.is_loyalty_member ? 'Aktif' : 'Nonaktif'}
                                 </span>
                             </div>
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                                {member.no_telp || "-"}{" "}
-                                {member.address ? `• ${member.address}` : ""}
+                                {member.no_telp || '-'}{' '}
+                                {member.address ? `• ${member.address}` : ''}
                             </p>
                             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                Nomor Anggota: {member.member_code || "-"}
+                                Nomor Anggota: {member.member_code || '-'}
                             </p>
                         </div>
 
@@ -92,7 +90,7 @@ export default function Show({
                                 {member.loyalty_points || 0} poin
                             </span>
                             <Link
-                                href={route("members.edit", member.id)}
+                                href={route('members.edit', member.id)}
                                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary-200 hover:text-primary-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-primary-800 dark:hover:text-primary-300"
                             >
                                 <IconPencil size={16} />
@@ -133,8 +131,8 @@ export default function Show({
                                         {member.loyalty_member_since
                                             ? new Date(
                                                   member.loyalty_member_since
-                                              ).toLocaleDateString("id-ID")
-                                            : "-"}
+                                              ).toLocaleDateString('id-ID')
+                                            : '-'}
                                     </p>
                                 </div>
                                 <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60">
@@ -143,10 +141,8 @@ export default function Show({
                                     </p>
                                     <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                                         {stats?.last_visit
-                                            ? new Date(
-                                                  stats.last_visit
-                                              ).toLocaleDateString("id-ID")
-                                            : "-"}
+                                            ? new Date(stats.last_visit).toLocaleDateString('id-ID')
+                                            : '-'}
                                     </p>
                                 </div>
                             </div>
@@ -182,7 +178,10 @@ export default function Show({
                                 </div>
                             ) : (
                                 <div className="rounded-2xl bg-slate-50 px-4 py-8 text-center dark:bg-slate-800/50">
-                                    <IconDatabaseOff size={28} className="mx-auto mb-3 text-slate-400" />
+                                    <IconDatabaseOff
+                                        size={28}
+                                        className="mx-auto mb-3 text-slate-400"
+                                    />
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
                                         Belum ada transaksi member.
                                     </p>
@@ -217,13 +216,11 @@ export default function Show({
                                                     <p
                                                         className={`text-sm font-bold ${
                                                             history.points_delta >= 0
-                                                                ? "text-emerald-600 dark:text-emerald-300"
-                                                                : "text-rose-600 dark:text-rose-300"
+                                                                ? 'text-emerald-600 dark:text-emerald-300'
+                                                                : 'text-rose-600 dark:text-rose-300'
                                                         }`}
                                                     >
-                                                        {history.points_delta >= 0
-                                                            ? "+"
-                                                            : ""}
+                                                        {history.points_delta >= 0 ? '+' : ''}
                                                         {history.points_delta} poin
                                                     </p>
                                                     <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -236,7 +233,10 @@ export default function Show({
                                 </div>
                             ) : (
                                 <div className="rounded-2xl bg-slate-50 px-4 py-8 text-center dark:bg-slate-800/50">
-                                    <IconDatabaseOff size={28} className="mx-auto mb-3 text-slate-400" />
+                                    <IconDatabaseOff
+                                        size={28}
+                                        className="mx-auto mb-3 text-slate-400"
+                                    />
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
                                         Belum ada histori reward.
                                     </p>
@@ -256,7 +256,7 @@ export default function Show({
                                         Tier Loyalty
                                     </p>
                                     <p className="mt-1 font-semibold text-slate-900 dark:text-white">
-                                        {member.loyalty_tier || "regular"}
+                                        {member.loyalty_tier || 'regular'}
                                     </p>
                                 </div>
                                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
@@ -291,9 +291,9 @@ export default function Show({
                                         <span
                                             key={segment.id}
                                             className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-                                                segment.source === "manual"
-                                                    ? "bg-primary-100 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300"
-                                                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                                                segment.source === 'manual'
+                                                    ? 'bg-primary-100 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300'
+                                                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
                                             }`}
                                         >
                                             {segment.name}
@@ -305,7 +305,10 @@ export default function Show({
                                 </div>
                             ) : (
                                 <div className="rounded-2xl bg-slate-50 px-4 py-8 text-center dark:bg-slate-800/50">
-                                    <IconDatabaseOff size={28} className="mx-auto mb-3 text-slate-400" />
+                                    <IconDatabaseOff
+                                        size={28}
+                                        className="mx-auto mb-3 text-slate-400"
+                                    />
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
                                         Belum ada segment untuk member ini.
                                     </p>
@@ -330,7 +333,10 @@ export default function Show({
                                 </div>
                             ) : (
                                 <div className="rounded-2xl bg-slate-50 px-4 py-8 text-center dark:bg-slate-800/50">
-                                    <IconDatabaseOff size={28} className="mx-auto mb-3 text-slate-400" />
+                                    <IconDatabaseOff
+                                        size={28}
+                                        className="mx-auto mb-3 text-slate-400"
+                                    />
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
                                         Belum ada data produk favorit.
                                     </p>
@@ -359,7 +365,7 @@ export default function Show({
                                                     </p>
                                                 </div>
                                                 <span className="text-xs font-medium text-primary-600 dark:text-primary-300">
-                                                    {voucher.discount_type === "percentage"
+                                                    {voucher.discount_type === 'percentage'
                                                         ? `${voucher.discount_value}%`
                                                         : formatPrice(voucher.discount_value)}
                                                 </span>
@@ -369,7 +375,10 @@ export default function Show({
                                 </div>
                             ) : (
                                 <div className="rounded-2xl bg-slate-50 px-4 py-8 text-center dark:bg-slate-800/50">
-                                    <IconDatabaseOff size={28} className="mx-auto mb-3 text-slate-400" />
+                                    <IconDatabaseOff
+                                        size={28}
+                                        className="mx-auto mb-3 text-slate-400"
+                                    />
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
                                         Belum ada voucher untuk member ini.
                                     </p>

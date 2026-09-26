@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const OnlineStatusContext = createContext(true);
 
@@ -16,11 +16,7 @@ export function OnlineStatusProvider({ children }) {
         };
     }, []);
 
-    return (
-        <OnlineStatusContext.Provider value={isOnline}>
-            {children}
-        </OnlineStatusContext.Provider>
-    );
+    return <OnlineStatusContext.Provider value={isOnline}>{children}</OnlineStatusContext.Provider>;
 }
 
 export function useOnlineStatus() {

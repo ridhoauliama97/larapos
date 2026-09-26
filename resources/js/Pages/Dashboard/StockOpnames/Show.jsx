@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link, router, useForm } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import Modal from "@/Components/Dashboard/Modal";
-import Table from "@/Components/Dashboard/Table";
+import { useEffect, useMemo, useState } from 'react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import Modal from '@/Components/Dashboard/Modal';
+import Table from '@/Components/Dashboard/Table';
 import {
     IconArrowLeft,
     IconCheck,
@@ -12,89 +12,76 @@ import {
     IconPackage,
     IconPlus,
     IconSearch,
-} from "@tabler/icons-react";
-import toast from "react-hot-toast";
-import { useAuthorization } from "@/Utils/authorization";
+} from '@tabler/icons-react';
+import toast from 'react-hot-toast';
+import { useAuthorization } from '@/Utils/authorization';
 
 const formatDateTime = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
-              timeStyle: "short",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
-function SummaryCard({ label, value, tone = "default" }) {
+function SummaryCard({ label, value, tone = 'default' }) {
     const toneClasses = {
         default:
-            "border-slate-200 bg-white text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white",
+            'border-slate-200 bg-white text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white',
         success:
-            "border-success-200 bg-success-50 text-success-700 dark:border-success-900 dark:bg-success-950/30 dark:text-success-400",
+            'border-success-200 bg-success-50 text-success-700 dark:border-success-900 dark:bg-success-950/30 dark:text-success-400',
         warning:
-            "border-warning-200 bg-warning-50 text-warning-700 dark:border-warning-900 dark:bg-warning-950/30 dark:text-warning-400",
+            'border-warning-200 bg-warning-50 text-warning-700 dark:border-warning-900 dark:bg-warning-950/30 dark:text-warning-400',
     };
 
     return (
         <div className={`rounded-2xl border p-4 ${toneClasses[tone]}`}>
-            <p className="text-xs font-medium uppercase tracking-wide opacity-80">
-                {label}
-            </p>
+            <p className="text-xs font-medium uppercase tracking-wide opacity-80">{label}</p>
             <p className="mt-2 text-2xl font-bold">{value}</p>
         </div>
     );
 }
 
-export default function Show({
-    stockOpname,
-    availableProducts,
-    productFilters,
-}) {
+export default function Show({ stockOpname, availableProducts, productFilters }) {
     const { can } = useAuthorization();
-    const canEditStockOpname = can("stock-opnames-create");
-    const canFinalizeStockOpname = can("stock-opnames-finalize");
-    const isDraft = stockOpname.status === "draft";
+    const canEditStockOpname = can('stock-opnames-create');
+    const canFinalizeStockOpname = can('stock-opnames-finalize');
+    const isDraft = stockOpname.status === 'draft';
     const canManageDraft = isDraft && canEditStockOpname;
     const [localItems, setLocalItems] = useState(stockOpname.items);
     const [savingItemId, setSavingItemId] = useState(null);
     const [showProductModal, setShowProductModal] = useState(false);
-    const [productSearchInput, setProductSearchInput] = useState(
-        productFilters.search || ""
-    );
+    const [productSearchInput, setProductSearchInput] = useState(productFilters.search || '');
 
     const notesForm = useForm({
-        notes: stockOpname.notes || "",
+        notes: stockOpname.notes || '',
     });
 
     useEffect(() => {
         setLocalItems(stockOpname.items);
-        notesForm.setData("notes", stockOpname.notes || "");
+        notesForm.setData('notes', stockOpname.notes || '');
     }, [stockOpname.items, stockOpname.notes]);
 
     useEffect(() => {
-        setProductSearchInput(productFilters.search || "");
+        setProductSearchInput(productFilters.search || '');
     }, [productFilters.search]);
 
     const filters = useMemo(
         () => ({
-            product_search: productFilters.search || "",
+            product_search: productFilters.search || '',
         }),
         [productFilters]
     );
     const isWaitingSearch =
-        showProductModal &&
-        productSearchInput.trim() !== (filters.product_search || "").trim();
+        showProductModal && productSearchInput.trim() !== (filters.product_search || '').trim();
 
     const summary = useMemo(() => {
         const totalItems = localItems.length;
         const countedItems = localItems.filter(
-            (item) => item.physical_stock !== null && item.physical_stock !== ""
+            (item) => item.physical_stock !== null && item.physical_stock !== ''
         );
-        const matchedItems = countedItems.filter(
-            (item) => Number(item.difference || 0) === 0
-        );
-        const differentItems = countedItems.filter(
-            (item) => Number(item.difference || 0) !== 0
-        );
+        const matchedItems = countedItems.filter((item) => Number(item.difference || 0) === 0);
+        const differentItems = countedItems.filter((item) => Number(item.difference || 0) !== 0);
         const totalAdjustment = countedItems.reduce(
             (carry, item) => carry + Number(item.difference || 0),
             0
@@ -105,9 +92,7 @@ export default function Show({
             matchedItems: matchedItems.length,
             differentItems: differentItems.length,
             totalAdjustment,
-            hasMissingReasons: differentItems.some(
-                (item) => !item.adjustment_reason
-            ),
+            hasMissingReasons: differentItems.some((item) => !item.adjustment_reason),
         };
     }, [localItems]);
 
@@ -117,11 +102,11 @@ export default function Show({
         }
 
         const timeoutId = setTimeout(() => {
-            if (productSearchInput === (filters.product_search || "")) {
+            if (productSearchInput === (filters.product_search || '')) {
                 return;
             }
 
-            updateFilter("product_search", productSearchInput);
+            updateFilter('product_search', productSearchInput);
         }, 1200);
 
         return () => clearTimeout(timeoutId);
@@ -129,7 +114,7 @@ export default function Show({
 
     const updateFilter = (key, value) => {
         router.get(
-            route("stock-opnames.show", stockOpname.id),
+            route('stock-opnames.show', stockOpname.id),
             {
                 ...filters,
                 [key]: value,
@@ -145,24 +130,24 @@ export default function Show({
     const saveNotes = (event) => {
         event.preventDefault();
 
-        notesForm.patch(route("stock-opnames.update", stockOpname.id), {
+        notesForm.patch(route('stock-opnames.update', stockOpname.id), {
             preserveScroll: true,
-            onSuccess: () => toast.success("Catatan sesi diperbarui"),
-            onError: () => toast.error("Gagal memperbarui catatan sesi"),
+            onSuccess: () => toast.success('Catatan sesi diperbarui'),
+            onError: () => toast.error('Gagal memperbarui catatan sesi'),
         });
     };
 
     const addProduct = (productId) => {
         router.post(
-            route("stock-opnames.items.store", stockOpname.id),
+            route('stock-opnames.items.store', stockOpname.id),
             { product_id: productId },
             {
                 preserveScroll: true,
                 onSuccess: () => {
                     setShowProductModal(false);
-                    toast.success("Produk ditambahkan ke sesi");
+                    toast.success('Produk ditambahkan ke sesi');
                 },
-                onError: () => toast.error("Gagal menambahkan produk"),
+                onError: () => toast.error('Gagal menambahkan produk'),
             }
         );
     };
@@ -175,8 +160,8 @@ export default function Show({
                 }
 
                 const nextPhysicalStock =
-                    key === "physical_stock"
-                        ? value === ""
+                    key === 'physical_stock'
+                        ? value === ''
                             ? null
                             : Number(value)
                         : item.physical_stock;
@@ -193,8 +178,8 @@ export default function Show({
                     difference: nextDifference,
                     adjustment_reason:
                         nextDifference === 0
-                            ? ""
-                            : key === "adjustment_reason"
+                            ? ''
+                            : key === 'adjustment_reason'
                               ? value
                               : item.adjustment_reason,
                 };
@@ -210,16 +195,15 @@ export default function Show({
         setSavingItemId(item.id);
 
         router.patch(
-            route("stock-opnames.items.update", [stockOpname.id, item.id]),
+            route('stock-opnames.items.update', [stockOpname.id, item.id]),
             {
-                physical_stock:
-                    item.physical_stock === "" ? null : item.physical_stock,
-                adjustment_reason: item.adjustment_reason || "",
+                physical_stock: item.physical_stock === '' ? null : item.physical_stock,
+                adjustment_reason: item.adjustment_reason || '',
             },
             {
                 preserveScroll: true,
-                onSuccess: () => toast.success("Item opname diperbarui"),
-                onError: () => toast.error("Gagal memperbarui item opname"),
+                onSuccess: () => toast.success('Item opname diperbarui'),
+                onError: () => toast.error('Gagal memperbarui item opname'),
                 onFinish: () => setSavingItemId(null),
             }
         );
@@ -227,13 +211,12 @@ export default function Show({
 
     const finalize = () => {
         router.post(
-            route("stock-opnames.finalize", stockOpname.id),
+            route('stock-opnames.finalize', stockOpname.id),
             {},
             {
                 preserveScroll: true,
-                onSuccess: () => toast.success("Stock opname difinalisasi"),
-                onError: () =>
-                    toast.error("Gagal finalize. Periksa item yang belum valid."),
+                onSuccess: () => toast.success('Stock opname difinalisasi'),
+                onError: () => toast.error('Gagal finalize. Periksa item yang belum valid.'),
             }
         );
     };
@@ -244,7 +227,7 @@ export default function Show({
 
             <div className="mb-6">
                 <Link
-                    href={route("stock-opnames.index")}
+                    href={route('stock-opnames.index')}
                     className="mb-3 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600"
                 >
                     <IconArrowLeft size={16} />
@@ -260,20 +243,20 @@ export default function Show({
                             <span
                                 className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
                                     isDraft
-                                        ? "bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400"
-                                        : "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400"
+                                        ? 'bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400'
+                                        : 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400'
                                 }`}
                             >
-                                {isDraft ? "Draft" : "Finalized"}
+                                {isDraft ? 'Draft' : 'Finalized'}
                             </span>
                         </div>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Dibuat oleh {stockOpname.creator?.name || "-"} •{" "}
+                            Dibuat oleh {stockOpname.creator?.name || '-'} •{' '}
                             {formatDateTime(stockOpname.created_at)}
                         </p>
                         {!isDraft && (
                             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                Difinalisasi oleh {stockOpname.finalizer?.name || "-"} •{" "}
+                                Difinalisasi oleh {stockOpname.finalizer?.name || '-'} •{' '}
                                 {formatDateTime(stockOpname.finalized_at)}
                             </p>
                         )}
@@ -283,12 +266,10 @@ export default function Show({
                         <Button
                             type="button"
                             icon={<IconCheck size={18} />}
-                            className="bg-success-500 hover:bg-success-600 text-white shadow-lg shadow-success-500/20 disabled:opacity-50"
+                            className="bg-success-500 text-white shadow-lg shadow-success-500/20 hover:bg-success-600 disabled:opacity-50"
                             label="Finalize Stock Opname"
                             onClick={finalize}
-                            disabled={
-                                localItems.length === 0 || summary.hasMissingReasons
-                            }
+                            disabled={localItems.length === 0 || summary.hasMissingReasons}
                         />
                     )}
                 </div>
@@ -296,16 +277,8 @@ export default function Show({
 
             <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <SummaryCard label="Total Item" value={summary.totalItems} />
-                <SummaryCard
-                    label="Item Sesuai"
-                    value={summary.matchedItems}
-                    tone="success"
-                />
-                <SummaryCard
-                    label="Item Selisih"
-                    value={summary.differentItems}
-                    tone="warning"
-                />
+                <SummaryCard label="Item Sesuai" value={summary.matchedItems} tone="success" />
+                <SummaryCard label="Item Selisih" value={summary.differentItems} tone="warning" />
                 <SummaryCard
                     label="Total Adjustment"
                     value={
@@ -313,7 +286,7 @@ export default function Show({
                             ? `+${summary.totalAdjustment}`
                             : summary.totalAdjustment
                     }
-                    tone={summary.totalAdjustment === 0 ? "default" : "warning"}
+                    tone={summary.totalAdjustment === 0 ? 'default' : 'warning'}
                 />
             </div>
 
@@ -328,7 +301,7 @@ export default function Show({
                                 <Button
                                     type="button"
                                     icon={<IconPlus size={18} />}
-                                    className="bg-primary-500 hover:bg-primary-600 text-white"
+                                    className="bg-primary-500 text-white hover:bg-primary-600"
                                     label="Tambah Produk"
                                     onClick={() => setShowProductModal(true)}
                                 />
@@ -364,10 +337,10 @@ export default function Show({
                                                             {item.product.title}
                                                         </p>
                                                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                            {item.product.category?.name || "-"} •{" "}
+                                                            {item.product.category?.name || '-'} •{' '}
                                                             {item.product.barcode ||
                                                                 item.product.sku ||
-                                                                "-"}
+                                                                '-'}
                                                         </p>
                                                     </div>
                                                 </Table.Td>
@@ -376,12 +349,12 @@ export default function Show({
                                                     <input
                                                         type="number"
                                                         min="0"
-                                                        value={item.physical_stock ?? ""}
+                                                        value={item.physical_stock ?? ''}
                                                         disabled={!canManageDraft}
                                                         onChange={(event) =>
                                                             setItemField(
                                                                 item.id,
-                                                                "physical_stock",
+                                                                'physical_stock',
                                                                 event.target.value
                                                             )
                                                         }
@@ -392,14 +365,14 @@ export default function Show({
                                                     <span
                                                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
                                                             item.physical_stock === null
-                                                                ? "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                                                                ? 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                                                                 : difference === 0
-                                                                  ? "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400"
-                                                                  : "bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400"
+                                                                  ? 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400'
+                                                                  : 'bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400'
                                                         }`}
                                                     >
                                                         {item.physical_stock === null
-                                                            ? "Belum dihitung"
+                                                            ? 'Belum dihitung'
                                                             : difference > 0
                                                               ? `+${difference}`
                                                               : difference}
@@ -408,19 +381,19 @@ export default function Show({
                                                 <Table.Td>
                                                     <input
                                                         type="text"
-                                                        value={item.adjustment_reason || ""}
+                                                        value={item.adjustment_reason || ''}
                                                         disabled={!canManageDraft}
                                                         onChange={(event) =>
                                                             setItemField(
                                                                 item.id,
-                                                                "adjustment_reason",
+                                                                'adjustment_reason',
                                                                 event.target.value
                                                             )
                                                         }
                                                         placeholder={
                                                             isDifferent
-                                                                ? "Wajib isi alasan"
-                                                                : "Tidak perlu"
+                                                                ? 'Wajib isi alasan'
+                                                                : 'Tidak perlu'
                                                         }
                                                         className="h-10 w-full min-w-48 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                                     />
@@ -436,7 +409,7 @@ export default function Show({
                                                             <IconDeviceFloppy size={18} />
                                                         </button>
                                                     ) : (
-                                                        "-"
+                                                        '-'
                                                     )}
                                                 </Table.Td>
                                             </tr>
@@ -472,9 +445,7 @@ export default function Show({
                         <textarea
                             value={notesForm.data.notes}
                             disabled={!canManageDraft}
-                            onChange={(event) =>
-                                notesForm.setData("notes", event.target.value)
-                            }
+                            onChange={(event) => notesForm.setData('notes', event.target.value)}
                             rows={4}
                             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                             placeholder="Catatan sesi stock opname"
@@ -484,7 +455,7 @@ export default function Show({
                                 <Button
                                     type="submit"
                                     icon={<IconDeviceFloppy size={18} />}
-                                    className="bg-primary-500 hover:bg-primary-600 text-white"
+                                    className="bg-primary-500 text-white hover:bg-primary-600"
                                     label="Simpan Catatan"
                                 />
                             </div>
@@ -529,9 +500,7 @@ export default function Show({
                             type="text"
                             autoFocus
                             value={productSearchInput}
-                            onChange={(event) =>
-                                setProductSearchInput(event.target.value)
-                            }
+                            onChange={(event) => setProductSearchInput(event.target.value)}
                             placeholder="Cari nama produk, barcode, atau SKU..."
                             className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         />
@@ -546,7 +515,7 @@ export default function Show({
                         </div>
                     ) : filters.product_search ? (
                         availableProducts.length > 0 ? (
-                            <div className="max-h-[420px] space-y-3 overflow-y-auto pr-1 dashboard-scrollbar">
+                            <div className="dashboard-scrollbar max-h-[420px] space-y-3 overflow-y-auto pr-1">
                                 {availableProducts.map((product) => (
                                     <button
                                         key={product.id}
@@ -559,7 +528,8 @@ export default function Show({
                                                 {product.title}
                                             </p>
                                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                                {product.category?.name || "-"} • {product.barcode || product.sku || "-"}
+                                                {product.category?.name || '-'} •{' '}
+                                                {product.barcode || product.sku || '-'}
                                             </p>
                                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                                 Stok sistem: {product.stock}
@@ -578,7 +548,8 @@ export default function Show({
                         )
                     ) : (
                         <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                            Ketik kata kunci, lalu tunggu sebentar untuk menampilkan hasil pencarian produk.
+                            Ketik kata kunci, lalu tunggu sebentar untuk menampilkan hasil pencarian
+                            produk.
                         </div>
                     )}
                 </div>

@@ -1,26 +1,21 @@
-import { useEffect, useState } from "react";
-import { Head, usePage, router } from "@inertiajs/react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import {
-    IconRulerMeasure,
-    IconPlus,
-    IconPencil,
-    IconTrash,
-} from "@tabler/icons-react";
-import toast from "react-hot-toast";
-import { useAuthorization } from "@/Utils/authorization";
-import Input from "@/Components/Dashboard/Input";
+import { useEffect, useState } from 'react';
+import { Head, usePage, router } from '@inertiajs/react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { IconRulerMeasure, IconPlus, IconPencil, IconTrash } from '@tabler/icons-react';
+import toast from 'react-hot-toast';
+import { useAuthorization } from '@/Utils/authorization';
+import Input from '@/Components/Dashboard/Input';
 
 export default function Units({ units = [] }) {
     const { flash } = usePage().props;
     const { can } = useAuthorization();
-    const canCreate = can("units-create");
-    const canUpdate = can("units-update");
-    const canDelete = can("units-delete");
+    const canCreate = can('units-create');
+    const canUpdate = can('units-update');
+    const canDelete = can('units-delete');
 
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState({ code: "", name: "", symbol: "" });
+    const [form, setForm] = useState({ code: '', name: '', symbol: '' });
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -29,7 +24,7 @@ export default function Units({ units = [] }) {
     }, [flash]);
 
     const resetForm = () => {
-        setForm({ code: "", name: "", symbol: "" });
+        setForm({ code: '', name: '', symbol: '' });
         setErrors({});
         setEditing(null);
         setShowForm(false);
@@ -47,12 +42,12 @@ export default function Units({ units = [] }) {
         setErrors({});
 
         if (editing) {
-            router.put(route("settings.units.update", editing.id), form, {
+            router.put(route('settings.units.update', editing.id), form, {
                 onError: (err) => setErrors(err),
                 onSuccess: () => resetForm(),
             });
         } else {
-            router.post(route("settings.units.store"), form, {
+            router.post(route('settings.units.store'), form, {
                 onError: (err) => setErrors(err),
                 onSuccess: () => resetForm(),
             });
@@ -61,7 +56,7 @@ export default function Units({ units = [] }) {
 
     const handleDelete = (u) => {
         if (!confirm(`Hapus satuan ${u.name}?`)) return;
-        router.delete(route("settings.units.destroy", u.id));
+        router.delete(route('settings.units.destroy', u.id));
     };
 
     return (
@@ -69,25 +64,28 @@ export default function Units({ units = [] }) {
             <Head title="Pengaturan Satuan" />
 
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
                     <IconRulerMeasure size={28} className="text-primary-500" />
                     Satuan
                 </h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     Master satuan produk (pcs, box, karton, dll) untuk penjualan multi-satuan
                 </p>
             </div>
 
             <div className="max-w-4xl space-y-6">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                    <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                    <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-slate-800">
                         <h3 className="font-semibold text-slate-800 dark:text-white">
                             Daftar Satuan ({units.length})
                         </h3>
                         {canCreate && (
                             <button
-                                onClick={() => { resetForm(); setShowForm(true); }}
-                                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors"
+                                onClick={() => {
+                                    resetForm();
+                                    setShowForm(true);
+                                }}
+                                className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
                             >
                                 <IconPlus size={18} />
                                 Tambah Satuan
@@ -98,16 +96,16 @@ export default function Units({ units = [] }) {
                     {units.length > 0 ? (
                         <div className="divide-y divide-slate-200 dark:divide-slate-800">
                             {units.map((u) => (
-                                <div key={u.id} className="p-4 flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                <div key={u.id} className="flex items-center gap-4 p-4">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
                                         <IconRulerMeasure size={22} className="text-slate-500" />
                                     </div>
-                                    <div className="flex-1 min-w-0">
+                                    <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
-                                            <p className="font-semibold text-slate-800 dark:text-white truncate">
+                                            <p className="truncate font-semibold text-slate-800 dark:text-white">
                                                 {u.name}
                                             </p>
-                                            <span className="px-2 py-0.5 rounded-lg text-xs font-medium bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-400">
+                                            <span className="rounded-lg bg-accent-100 px-2 py-0.5 text-xs font-medium text-accent-700 dark:bg-accent-900/30 dark:text-accent-400">
                                                 {u.symbol}
                                             </span>
                                         </div>
@@ -115,14 +113,14 @@ export default function Units({ units = [] }) {
                                             {u.code}
                                             {u.products_count > 0
                                                 ? ` • dipakai ${u.products_count} produk`
-                                                : ""}
+                                                : ''}
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-2 shrink-0">
+                                    <div className="flex shrink-0 items-center gap-2">
                                         {canUpdate && (
                                             <button
                                                 onClick={() => openEdit(u)}
-                                                className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                                className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
                                             >
                                                 <IconPencil size={18} />
                                             </button>
@@ -130,7 +128,7 @@ export default function Units({ units = [] }) {
                                         {canDelete && u.products_count === 0 && (
                                             <button
                                                 onClick={() => handleDelete(u)}
-                                                className="p-2 rounded-lg text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors"
+                                                className="rounded-lg p-2 text-danger-500 transition-colors hover:bg-danger-50 dark:hover:bg-danger-900/20"
                                             >
                                                 <IconTrash size={18} />
                                             </button>
@@ -141,19 +139,22 @@ export default function Units({ units = [] }) {
                         </div>
                     ) : (
                         <div className="p-8 text-center">
-                            <IconRulerMeasure size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+                            <IconRulerMeasure
+                                size={48}
+                                className="mx-auto mb-3 text-slate-300 dark:text-slate-600"
+                            />
                             <p className="text-slate-500 dark:text-slate-400">Belum ada satuan</p>
                         </div>
                     )}
                 </div>
 
                 {showForm && (
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-4">
+                    <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
                         <h3 className="font-semibold text-slate-800 dark:text-white">
-                            {editing ? "Edit Satuan" : "Tambah Satuan Baru"}
+                            {editing ? 'Edit Satuan' : 'Tambah Satuan Baru'}
                         </h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <Input
                                     label="Kode"
                                     placeholder="PCS"
@@ -179,14 +180,14 @@ export default function Units({ units = [] }) {
                             <div className="flex items-center gap-3">
                                 <button
                                     type="submit"
-                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition-colors"
+                                    className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600"
                                 >
-                                    {editing ? "Update" : "Simpan"}
+                                    {editing ? 'Update' : 'Simpan'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={resetForm}
-                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                                 >
                                     Batal
                                 </button>

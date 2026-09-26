@@ -1,8 +1,8 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import Table from "@/Components/Dashboard/Table";
-import { Head, Link, router } from "@inertiajs/react";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import Table from '@/Components/Dashboard/Table';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     IconCirclePlus,
     IconCrown,
@@ -10,26 +10,26 @@ import {
     IconPencil,
     IconSearch,
     IconUsers,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
 const formatCurrency = (value = 0) =>
-    Number(value || 0).toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    Number(value || 0).toLocaleString('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     });
 
 const formatDate = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
 export default function Index({ members, filters, tierOptions, summary }) {
     const handleFilterChange = (key, value) => {
         router.get(
-            route("members.index"),
+            route('members.index'),
             { ...filters, [key]: value },
             { preserveState: true, replace: true }
         );
@@ -37,27 +37,26 @@ export default function Index({ members, filters, tierOptions, summary }) {
 
     const summaryCards = [
         {
-            label: "Total Member",
+            label: 'Total Member',
             value: summary?.total_members || 0,
-            helper: "Seluruh member yang pernah terdaftar",
+            helper: 'Seluruh member yang pernah terdaftar',
         },
         {
-            label: "Member Aktif",
+            label: 'Member Aktif',
             value: summary?.active_members || 0,
-            helper: "Masih menerima benefit member",
+            helper: 'Masih menerima benefit member',
         },
         {
-            label: "Omzet Member",
+            label: 'Omzet Member',
             value: formatCurrency(summary?.member_revenue || 0),
-            helper: "Kontribusi transaksi dari member",
+            helper: 'Kontribusi transaksi dari member',
         },
         {
-            label: "Repeat Rate",
+            label: 'Repeat Rate',
             value: `${summary?.repeat_rate || 0}%`,
-            helper:
-                summary?.top_member?.name
-                    ? `Top member: ${summary.top_member.name}`
-                    : "Belum ada top member",
+            helper: summary?.top_member?.name
+                ? `Top member: ${summary.top_member.name}`
+                : 'Belum ada top member',
         },
     ];
 
@@ -72,11 +71,12 @@ export default function Index({ members, filters, tierOptions, summary }) {
                             Member
                         </h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Kelola pendaftaran, status, dan performa member tanpa memisahkan data dari customer inti.
+                            Kelola pendaftaran, status, dan performa member tanpa memisahkan data
+                            dari customer inti.
                         </p>
                     </div>
                     <Link
-                        href={route("members.create")}
+                        href={route('members.create')}
                         className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-600"
                     >
                         <IconCirclePlus size={18} />
@@ -108,9 +108,9 @@ export default function Index({ members, filters, tierOptions, summary }) {
                         <div className="relative md:col-span-2">
                             <input
                                 type="text"
-                                value={filters.search || ""}
+                                value={filters.search || ''}
                                 onChange={(event) =>
-                                    handleFilterChange("search", event.target.value)
+                                    handleFilterChange('search', event.target.value)
                                 }
                                 placeholder="Cari nama member atau nomor anggota..."
                                 className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
@@ -122,12 +122,10 @@ export default function Index({ members, filters, tierOptions, summary }) {
 
                         <Select
                             size="sm"
-                            value={filters.tier || ""}
-                            onChange={(value) =>
-                                handleFilterChange("tier", value)
-                            }
+                            value={filters.tier || ''}
+                            onChange={(value) => handleFilterChange('tier', value)}
                             options={[
-                                { value: "", label: "Semua Tier" },
+                                { value: '', label: 'Semua Tier' },
                                 ...tierOptions.map((tier) => ({
                                     value: tier.value,
                                     label: tier.label,
@@ -137,14 +135,12 @@ export default function Index({ members, filters, tierOptions, summary }) {
 
                         <Select
                             size="sm"
-                            value={filters.status || "active"}
-                            onChange={(value) =>
-                                handleFilterChange("status", value)
-                            }
+                            value={filters.status || 'active'}
+                            onChange={(value) => handleFilterChange('status', value)}
                             options={[
-                                { value: "active", label: "Member Aktif" },
-                                { value: "inactive", label: "Member Nonaktif" },
-                                { value: "all", label: "Semua Status" },
+                                { value: 'active', label: 'Member Aktif' },
+                                { value: 'inactive', label: 'Member Nonaktif' },
+                                { value: 'all', label: 'Semua Status' },
                             ]}
                         />
                     </div>
@@ -160,9 +156,7 @@ export default function Index({ members, filters, tierOptions, summary }) {
                                 <Table.Th>Total Belanja</Table.Th>
                                 <Table.Th>Transaksi</Table.Th>
                                 <Table.Th>Terakhir Belanja</Table.Th>
-                                <Table.Th className="w-28 text-center">
-                                    Aksi
-                                </Table.Th>
+                                <Table.Th className="w-28 text-center">Aksi</Table.Th>
                             </tr>
                         </Table.Thead>
                         <Table.Tbody>
@@ -171,43 +165,35 @@ export default function Index({ members, filters, tierOptions, summary }) {
                                     <tr key={member.id}>
                                         <Table.Td>
                                             <Link
-                                                href={route("members.show", member.id)}
+                                                href={route('members.show', member.id)}
                                                 className="font-semibold text-slate-800 hover:text-primary-600 dark:text-slate-100"
                                             >
                                                 {member.name}
                                             </Link>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                {member.member_code || "Belum ada nomor anggota"}
+                                                {member.member_code || 'Belum ada nomor anggota'}
                                             </p>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                {member.no_telp || "-"}
+                                                {member.no_telp || '-'}
                                             </p>
                                         </Table.Td>
                                         <Table.Td>
                                             <span className="inline-flex rounded-full bg-primary-100 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/40 dark:text-primary-300">
-                                                {member.loyalty_tier || "regular"}
+                                                {member.loyalty_tier || 'regular'}
                                             </span>
                                             <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                                                {member.is_loyalty_member
-                                                    ? "Aktif"
-                                                    : "Nonaktif"}
+                                                {member.is_loyalty_member ? 'Aktif' : 'Nonaktif'}
                                             </p>
                                         </Table.Td>
                                         <Table.Td>{member.loyalty_points || 0}</Table.Td>
                                         <Table.Td>
-                                            {formatCurrency(
-                                                member.loyalty_total_spent || 0
-                                            )}
+                                            {formatCurrency(member.loyalty_total_spent || 0)}
                                         </Table.Td>
-                                        <Table.Td>
-                                            {member.loyalty_transaction_count || 0}
-                                        </Table.Td>
-                                        <Table.Td>
-                                            {formatDate(member.last_purchase_at)}
-                                        </Table.Td>
+                                        <Table.Td>{member.loyalty_transaction_count || 0}</Table.Td>
+                                        <Table.Td>{formatDate(member.last_purchase_at)}</Table.Td>
                                         <Table.Td className="text-center">
                                             <Link
-                                                href={route("members.edit", member.id)}
+                                                href={route('members.edit', member.id)}
                                                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300"
                                             >
                                                 <IconPencil size={16} />
@@ -240,7 +226,8 @@ export default function Index({ members, filters, tierOptions, summary }) {
                                     Top Member by Spending
                                 </p>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                                    {summary.top_member.name} • {formatCurrency(summary.top_member.total_spent)}
+                                    {summary.top_member.name} •{' '}
+                                    {formatCurrency(summary.top_member.total_spent)}
                                 </p>
                             </div>
                         </div>
@@ -259,7 +246,9 @@ export default function Index({ members, filters, tierOptions, summary }) {
                                 Bantuan cepat
                             </p>
                             <p className="mt-1 text-xs leading-6 text-slate-500 dark:text-slate-400">
-                                Daftarkan member baru dari halaman ini atau langsung dari POS. Untuk upgrade pelanggan biasa menjadi member, gunakan tombol upgrade di detail pelanggan atau picker pelanggan di POS.
+                                Daftarkan member baru dari halaman ini atau langsung dari POS. Untuk
+                                upgrade pelanggan biasa menjadi member, gunakan tombol upgrade di
+                                detail pelanggan atau picker pelanggan di POS.
                             </p>
                         </div>
                     </div>

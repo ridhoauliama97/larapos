@@ -1,38 +1,35 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link, router } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import Table from "@/Components/Dashboard/Table";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import { useAuthorization } from "@/Utils/authorization";
-import {
-    IconCirclePlus,
-    IconEye,
-    IconSearch,
-    IconTruckReturn,
-} from "@tabler/icons-react";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link, router } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import Table from '@/Components/Dashboard/Table';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import { useAuthorization } from '@/Utils/authorization';
+import { IconCirclePlus, IconEye, IconSearch, IconTruckReturn } from '@tabler/icons-react';
 
 const formatDateTime = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
-              timeStyle: "short",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
 const statusBadge = (status) => {
-    const base = "inline-flex rounded-full px-2.5 py-1 text-xs font-semibold";
+    const base = 'inline-flex rounded-full px-2.5 py-1 text-xs font-semibold';
     const map = {
-        draft: "bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400",
-        completed: "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400",
-        cancelled: "bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400",
+        draft: 'bg-warning-100 text-warning-700 dark:bg-warning-950/30 dark:text-warning-400',
+        completed: 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400',
+        cancelled: 'bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400',
     };
     const labels = {
-        draft: "Draft",
-        completed: "Selesai",
-        cancelled: "Dibatalkan",
+        draft: 'Draft',
+        completed: 'Selesai',
+        cancelled: 'Dibatalkan',
     };
-    return <span className={`${base} ${map[status] || map.draft}`}>{labels[status] || status}</span>;
+    return (
+        <span className={`${base} ${map[status] || map.draft}`}>{labels[status] || status}</span>
+    );
 };
 
 export default function Index({ returns, filters, suppliers }) {
@@ -40,7 +37,7 @@ export default function Index({ returns, filters, suppliers }) {
 
     const handleFilterChange = (key, value) => {
         router.get(
-            route("supplier-returns.index"),
+            route('supplier-returns.index'),
             { ...filters, [key]: value },
             { preserveState: true, replace: true }
         );
@@ -58,12 +55,12 @@ export default function Index({ returns, filters, suppliers }) {
                         Kelola retur barang ke supplier.
                     </p>
                 </div>
-                {can("supplier-returns-create") && (
+                {can('supplier-returns-create') && (
                     <Button
                         type="link"
-                        href={route("supplier-returns.create")}
+                        href={route('supplier-returns.create')}
                         icon={<IconCirclePlus size={18} />}
-                        className="bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                        className="bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600"
                         label="Buat Retur"
                     />
                 )}
@@ -73,8 +70,8 @@ export default function Index({ returns, filters, suppliers }) {
                 <div className="relative md:col-span-2">
                     <input
                         type="text"
-                        value={filters.search || ""}
-                        onChange={(e) => handleFilterChange("search", e.target.value)}
+                        value={filters.search || ''}
+                        onChange={(e) => handleFilterChange('search', e.target.value)}
                         placeholder="Cari nomor dokumen..."
                         className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                     />
@@ -83,21 +80,21 @@ export default function Index({ returns, filters, suppliers }) {
                     </div>
                 </div>
                 <Select
-                    value={filters.status || ""}
-                    onChange={(value) => handleFilterChange("status", value)}
+                    value={filters.status || ''}
+                    onChange={(value) => handleFilterChange('status', value)}
                     options={[
-                        { value: "", label: "Semua Status" },
-                        { value: "draft", label: "Draft" },
-                        { value: "completed", label: "Selesai" },
-                        { value: "cancelled", label: "Dibatalkan" },
+                        { value: '', label: 'Semua Status' },
+                        { value: 'draft', label: 'Draft' },
+                        { value: 'completed', label: 'Selesai' },
+                        { value: 'cancelled', label: 'Dibatalkan' },
                     ]}
                     size="sm"
                 />
                 <Select
-                    value={filters.supplier || ""}
-                    onChange={(value) => handleFilterChange("supplier", value)}
+                    value={filters.supplier || ''}
+                    onChange={(value) => handleFilterChange('supplier', value)}
                     options={[
-                        { value: "", label: "Semua Supplier" },
+                        { value: '', label: 'Semua Supplier' },
                         ...suppliers.map((s) => ({ value: s.id, label: s.name })),
                     ]}
                     size="sm"
@@ -120,19 +117,28 @@ export default function Index({ returns, filters, suppliers }) {
                     <Table.Tbody>
                         {returns.data.length > 0 ? (
                             returns.data.map((ret) => (
-                                <tr key={ret.id} className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                                <tr
+                                    key={ret.id}
+                                    className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                >
                                     <Table.Td>
-                                        <p className="font-semibold text-slate-800 dark:text-slate-200">{ret.document_number}</p>
-                                        <p className="text-xs text-slate-500">{ret.created_at?.split("T")[0]}</p>
+                                        <p className="font-semibold text-slate-800 dark:text-slate-200">
+                                            {ret.document_number}
+                                        </p>
+                                        <p className="text-xs text-slate-500">
+                                            {ret.created_at?.split('T')[0]}
+                                        </p>
                                     </Table.Td>
-                                    <Table.Td>{ret.supplier?.name || "-"}</Table.Td>
+                                    <Table.Td>{ret.supplier?.name || '-'}</Table.Td>
                                     <Table.Td>{statusBadge(ret.status)}</Table.Td>
                                     <Table.Td>{ret.items_count}</Table.Td>
-                                    <Table.Td>{formatDateTime(ret.returned_at || ret.created_at)}</Table.Td>
-                                    <Table.Td>{ret.creator?.name || "-"}</Table.Td>
+                                    <Table.Td>
+                                        {formatDateTime(ret.returned_at || ret.created_at)}
+                                    </Table.Td>
+                                    <Table.Td>{ret.creator?.name || '-'}</Table.Td>
                                     <Table.Td className="text-center">
                                         <Link
-                                            href={route("supplier-returns.show", ret.id)}
+                                            href={route('supplier-returns.show', ret.id)}
                                             className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-600 transition hover:border-primary-300 hover:text-primary-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-primary-700 dark:hover:text-primary-400"
                                         >
                                             <IconEye size={18} />
@@ -141,11 +147,14 @@ export default function Index({ returns, filters, suppliers }) {
                                 </tr>
                             ))
                         ) : (
-                            <Table.Empty colSpan={7} message={
-                                <div className="text-slate-500 dark:text-slate-400">
-                                    Belum ada data retur supplier.
-                                </div>
-                            }>
+                            <Table.Empty
+                                colSpan={7}
+                                message={
+                                    <div className="text-slate-500 dark:text-slate-400">
+                                        Belum ada data retur supplier.
+                                    </div>
+                                }
+                            >
                                 <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                                     <IconTruckReturn size={28} className="text-slate-400" />
                                 </div>

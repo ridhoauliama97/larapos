@@ -1,5 +1,5 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
     IconArrowLeft,
     IconCoins,
@@ -8,22 +8,22 @@ import {
     IconGift,
     IconReceipt,
     IconTags,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
 const formatPrice = (value = 0) =>
-    Number(value || 0).toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    Number(value || 0).toLocaleString('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     });
 
 const formatDateTime = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
-              timeStyle: "short",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
 export default function Show({
     customer,
@@ -47,7 +47,7 @@ export default function Show({
 
     const submitSegments = (event) => {
         event.preventDefault();
-        segmentForm.put(route("customers.segments.sync", customer.id), {
+        segmentForm.put(route('customers.segments.sync', customer.id), {
             preserveScroll: true,
         });
     };
@@ -59,7 +59,7 @@ export default function Show({
             <div className="w-full">
                 <div className="mb-6">
                     <Link
-                        href={route("customers.index")}
+                        href={route('customers.index')}
                         className="mb-3 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600"
                     >
                         <IconArrowLeft size={16} />
@@ -76,12 +76,12 @@ export default function Show({
                                     <IconCrown size={14} />
                                     {customer.is_loyalty_member
                                         ? customer.loyalty_tier
-                                        : "non-member"}
+                                        : 'non-member'}
                                 </span>
                             </div>
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                                {customer.no_telp || "-"}{" "}
-                                {customer.address ? `• ${customer.address}` : ""}
+                                {customer.no_telp || '-'}{' '}
+                                {customer.address ? `• ${customer.address}` : ''}
                             </p>
                             {customer.member_code && (
                                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -96,10 +96,7 @@ export default function Show({
                             </span>
                             {!customer.is_loyalty_member ? (
                                 <Link
-                                    href={route(
-                                        "customers.upgrade-member",
-                                        customer.id
-                                    )}
+                                    href={route('customers.upgrade-member', customer.id)}
                                     method="post"
                                     as="button"
                                     className="inline-flex items-center gap-2 rounded-full bg-primary-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-primary-600"
@@ -143,8 +140,8 @@ export default function Show({
                                         {customer.loyalty_member_since
                                             ? new Date(
                                                   customer.loyalty_member_since
-                                              ).toLocaleDateString("id-ID")
-                                            : "-"}
+                                              ).toLocaleDateString('id-ID')
+                                            : '-'}
                                     </p>
                                 </div>
                                 <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60">
@@ -153,10 +150,8 @@ export default function Show({
                                     </p>
                                     <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                                         {stats?.last_visit
-                                            ? new Date(
-                                                  stats.last_visit
-                                              ).toLocaleDateString("id-ID")
-                                            : "-"}
+                                            ? new Date(stats.last_visit).toLocaleDateString('id-ID')
+                                            : '-'}
                                     </p>
                                 </div>
                             </div>
@@ -175,9 +170,9 @@ export default function Show({
                                         <span
                                             key={segment.id}
                                             className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-                                                segment.source === "manual"
-                                                    ? "bg-primary-100 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300"
-                                                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                                                segment.source === 'manual'
+                                                    ? 'bg-primary-100 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300'
+                                                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
                                             }`}
                                         >
                                             {segment.name}
@@ -219,9 +214,7 @@ export default function Show({
                                                     {transaction.invoice}
                                                 </p>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                    {formatDateTime(
-                                                        transaction.date
-                                                    )}
+                                                    {formatDateTime(transaction.date)}
                                                 </p>
                                             </div>
                                             <p className="text-sm font-bold text-primary-600 dark:text-primary-300">
@@ -270,11 +263,11 @@ export default function Show({
                                                     <p
                                                         className={`text-sm font-bold ${
                                                             history.points_delta >= 0
-                                                                ? "text-emerald-600 dark:text-emerald-300"
-                                                                : "text-rose-600 dark:text-rose-300"
+                                                                ? 'text-emerald-600 dark:text-emerald-300'
+                                                                : 'text-rose-600 dark:text-rose-300'
                                                         }`}
                                                     >
-                                                        {history.points_delta >= 0 ? "+" : ""}
+                                                        {history.points_delta >= 0 ? '+' : ''}
                                                         {history.points_delta} poin
                                                     </p>
                                                     <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -312,7 +305,7 @@ export default function Show({
                                     <p className="mt-1 font-semibold text-slate-900 dark:text-white">
                                         {customer.is_loyalty_member
                                             ? customer.loyalty_tier
-                                            : "Belum menjadi member"}
+                                            : 'Belum menjadi member'}
                                     </p>
                                 </div>
                                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
@@ -329,9 +322,7 @@ export default function Show({
                                     </p>
                                     <p className="mt-1 font-semibold text-slate-900 dark:text-white">
                                         {formatPrice(
-                                            customer.total_spent ||
-                                                stats?.total_spent ||
-                                                0
+                                            customer.total_spent || stats?.total_spent || 0
                                         )}
                                     </p>
                                 </div>
@@ -361,19 +352,13 @@ export default function Show({
                                                     onChange={(event) => {
                                                         const nextIds = event.target.checked
                                                             ? [
-                                                                  ...segmentForm.data
-                                                                      .segment_ids,
+                                                                  ...segmentForm.data.segment_ids,
                                                                   segment.value,
                                                               ]
                                                             : segmentForm.data.segment_ids.filter(
-                                                                  (value) =>
-                                                                      value !==
-                                                                      segment.value
+                                                                  (value) => value !== segment.value
                                                               );
-                                                        segmentForm.setData(
-                                                            "segment_ids",
-                                                            nextIds
-                                                        );
+                                                        segmentForm.setData('segment_ids', nextIds);
                                                     }}
                                                     className="mt-0.5 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                                                 />
@@ -400,9 +385,7 @@ export default function Show({
                                         disabled={segmentForm.processing}
                                         className="inline-flex items-center justify-center rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
-                                        {segmentForm.processing
-                                            ? "Menyimpan..."
-                                            : "Simpan Segment"}
+                                        {segmentForm.processing ? 'Menyimpan...' : 'Simpan Segment'}
                                     </button>
                                 </form>
                             ) : (
@@ -467,7 +450,7 @@ export default function Show({
                                                     </p>
                                                 </div>
                                                 <span className="text-xs font-medium text-primary-600 dark:text-primary-300">
-                                                    {voucher.discount_type === "percentage"
+                                                    {voucher.discount_type === 'percentage'
                                                         ? `${voucher.discount_value}%`
                                                         : formatPrice(voucher.discount_value)}
                                                 </span>

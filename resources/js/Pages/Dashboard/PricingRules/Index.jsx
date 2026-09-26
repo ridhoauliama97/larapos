@@ -1,39 +1,39 @@
-import { Head, Link, router } from "@inertiajs/react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import Button from "@/Components/Dashboard/Button";
-import Select from "@/Components/Dashboard/Select";
-import Table from "@/Components/Dashboard/Table";
-import Pagination from "@/Components/Dashboard/Pagination";
+import { Head, Link, router } from '@inertiajs/react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import Button from '@/Components/Dashboard/Button';
+import Select from '@/Components/Dashboard/Select';
+import Table from '@/Components/Dashboard/Table';
+import Pagination from '@/Components/Dashboard/Pagination';
 import {
     IconChartInfographic,
     IconCirclePlus,
     IconPencil,
     IconSearch,
     IconTrash,
-} from "@tabler/icons-react";
-import { useAuthorization } from "@/Utils/authorization";
+} from '@tabler/icons-react';
+import { useAuthorization } from '@/Utils/authorization';
 
 const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     }).format(value);
 
 const discountLabel = (rule) => {
-    if (rule.kind === "bundle_price") {
+    if (rule.kind === 'bundle_price') {
         return `Bundle ${formatCurrency(rule.discount_value)}`;
     }
 
-    if (rule.kind === "buy_x_get_y") {
+    if (rule.kind === 'buy_x_get_y') {
         return `${rule.buy_get_items_count || 0} item rule`;
     }
 
-    if (rule.discount_type === "percentage") {
+    if (rule.discount_type === 'percentage') {
         return `${Number(rule.discount_value)}%`;
     }
 
-    if (rule.discount_type === "fixed_price") {
+    if (rule.discount_type === 'fixed_price') {
         return `Harga ${formatCurrency(rule.discount_value)}`;
     }
 
@@ -41,47 +41,47 @@ const discountLabel = (rule) => {
 };
 
 const targetLabel = (rule) => {
-    if (rule.target_type === "product") return rule.product?.title || "Produk";
-    if (rule.target_type === "category") {
-        return rule.category?.name || "Kategori";
+    if (rule.target_type === 'product') return rule.product?.title || 'Produk';
+    if (rule.target_type === 'category') {
+        return rule.category?.name || 'Kategori';
     }
 
-    return "Semua Produk";
+    return 'Semua Produk';
 };
 
 const customerScopeLabel = (scope) => {
-    if (scope === "walk_in") return "Umum";
-    if (scope === "registered") return "Pelanggan";
-    if (scope === "member") return "Member";
-    return "Semua";
+    if (scope === 'walk_in') return 'Umum';
+    if (scope === 'registered') return 'Pelanggan';
+    if (scope === 'member') return 'Member';
+    return 'Semua';
 };
 
 const kindLabel = (kind) => {
-    if (kind === "qty_break") return "Grosir";
-    if (kind === "bundle_price") return "Bundle";
-    if (kind === "buy_x_get_y") return "BXGY";
-    return "Standar";
+    if (kind === 'qty_break') return 'Grosir';
+    if (kind === 'bundle_price') return 'Bundle';
+    if (kind === 'buy_x_get_y') return 'BXGY';
+    return 'Standar';
 };
 
 const statusOptions = [
-    { value: "", label: "Semua Status" },
-    { value: "active", label: "Aktif" },
-    { value: "inactive", label: "Nonaktif" },
+    { value: '', label: 'Semua Status' },
+    { value: 'active', label: 'Aktif' },
+    { value: 'inactive', label: 'Nonaktif' },
 ];
 
 const targetOptions = [
-    { value: "", label: "Semua Target" },
-    { value: "all", label: "Semua Produk" },
-    { value: "product", label: "Produk" },
-    { value: "category", label: "Kategori" },
+    { value: '', label: 'Semua Target' },
+    { value: 'all', label: 'Semua Produk' },
+    { value: 'product', label: 'Produk' },
+    { value: 'category', label: 'Kategori' },
 ];
 
 const kindOptions = [
-    { value: "", label: "Semua Jenis" },
-    { value: "standard_discount", label: "Standar" },
-    { value: "qty_break", label: "Grosir" },
-    { value: "bundle_price", label: "Bundle" },
-    { value: "buy_x_get_y", label: "BXGY" },
+    { value: '', label: 'Semua Jenis' },
+    { value: 'standard_discount', label: 'Standar' },
+    { value: 'qty_break', label: 'Grosir' },
+    { value: 'bundle_price', label: 'Bundle' },
+    { value: 'buy_x_get_y', label: 'BXGY' },
 ];
 
 export default function Index({ rules, filters, summary = {}, recentAudits = [] }) {
@@ -90,7 +90,7 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
 
     const handleFilterChange = (key, value) => {
         router.get(
-            route("pricing-rules.index"),
+            route('pricing-rules.index'),
             { ...filters, [key]: value },
             { preserveState: true, replace: true }
         );
@@ -110,10 +110,10 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                             Atur diskon dan harga otomatis untuk POS.
                         </p>
                     </div>
-                    {can("pricing-rules-create") && (
+                    {can('pricing-rules-create') && (
                         <Button
                             type="link"
-                            href={route("pricing-rules.create")}
+                            href={route('pricing-rules.create')}
                             icon={<IconCirclePlus size={18} />}
                             className="bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600"
                             label="Buat Rule"
@@ -123,10 +123,10 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
 
                 <div className="mb-4 grid gap-3 md:grid-cols-4">
                     {[
-                        { label: "Aktif", value: summary.active || 0 },
-                        { label: "Terjadwal", value: summary.scheduled || 0 },
-                        { label: "Expired", value: summary.expired || 0 },
-                        { label: "Inactive", value: summary.inactive || 0 },
+                        { label: 'Aktif', value: summary.active || 0 },
+                        { label: 'Terjadwal', value: summary.scheduled || 0 },
+                        { label: 'Expired', value: summary.expired || 0 },
+                        { label: 'Inactive', value: summary.inactive || 0 },
                     ].map((item) => (
                         <div
                             key={item.label}
@@ -147,9 +147,9 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                         <div className="relative md:col-span-2">
                             <input
                                 type="text"
-                                value={filters.search || ""}
+                                value={filters.search || ''}
                                 onChange={(event) =>
-                                    handleFilterChange("search", event.target.value)
+                                    handleFilterChange('search', event.target.value)
                                 }
                                 placeholder="Cari nama rule..."
                                 className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
@@ -159,26 +159,20 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                             </div>
                         </div>
                         <Select
-                            value={filters.status || ""}
-                            onChange={(value) =>
-                                handleFilterChange("status", value)
-                            }
+                            value={filters.status || ''}
+                            onChange={(value) => handleFilterChange('status', value)}
                             options={statusOptions}
                             size="sm"
                         />
                         <Select
-                            value={filters.target_type || ""}
-                            onChange={(value) =>
-                                handleFilterChange("target_type", value)
-                            }
+                            value={filters.target_type || ''}
+                            onChange={(value) => handleFilterChange('target_type', value)}
                             options={targetOptions}
                             size="sm"
                         />
                         <Select
-                            value={filters.kind || ""}
-                            onChange={(value) =>
-                                handleFilterChange("kind", value)
-                            }
+                            value={filters.kind || ''}
+                            onChange={(value) => handleFilterChange('kind', value)}
                             options={kindOptions}
                             size="sm"
                         />
@@ -217,8 +211,10 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                                                     </p>
                                                     <p className="text-xs text-slate-500 dark:text-slate-400">
                                                         {rule.starts_at
-                                                            ? new Date(rule.starts_at).toLocaleString("id-ID")
-                                                            : "Tanpa jadwal mulai"}
+                                                            ? new Date(
+                                                                  rule.starts_at
+                                                              ).toLocaleString('id-ID')
+                                                            : 'Tanpa jadwal mulai'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -237,11 +233,11 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                                         <Table.Td>
                                             <span
                                                 className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                                                    rule.status_label === "active"
-                                                        ? "bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400"
-                                                        : rule.status_label === "scheduled"
-                                                          ? "bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300"
-                                                          : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                                                    rule.status_label === 'active'
+                                                        ? 'bg-success-100 text-success-700 dark:bg-success-950/30 dark:text-success-400'
+                                                        : rule.status_label === 'scheduled'
+                                                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
+                                                          : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                                 }`}
                                             >
                                                 {rule.status_label}
@@ -249,18 +245,21 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                                         </Table.Td>
                                         <Table.Td className="text-center">
                                             <div className="flex items-center justify-center gap-2">
-                                                {can("pricing-rules-update") && (
+                                                {can('pricing-rules-update') && (
                                                     <Link
-                                                        href={route("pricing-rules.edit", rule.id)}
+                                                        href={route('pricing-rules.edit', rule.id)}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300"
                                                     >
                                                         <IconPencil size={16} />
                                                     </Link>
                                                 )}
-                                                {can("pricing-rules-delete") && (
+                                                {can('pricing-rules-delete') && (
                                                     <Button
                                                         type="delete"
-                                                        url={route("pricing-rules.destroy", rule.id)}
+                                                        url={route(
+                                                            'pricing-rules.destroy',
+                                                            rule.id
+                                                        )}
                                                         icon={<IconTrash size={16} />}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-300"
                                                     />
@@ -270,10 +269,7 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                                     </tr>
                                 ))
                             ) : (
-                                <Table.Empty
-                                    colSpan={8}
-                                    message="Belum ada rule promo harga."
-                                >
+                                <Table.Empty colSpan={8} message="Belum ada rule promo harga.">
                                     <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                                         <IconChartInfographic
                                             size={28}
@@ -308,7 +304,7 @@ export default function Index({ rules, filters, summary = {}, recentAudits = [] 
                                         </p>
                                     </div>
                                     <span className="text-xs text-slate-500 dark:text-slate-400">
-                                        {new Date(audit.created_at).toLocaleString("id-ID")}
+                                        {new Date(audit.created_at).toLocaleString('id-ID')}
                                     </span>
                                 </div>
                             ))}

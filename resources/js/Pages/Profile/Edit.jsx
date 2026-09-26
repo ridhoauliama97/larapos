@@ -1,20 +1,20 @@
-import { useRef, useState } from "react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head } from "@inertiajs/react";
-import { IconBell, IconLock, IconUserCircle } from "@tabler/icons-react";
-import DeleteUserForm from "./Partials/DeleteUserForm";
-import UpdateNotificationPreferencesForm from "./Partials/UpdateNotificationPreferencesForm";
-import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
-import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
+import { useRef, useState } from 'react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head } from '@inertiajs/react';
+import { IconBell, IconLock, IconUserCircle } from '@tabler/icons-react';
+import DeleteUserForm from './Partials/DeleteUserForm';
+import UpdateNotificationPreferencesForm from './Partials/UpdateNotificationPreferencesForm';
+import UpdatePasswordForm from './Partials/UpdatePasswordForm';
+import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 
 const TABS = [
-    { key: "profile", label: "Profil", icon: IconUserCircle },
-    { key: "security", label: "Keamanan", icon: IconLock },
-    { key: "notifications", label: "Notifikasi", icon: IconBell },
+    { key: 'profile', label: 'Profil', icon: IconUserCircle },
+    { key: 'security', label: 'Keamanan', icon: IconLock },
+    { key: 'notifications', label: 'Notifikasi', icon: IconBell },
 ];
 
 export default function Edit({ mustVerifyEmail, status, notificationPreferences }) {
-    const [active, setActive] = useState("profile");
+    const [active, setActive] = useState('profile');
     const tabRefs = useRef({});
 
     const focusTab = (index) => {
@@ -24,16 +24,16 @@ export default function Edit({ mustVerifyEmail, status, notificationPreferences 
     };
 
     const onTabKeyDown = (event, index) => {
-        if (event.key === "ArrowRight") {
+        if (event.key === 'ArrowRight') {
             event.preventDefault();
             focusTab(index + 1);
-        } else if (event.key === "ArrowLeft") {
+        } else if (event.key === 'ArrowLeft') {
             event.preventDefault();
             focusTab(index - 1);
-        } else if (event.key === "Home") {
+        } else if (event.key === 'Home') {
             event.preventDefault();
             focusTab(0);
-        } else if (event.key === "End") {
+        } else if (event.key === 'End') {
             event.preventDefault();
             focusTab(TABS.length - 1);
         }
@@ -44,11 +44,11 @@ export default function Edit({ mustVerifyEmail, status, notificationPreferences 
             <Head title="Profil" />
 
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
                     <IconUserCircle size={28} className="text-primary-500" />
                     Profil Saya
                 </h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     Kelola informasi akun, keamanan, dan preferensi Anda.
                 </p>
             </div>
@@ -78,8 +78,8 @@ export default function Edit({ mustVerifyEmail, status, notificationPreferences 
                             onKeyDown={(event) => onTabKeyDown(event, index)}
                             className={`inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 ${
                                 isActive
-                                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"
-                                    : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                                    ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white'
+                                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                             }`}
                         >
                             <Icon size={16} strokeWidth={1.5} />
@@ -94,8 +94,8 @@ export default function Edit({ mustVerifyEmail, status, notificationPreferences 
                     id="profile-panel-profile"
                     role="tabpanel"
                     aria-labelledby="profile-tab-profile"
-                    hidden={active !== "profile"}
-                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6"
+                    hidden={active !== 'profile'}
+                    className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
                 >
                     <UpdateProfileInformationForm
                         mustVerifyEmail={mustVerifyEmail}
@@ -107,8 +107,8 @@ export default function Edit({ mustVerifyEmail, status, notificationPreferences 
                     id="profile-panel-security"
                     role="tabpanel"
                     aria-labelledby="profile-tab-security"
-                    hidden={active !== "security"}
-                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6"
+                    hidden={active !== 'security'}
+                    className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
                 >
                     <UpdatePasswordForm />
 
@@ -121,12 +121,10 @@ export default function Edit({ mustVerifyEmail, status, notificationPreferences 
                     id="profile-panel-notifications"
                     role="tabpanel"
                     aria-labelledby="profile-tab-notifications"
-                    hidden={active !== "notifications"}
-                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6"
+                    hidden={active !== 'notifications'}
+                    className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
                 >
-                    <UpdateNotificationPreferencesForm
-                        preferences={notificationPreferences}
-                    />
+                    <UpdateNotificationPreferencesForm preferences={notificationPreferences} />
                 </div>
             </div>
         </>

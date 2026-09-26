@@ -1,22 +1,22 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, router } from "@inertiajs/react";
-import Table from "@/Components/Dashboard/Table";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import { IconHistory } from "@tabler/icons-react";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, router } from '@inertiajs/react';
+import Table from '@/Components/Dashboard/Table';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import { IconHistory } from '@tabler/icons-react';
 
 const formatDateTime = (value) =>
     value
-        ? new Intl.DateTimeFormat("id-ID", {
-              dateStyle: "medium",
-              timeStyle: "short",
+        ? new Intl.DateTimeFormat('id-ID', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
           }).format(new Date(value))
-        : "-";
+        : '-';
 
 export default function Index({ stockMutations, products, warehouses = [], filters }) {
     const updateFilter = (key, value) => {
         router.get(
-            route("stock-mutations.index"),
+            route('stock-mutations.index'),
             {
                 ...filters,
                 [key]: value,
@@ -33,9 +33,7 @@ export default function Index({ stockMutations, products, warehouses = [], filte
             <Head title="Mutasi Stok" />
 
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    Mutasi Stok
-                </h1>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mutasi Stok</h1>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
                     Histori perubahan stok dari stock opname dan initial stock produk.
                 </p>
@@ -43,10 +41,10 @@ export default function Index({ stockMutations, products, warehouses = [], filte
 
             <div className="mb-4 grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-5">
                 <Select
-                    value={filters.product_id || ""}
-                    onChange={(value) => updateFilter("product_id", value)}
+                    value={filters.product_id || ''}
+                    onChange={(value) => updateFilter('product_id', value)}
                     options={[
-                        { value: "", label: "Semua Produk" },
+                        { value: '', label: 'Semua Produk' },
                         ...products.map((product) => ({
                             value: product.id,
                             label: product.title,
@@ -56,22 +54,22 @@ export default function Index({ stockMutations, products, warehouses = [], filte
                 />
 
                 <Select
-                    value={filters.mutation_type || ""}
-                    onChange={(value) => updateFilter("mutation_type", value)}
+                    value={filters.mutation_type || ''}
+                    onChange={(value) => updateFilter('mutation_type', value)}
                     options={[
-                        { value: "", label: "Semua Tipe" },
-                        { value: "in", label: "In" },
-                        { value: "out", label: "Out" },
-                        { value: "adjustment", label: "Adjustment" },
+                        { value: '', label: 'Semua Tipe' },
+                        { value: 'in', label: 'In' },
+                        { value: 'out', label: 'Out' },
+                        { value: 'adjustment', label: 'Adjustment' },
                     ]}
                     size="sm"
                 />
 
                 <Select
-                    value={filters.warehouse_id || ""}
-                    onChange={(value) => updateFilter("warehouse_id", value)}
+                    value={filters.warehouse_id || ''}
+                    onChange={(value) => updateFilter('warehouse_id', value)}
                     options={[
-                        { value: "", label: "Semua Gudang" },
+                        { value: '', label: 'Semua Gudang' },
                         ...warehouses.map((w) => ({
                             value: w.id,
                             label: `${w.code} — ${w.name}`,
@@ -82,19 +80,15 @@ export default function Index({ stockMutations, products, warehouses = [], filte
 
                 <input
                     type="date"
-                    value={filters.date_from || ""}
-                    onChange={(event) =>
-                        updateFilter("date_from", event.target.value)
-                    }
+                    value={filters.date_from || ''}
+                    onChange={(event) => updateFilter('date_from', event.target.value)}
                     className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                 />
 
                 <input
                     type="date"
-                    value={filters.date_to || ""}
-                    onChange={(event) =>
-                        updateFilter("date_to", event.target.value)
-                    }
+                    value={filters.date_to || ''}
+                    onChange={(event) => updateFilter('date_to', event.target.value)}
                     className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                 />
             </div>
@@ -123,10 +117,12 @@ export default function Index({ stockMutations, products, warehouses = [], filte
                                     <Table.Td>
                                         <div>
                                             <p className="font-medium text-slate-800 dark:text-slate-200">
-                                                {mutation.product?.title || "-"}
+                                                {mutation.product?.title || '-'}
                                             </p>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                {mutation.product?.barcode || mutation.product?.sku || "-"}
+                                                {mutation.product?.barcode ||
+                                                    mutation.product?.sku ||
+                                                    '-'}
                                             </p>
                                         </div>
                                     </Table.Td>
@@ -139,24 +135,24 @@ export default function Index({ stockMutations, products, warehouses = [], filte
                                     <Table.Td>
                                         {mutation.stock_before} → {mutation.stock_after}
                                     </Table.Td>
-                                    <Table.Td>{mutation.warehouse?.name || "-"}</Table.Td>
+                                    <Table.Td>{mutation.warehouse?.name || '-'}</Table.Td>
                                     <Table.Td>
                                         <div>
                                             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                                 {mutation.reference_type}
                                             </p>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                {mutation.notes || "-"}
+                                                {mutation.notes || '-'}
                                             </p>
                                         </div>
                                     </Table.Td>
-                                    <Table.Td>{mutation.creator?.name || "-"}</Table.Td>
+                                    <Table.Td>{mutation.creator?.name || '-'}</Table.Td>
                                     <Table.Td>{formatDateTime(mutation.created_at)}</Table.Td>
                                 </tr>
                             ))
                         ) : (
-                                <Table.Empty
-                                    colSpan={8}
+                            <Table.Empty
+                                colSpan={8}
                                 message={
                                     <div className="text-slate-500 dark:text-slate-400">
                                         Belum ada mutasi stok.
@@ -172,9 +168,7 @@ export default function Index({ stockMutations, products, warehouses = [], filte
                 </Table>
             </Table.Card>
 
-            {stockMutations.last_page > 1 && (
-                <Pagination links={stockMutations.links} />
-            )}
+            {stockMutations.last_page > 1 && <Pagination links={stockMutations.links} />}
         </>
     );
 }

@@ -1,23 +1,23 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import Textarea from "@/Components/Dashboard/TextArea";
-import Button from "@/Components/Dashboard/Button";
-import Select from "@/Components/Dashboard/Select";
-import { IconArrowLeft, IconClipboardCheck } from "@tabler/icons-react";
-import toast from "react-hot-toast";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import Textarea from '@/Components/Dashboard/TextArea';
+import Button from '@/Components/Dashboard/Button';
+import Select from '@/Components/Dashboard/Select';
+import { IconArrowLeft, IconClipboardCheck } from '@tabler/icons-react';
+import toast from 'react-hot-toast';
 
 export default function Create({ warehouses = [] }) {
     const { errors } = usePage().props;
     const { data, setData, post, processing } = useForm({
-        notes: "",
-        warehouse_id: warehouses.length > 0 ? warehouses[0].id : "",
+        notes: '',
+        warehouse_id: warehouses.length > 0 ? warehouses[0].id : '',
     });
 
     const submit = (event) => {
         event.preventDefault();
 
-        post(route("stock-opnames.store"), {
-            onError: () => toast.error("Gagal membuat sesi stock opname"),
+        post(route('stock-opnames.store'), {
+            onError: () => toast.error('Gagal membuat sesi stock opname'),
         });
     };
 
@@ -27,7 +27,7 @@ export default function Create({ warehouses = [] }) {
 
             <div className="mb-6">
                 <Link
-                    href={route("stock-opnames.index")}
+                    href={route('stock-opnames.index')}
                     className="mb-3 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600"
                 >
                     <IconArrowLeft size={16} />
@@ -47,7 +47,7 @@ export default function Create({ warehouses = [] }) {
                         </label>
                         <Select
                             value={data.warehouse_id}
-                            onChange={(value) => setData("warehouse_id", value)}
+                            onChange={(value) => setData('warehouse_id', value)}
                             options={warehouses.map((w) => ({
                                 value: w.id,
                                 label: `${w.code} — ${w.name}`,
@@ -59,7 +59,7 @@ export default function Create({ warehouses = [] }) {
                         label="Catatan Sesi"
                         placeholder="Contoh: opname bulanan gudang depan"
                         value={data.notes}
-                        onChange={(event) => setData("notes", event.target.value)}
+                        onChange={(event) => setData('notes', event.target.value)}
                         errors={errors.notes}
                         rows={5}
                     />
@@ -68,8 +68,8 @@ export default function Create({ warehouses = [] }) {
                         <Button
                             type="submit"
                             icon={<IconClipboardCheck size={18} />}
-                            className="bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                            label={processing ? "Menyimpan..." : "Buat Sesi"}
+                            className="bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600"
+                            label={processing ? 'Menyimpan...' : 'Buat Sesi'}
                             disabled={processing}
                         />
                     </div>

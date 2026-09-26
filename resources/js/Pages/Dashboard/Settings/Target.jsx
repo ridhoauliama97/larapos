@@ -1,28 +1,28 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, useForm, usePage } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
-import Input from "@/Components/Dashboard/Input";
-import toast from "react-hot-toast";
-import { IconTarget, IconDeviceFloppy, IconCoin } from "@tabler/icons-react";
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import Button from '@/Components/Dashboard/Button';
+import Input from '@/Components/Dashboard/Input';
+import toast from 'react-hot-toast';
+import { IconTarget, IconDeviceFloppy, IconCoin } from '@tabler/icons-react';
 
 const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     }).format(value);
 
 export default function Target({ settings }) {
     const { data, setData, post, processing, errors } = useForm({
-        monthly_sales_target: settings?.monthly_sales_target || "",
+        monthly_sales_target: settings?.monthly_sales_target || '',
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route("settings.target.update"), {
+        post(route('settings.target.update'), {
             preserveScroll: true,
-            onSuccess: () => toast.success("Target berhasil disimpan"),
-            onError: () => toast.error("Gagal menyimpan target"),
+            onSuccess: () => toast.success('Target berhasil disimpan'),
+            onError: () => toast.error('Gagal menyimpan target'),
         });
     };
 
@@ -42,17 +42,17 @@ export default function Target({ settings }) {
                 </div>
 
                 {/* Form Card */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
                     <form onSubmit={submit} className="space-y-6">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-xl bg-primary-100 dark:bg-primary-900/30">
+                            <div className="rounded-xl bg-primary-100 p-3 dark:bg-primary-900/30">
                                 <IconTarget
                                     size={24}
                                     className="text-primary-600 dark:text-primary-400"
                                 />
                             </div>
                             <div className="flex-1">
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Target Penjualan Bulanan
                                 </label>
                                 <div className="relative">
@@ -63,21 +63,15 @@ export default function Target({ settings }) {
                                         type="number"
                                         value={data.monthly_sales_target}
                                         onChange={(e) =>
-                                            setData(
-                                                "monthly_sales_target",
-                                                e.target.value
-                                            )
+                                            setData('monthly_sales_target', e.target.value)
                                         }
                                         placeholder="Contoh: 50000000"
-                                        className="w-full h-12 pl-12 pr-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all"
+                                        className="h-12 w-full rounded-xl border-2 border-slate-200 bg-white pl-12 pr-4 text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                     />
                                 </div>
                                 {data.monthly_sales_target > 0 && (
                                     <p className="mt-2 text-sm text-slate-500">
-                                        Target:{" "}
-                                        {formatCurrency(
-                                            data.monthly_sales_target
-                                        )}
+                                        Target: {formatCurrency(data.monthly_sales_target)}
                                     </p>
                                 )}
                                 {errors.monthly_sales_target && (
@@ -88,7 +82,7 @@ export default function Target({ settings }) {
                             </div>
                         </div>
 
-                        <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
                             <Button
                                 type="submit"
                                 variant="primary"
@@ -96,18 +90,17 @@ export default function Target({ settings }) {
                                 className="flex items-center gap-2"
                             >
                                 <IconDeviceFloppy size={18} />
-                                {processing ? "Menyimpan..." : "Simpan Target"}
+                                {processing ? 'Menyimpan...' : 'Simpan Target'}
                             </Button>
                         </div>
                     </form>
                 </div>
 
                 {/* Info */}
-                <div className="bg-primary-50 dark:bg-primary-950/30 rounded-xl p-4 border border-primary-200 dark:border-primary-900">
+                <div className="rounded-xl border border-primary-200 bg-primary-50 p-4 dark:border-primary-900 dark:bg-primary-950/30">
                     <p className="text-sm text-primary-700 dark:text-primary-300">
-                        <strong>Tip:</strong> Target penjualan akan ditampilkan
-                        di Dashboard sebagai progress bar untuk memantau
-                        pencapaian bulanan Anda.
+                        <strong>Tip:</strong> Target penjualan akan ditampilkan di Dashboard sebagai
+                        progress bar untuk memantau pencapaian bulanan Anda.
                     </p>
                 </div>
             </div>

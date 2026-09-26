@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { IconBackspace, IconX, IconCheck } from "@tabler/icons-react";
+import { useState, useEffect, useCallback } from 'react';
+import { IconBackspace, IconX, IconCheck } from '@tabler/icons-react';
 
 /**
  * Numpad Modal for POS - Touch-friendly number input
@@ -17,18 +17,18 @@ export default function NumpadModal({
     isOpen,
     onClose,
     onConfirm,
-    title = "Masukkan Angka",
+    title = 'Masukkan Angka',
     initialValue = 0,
     minValue = 0,
     maxValue = 999999999,
     isCurrency = false,
 }) {
-    const [value, setValue] = useState(String(initialValue || ""));
+    const [value, setValue] = useState(String(initialValue || ''));
 
     // Reset value when modal opens
     useEffect(() => {
         if (isOpen) {
-            setValue(String(initialValue || ""));
+            setValue(String(initialValue || ''));
         }
     }, [isOpen, initialValue]);
 
@@ -37,27 +37,27 @@ export default function NumpadModal({
         if (!isOpen) return;
 
         const handleKeyDown = (e) => {
-            if (e.key >= "0" && e.key <= "9") {
+            if (e.key >= '0' && e.key <= '9') {
                 handleDigit(e.key);
-            } else if (e.key === "Backspace") {
+            } else if (e.key === 'Backspace') {
                 handleBackspace();
-            } else if (e.key === "Enter") {
+            } else if (e.key === 'Enter') {
                 handleConfirm();
-            } else if (e.key === "Escape") {
+            } else if (e.key === 'Escape') {
                 onClose();
-            } else if (e.key === "c" || e.key === "C") {
+            } else if (e.key === 'c' || e.key === 'C') {
                 handleClear();
             }
         };
 
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, value]);
 
     const handleDigit = useCallback(
         (digit) => {
             setValue((prev) => {
-                const newValue = prev === "0" ? digit : prev + digit;
+                const newValue = prev === '0' ? digit : prev + digit;
                 const numValue = parseInt(newValue, 10);
                 if (numValue > maxValue) return prev;
                 return newValue;
@@ -67,11 +67,11 @@ export default function NumpadModal({
     );
 
     const handleBackspace = useCallback(() => {
-        setValue((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0"));
+        setValue((prev) => (prev.length > 1 ? prev.slice(0, -1) : '0'));
     }, []);
 
     const handleClear = useCallback(() => {
-        setValue("0");
+        setValue('0');
     }, []);
 
     const handleConfirm = useCallback(() => {
@@ -96,13 +96,13 @@ export default function NumpadModal({
     const formatDisplay = (val) => {
         const num = parseInt(val, 10) || 0;
         if (isCurrency) {
-            return new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
                 minimumFractionDigits: 0,
             }).format(num);
         }
-        return num.toLocaleString("id-ID");
+        return num.toLocaleString('id-ID');
     };
 
     if (!isOpen) return null;
@@ -113,30 +113,27 @@ export default function NumpadModal({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
 
             {/* Modal */}
-            <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up">
+            <div className="relative w-full max-w-sm animate-slide-up overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-slate-900">
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800">
                     <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
                         {title}
                     </h3>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
                     >
                         <IconX size={20} />
                     </button>
                 </div>
 
                 {/* Display */}
-                <div className="px-5 py-6 bg-slate-50 dark:bg-slate-800/50">
+                <div className="bg-slate-50 px-5 py-6 dark:bg-slate-800/50">
                     <div className="text-right">
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white font-mono">
+                        <p className="font-mono text-3xl font-bold text-slate-900 dark:text-white">
                             {formatDisplay(value)}
                         </p>
                     </div>
@@ -144,12 +141,12 @@ export default function NumpadModal({
 
                 {/* Quick Amounts (for currency mode) */}
                 {isCurrency && (
-                    <div className="grid grid-cols-4 gap-2 px-5 py-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="grid grid-cols-4 gap-2 border-b border-slate-100 px-5 py-3 dark:border-slate-800">
                         {[10000, 20000, 50000, 100000].map((amount) => (
                             <button
                                 key={amount}
                                 onClick={() => handleQuickAmount(amount)}
-                                className="py-2 px-2 text-xs font-medium rounded-xl bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
+                                className="rounded-xl bg-primary-50 px-2 py-2 text-xs font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
                             >
                                 +{amount / 1000}rb
                             </button>
@@ -158,13 +155,13 @@ export default function NumpadModal({
                 )}
 
                 {/* Numpad Grid */}
-                <div className="p-5 grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-3 p-5">
                     {/* Numbers 1-9 */}
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                         <button
                             key={num}
                             onClick={() => handleDigit(String(num))}
-                            className="h-14 text-2xl font-semibold rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                            className="h-14 rounded-2xl bg-slate-100 text-2xl font-semibold text-slate-800 transition-all hover:bg-slate-200 active:scale-95 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                         >
                             {num}
                         </button>
@@ -173,15 +170,15 @@ export default function NumpadModal({
                     {/* Clear */}
                     <button
                         onClick={handleClear}
-                        className="h-14 text-sm font-semibold rounded-2xl bg-warning-100 dark:bg-warning-900/50 text-warning-700 dark:text-warning-400 hover:bg-warning-200 dark:hover:bg-warning-900 active:scale-95 transition-all"
+                        className="h-14 rounded-2xl bg-warning-100 text-sm font-semibold text-warning-700 transition-all hover:bg-warning-200 active:scale-95 dark:bg-warning-900/50 dark:text-warning-400 dark:hover:bg-warning-900"
                     >
                         C
                     </button>
 
                     {/* 0 */}
                     <button
-                        onClick={() => handleDigit("0")}
-                        className="h-14 text-2xl font-semibold rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                        onClick={() => handleDigit('0')}
+                        className="h-14 rounded-2xl bg-slate-100 text-2xl font-semibold text-slate-800 transition-all hover:bg-slate-200 active:scale-95 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
                         0
                     </button>
@@ -189,7 +186,7 @@ export default function NumpadModal({
                     {/* Backspace */}
                     <button
                         onClick={handleBackspace}
-                        className="h-14 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                        className="flex h-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 active:scale-95 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                     >
                         <IconBackspace size={24} />
                     </button>
@@ -200,10 +197,10 @@ export default function NumpadModal({
                     <button
                         onClick={handleConfirm}
                         disabled={!isValid}
-                        className={`w-full h-14 flex items-center justify-center gap-2 text-lg font-semibold rounded-2xl transition-all ${
+                        className={`flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-lg font-semibold transition-all ${
                             isValid
-                                ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl active:scale-[0.98]"
-                                : "bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+                                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl active:scale-[0.98]'
+                                : 'cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-slate-700'
                         }`}
                     >
                         <IconCheck size={22} />

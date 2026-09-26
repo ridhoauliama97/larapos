@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import Table from "@/Components/Dashboard/Table";
-import Pagination from "@/Components/Dashboard/Pagination";
-import Select from "@/Components/Dashboard/Select";
-import { useAuthorization } from "@/Utils/authorization";
+import { useMemo, useState } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import Table from '@/Components/Dashboard/Table';
+import Pagination from '@/Components/Dashboard/Pagination';
+import Select from '@/Components/Dashboard/Select';
+import { useAuthorization } from '@/Utils/authorization';
 import {
     IconCashBanknote,
     IconClockHour4,
@@ -12,21 +12,21 @@ import {
     IconHistory,
     IconPrinter,
     IconUser,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
 const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
+    new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
     }).format(value);
 
 const formatDateTime = (value) => {
-    if (!value) return "-";
+    if (!value) return '-';
 
-    return new Intl.DateTimeFormat("id-ID", {
-        dateStyle: "medium",
-        timeStyle: "short",
+    return new Intl.DateTimeFormat('id-ID', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
     }).format(new Date(value));
 };
 
@@ -39,27 +39,27 @@ export default function Index({
 }) {
     const { auth, errors } = usePage().props;
     const { can } = useAuthorization();
-    const [openingCash, setOpeningCash] = useState("");
-    const [notes, setNotes] = useState("");
-    const [warehouseId, setWarehouseId] = useState(warehouses.length > 0 ? warehouses[0].id : "");
+    const [openingCash, setOpeningCash] = useState('');
+    const [notes, setNotes] = useState('');
+    const [warehouseId, setWarehouseId] = useState(warehouses.length > 0 ? warehouses[0].id : '');
     const [cashModal, setCashModal] = useState(null); // 'in' | 'out' | null
-    const [cashAmount, setCashAmount] = useState("");
-    const [cashNote, setCashNote] = useState("");
-    const canOpenShift = can("cashier-shifts-open");
+    const [cashAmount, setCashAmount] = useState('');
+    const [cashNote, setCashNote] = useState('');
+    const canOpenShift = can('cashier-shifts-open');
 
     const currentFilters = useMemo(
         () => ({
-            cashier_id: filters?.cashier_id || "",
-            status: filters?.status || "",
-            opened_from: filters?.opened_from || "",
-            opened_to: filters?.opened_to || "",
+            cashier_id: filters?.cashier_id || '',
+            status: filters?.status || '',
+            opened_from: filters?.opened_from || '',
+            opened_to: filters?.opened_to || '',
         }),
         [filters]
     );
 
     const handleFilterChange = (key, value) => {
         router.get(
-            route("cashier-shifts.index"),
+            route('cashier-shifts.index'),
             {
                 ...currentFilters,
                 [key]: value,
@@ -82,14 +82,14 @@ export default function Index({
             payload.warehouse_id = warehouseId;
         }
 
-        router.post(route("cashier-shifts.store"), payload);
+        router.post(route('cashier-shifts.store'), payload);
     };
 
     const handleCashMovement = (event) => {
         event.preventDefault();
 
         router.post(
-            route("cashier-shifts.cash-movements.store", activeShift.id),
+            route('cashier-shifts.cash-movements.store', activeShift.id),
             {
                 type: cashModal,
                 amount: Number(cashAmount || 0),
@@ -98,8 +98,8 @@ export default function Index({
             {
                 onSuccess: () => {
                     setCashModal(null);
-                    setCashAmount("");
-                    setCashNote("");
+                    setCashAmount('');
+                    setCashNote('');
                 },
             }
         );
@@ -125,7 +125,7 @@ export default function Index({
                     </div>
                     {activeShift && (
                         <Link
-                            href={route("cashier-shifts.show", activeShift.id)}
+                            href={route('cashier-shifts.show', activeShift.id)}
                             className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/30 transition-colors hover:bg-primary-600"
                         >
                             <IconEye size={18} />
@@ -162,7 +162,9 @@ export default function Index({
                                     placeholder="0"
                                 />
                                 {errors?.opening_cash && (
-                                    <p className="mt-2 text-xs text-rose-500">{errors.opening_cash}</p>
+                                    <p className="mt-2 text-xs text-rose-500">
+                                        {errors.opening_cash}
+                                    </p>
                                 )}
                             </div>
                             <div>
@@ -214,7 +216,8 @@ export default function Index({
                                 {activeShift.user?.name}
                             </p>
                             <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
-                                {activeShift.warehouse?.name || formatDateTime(activeShift.opened_at)}
+                                {activeShift.warehouse?.name ||
+                                    formatDateTime(activeShift.opened_at)}
                             </p>
                             {activeShift.warehouse && (
                                 <p className="text-xs text-emerald-600 dark:text-emerald-400">
@@ -251,11 +254,11 @@ export default function Index({
                                 type="button"
                                 onClick={() =>
                                     window.open(
-                                        route("cashier-shifts.report", {
+                                        route('cashier-shifts.report', {
                                             cashierShift: activeShift.id,
-                                            type: "x",
+                                            type: 'x',
                                         }),
-                                        "_blank"
+                                        '_blank'
                                     )
                                 }
                                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -265,7 +268,7 @@ export default function Index({
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setCashModal("in")}
+                                onClick={() => setCashModal('in')}
                                 className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 px-4 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:border-emerald-900/50 dark:text-emerald-300 dark:hover:bg-emerald-950/30"
                             >
                                 <IconCashBanknote size={18} />
@@ -273,7 +276,7 @@ export default function Index({
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setCashModal("out")}
+                                onClick={() => setCashModal('out')}
                                 className="inline-flex items-center gap-2 rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-300 dark:hover:bg-rose-950/30"
                             >
                                 <IconCashBanknote size={18} />
@@ -294,7 +297,7 @@ export default function Index({
                             className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900"
                         >
                             <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                                {cashModal === "in" ? "Catat Kas Masuk" : "Catat Kas Keluar"}
+                                {cashModal === 'in' ? 'Catat Kas Masuk' : 'Catat Kas Keluar'}
                             </h3>
                             <div className="mt-4 space-y-3">
                                 <div>
@@ -322,9 +325,9 @@ export default function Index({
                                         onChange={(event) => setCashNote(event.target.value)}
                                         className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                         placeholder={
-                                            cashModal === "in"
-                                                ? "Misal: setoran tambahan modal"
-                                                : "Misal: beli galon, kirim uang ke kasir pusat"
+                                            cashModal === 'in'
+                                                ? 'Misal: setoran tambahan modal'
+                                                : 'Misal: beli galon, kirim uang ke kasir pusat'
                                         }
                                         maxLength={255}
                                     />
@@ -341,9 +344,9 @@ export default function Index({
                                 <button
                                     type="submit"
                                     className={`flex-1 rounded-xl py-2.5 text-sm font-medium text-white transition-colors ${
-                                        cashModal === "in"
-                                            ? "bg-emerald-500 hover:bg-emerald-600"
-                                            : "bg-rose-500 hover:bg-rose-600"
+                                        cashModal === 'in'
+                                            ? 'bg-emerald-500 hover:bg-emerald-600'
+                                            : 'bg-rose-500 hover:bg-rose-600'
                                     }`}
                                 >
                                     Simpan
@@ -360,9 +363,9 @@ export default function Index({
                     {cashiers.length > 1 ? (
                         <Select
                             value={currentFilters.cashier_id}
-                            onChange={(value) => handleFilterChange("cashier_id", value)}
+                            onChange={(value) => handleFilterChange('cashier_id', value)}
                             options={[
-                                { value: "", label: "Semua Kasir" },
+                                { value: '', label: 'Semua Kasir' },
                                 ...cashiers.map((cashier) => ({
                                     value: cashier.id,
                                     label: cashier.name,
@@ -378,109 +381,114 @@ export default function Index({
                     )}
                     <Select
                         value={currentFilters.status}
-                        onChange={(value) => handleFilterChange("status", value)}
+                        onChange={(value) => handleFilterChange('status', value)}
                         options={[
-                            { value: "", label: "Semua Status" },
-                            { value: "open", label: "Open" },
-                            { value: "closed", label: "Closed" },
-                            { value: "force_closed", label: "Force Closed" },
+                            { value: '', label: 'Semua Status' },
+                            { value: 'open', label: 'Open' },
+                            { value: 'closed', label: 'Closed' },
+                            { value: 'force_closed', label: 'Force Closed' },
                         ]}
                         size="sm"
                     />
                     <input
                         type="date"
                         value={currentFilters.opened_from}
-                        onChange={(event) => handleFilterChange("opened_from", event.target.value)}
+                        onChange={(event) => handleFilterChange('opened_from', event.target.value)}
                         className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                     />
                     <input
                         type="date"
                         value={currentFilters.opened_to}
-                        onChange={(event) => handleFilterChange("opened_to", event.target.value)}
+                        onChange={(event) => handleFilterChange('opened_to', event.target.value)}
                         className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                     />
                 </div>
 
                 <div data-tour="shifts-history">
                     <Table.Card title="Histori Shift Kasir">
-                    <Table>
-                        <Table.Thead>
-                            <tr>
-                                <Table.Th>Kasir</Table.Th>
-                                <Table.Th>Status</Table.Th>
-                                <Table.Th>Buka</Table.Th>
-                                <Table.Th>Tutup</Table.Th>
-                                <Table.Th>Expected Cash</Table.Th>
-                                <Table.Th>Selisih</Table.Th>
-                                <Table.Th className="w-24 text-center">Aksi</Table.Th>
-                            </tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                            {shifts.data.length > 0 ? (
-                                shifts.data.map((shift) => (
-                                    <tr key={shift.id} className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                                        <Table.Td>
-                                            <div>
-                                                <p className="font-semibold text-slate-800 dark:text-slate-200">
-                                                    {shift.user?.name || "-"}
-                                                </p>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                    Modal {formatCurrency(shift.opening_cash)}
-                                                </p>
+                        <Table>
+                            <Table.Thead>
+                                <tr>
+                                    <Table.Th>Kasir</Table.Th>
+                                    <Table.Th>Status</Table.Th>
+                                    <Table.Th>Buka</Table.Th>
+                                    <Table.Th>Tutup</Table.Th>
+                                    <Table.Th>Expected Cash</Table.Th>
+                                    <Table.Th>Selisih</Table.Th>
+                                    <Table.Th className="w-24 text-center">Aksi</Table.Th>
+                                </tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                                {shifts.data.length > 0 ? (
+                                    shifts.data.map((shift) => (
+                                        <tr
+                                            key={shift.id}
+                                            className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                        >
+                                            <Table.Td>
+                                                <div>
+                                                    <p className="font-semibold text-slate-800 dark:text-slate-200">
+                                                        {shift.user?.name || '-'}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        Modal {formatCurrency(shift.opening_cash)}
+                                                    </p>
+                                                </div>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <span
+                                                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                                                        shift.status === 'open'
+                                                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                                            : shift.status === 'force_closed'
+                                                              ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
+                                                              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                                    }`}
+                                                >
+                                                    {shift.status === 'open'
+                                                        ? 'Open'
+                                                        : shift.status === 'force_closed'
+                                                          ? 'Force Closed'
+                                                          : 'Closed'}
+                                                </span>
+                                            </Table.Td>
+                                            <Table.Td>{formatDateTime(shift.opened_at)}</Table.Td>
+                                            <Table.Td>{formatDateTime(shift.closed_at)}</Table.Td>
+                                            <Table.Td>
+                                                {formatCurrency(shift.expected_cash)}
+                                            </Table.Td>
+                                            <Table.Td>
+                                                {shift.cash_difference === null
+                                                    ? '-'
+                                                    : formatCurrency(shift.cash_difference)}
+                                            </Table.Td>
+                                            <Table.Td className="text-center">
+                                                <Link
+                                                    href={route('cashier-shifts.show', shift.id)}
+                                                    className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-600 transition hover:border-primary-300 hover:text-primary-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-primary-700 dark:hover:text-primary-400"
+                                                >
+                                                    <IconEye size={18} />
+                                                </Link>
+                                            </Table.Td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <Table.Empty
+                                        colSpan={7}
+                                        message={
+                                            <div className="text-slate-500 dark:text-slate-400">
+                                                Belum ada histori shift kasir.
                                             </div>
-                                        </Table.Td>
-                                        <Table.Td>
-                                            <span
-                                                className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                                                    shift.status === "open"
-                                                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
-                                                        : shift.status === "force_closed"
-                                                          ? "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
-                                                          : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                                                }`}
-                                            >
-                                                {shift.status === "open"
-                                                    ? "Open"
-                                                    : shift.status === "force_closed"
-                                                      ? "Force Closed"
-                                                      : "Closed"}
-                                            </span>
-                                        </Table.Td>
-                                        <Table.Td>{formatDateTime(shift.opened_at)}</Table.Td>
-                                        <Table.Td>{formatDateTime(shift.closed_at)}</Table.Td>
-                                        <Table.Td>{formatCurrency(shift.expected_cash)}</Table.Td>
-                                        <Table.Td>
-                                            {shift.cash_difference === null
-                                                ? "-"
-                                                : formatCurrency(shift.cash_difference)}
-                                        </Table.Td>
-                                        <Table.Td className="text-center">
-                                            <Link
-                                                href={route("cashier-shifts.show", shift.id)}
-                                                className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-600 transition hover:border-primary-300 hover:text-primary-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-primary-700 dark:hover:text-primary-400"
-                                            >
-                                                <IconEye size={18} />
-                                            </Link>
-                                        </Table.Td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <Table.Empty
-                                    colSpan={7}
-                                    message={
-                                        <div className="text-slate-500 dark:text-slate-400">
-                                            Belum ada histori shift kasir.
+                                        }
+                                    >
+                                        <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                                            <IconClockHour4 size={28} className="text-slate-400" />
                                         </div>
-                                    }
-                                >
-                                    <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                                        <IconClockHour4 size={28} className="text-slate-400" />
-                                    </div>
-                                </Table.Empty>
-                            )}
-                        </Table.Tbody>
-                    </Table>
-                </Table.Card>
+                                    </Table.Empty>
+                                )}
+                            </Table.Tbody>
+                        </Table>
+                    </Table.Card>
                 </div>
 
                 {shifts.last_page > 1 && <Pagination links={shifts.links} />}

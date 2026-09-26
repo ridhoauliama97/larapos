@@ -1,12 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, usePage } from "@inertiajs/react";
-import {
-    IconChevronDown,
-    IconChevronUp,
-    IconCornerDownRight,
-} from "@tabler/icons-react";
-import { isSuperAdmin } from "@/Utils/authorization";
-import { isActiveUrl } from "@/Utils/activeUrl";
+import { useEffect, useMemo, useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
+import { IconChevronDown, IconChevronUp, IconCornerDownRight } from '@tabler/icons-react';
+import { isSuperAdmin } from '@/Utils/authorization';
+import { isActiveUrl } from '@/Utils/activeUrl';
 
 export default function LinkItemDropdown({ icon, title, data, access, sidebarOpen, ...props }) {
     const { url } = usePage();
@@ -37,8 +33,8 @@ export default function LinkItemDropdown({ icon, title, data, access, sidebarOpe
     }
 
     const accentState = childActive
-        ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300"
-        : "border-transparent text-slate-500 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-transparent dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200";
+        ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
+        : 'border-transparent text-slate-500 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-transparent dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200';
 
     const buttonClass = sidebarOpen
         ? `min-w-full flex items-center justify-between gap-x-3.5 rounded-r-lg border-l-[3px] px-4 py-2.5 text-sm font-medium capitalize transition-all duration-200 hover:cursor-pointer ${accentState}`
@@ -46,7 +42,11 @@ export default function LinkItemDropdown({ icon, title, data, access, sidebarOpe
 
     return (
         <>
-            <button className={buttonClass} onClick={() => setIsOpen(!isOpen)} aria-expanded={isOpen}>
+            <button
+                className={buttonClass}
+                onClick={() => setIsOpen(!isOpen)}
+                aria-expanded={isOpen}
+            >
                 {sidebarOpen ? (
                     <>
                         <div className="flex items-center gap-x-3.5">
@@ -74,7 +74,7 @@ export default function LinkItemDropdown({ icon, title, data, access, sidebarOpe
                         <Link
                             key={index}
                             href={item.href}
-                            aria-current={isActive ? "page" : undefined}
+                            aria-current={isActive ? 'page' : undefined}
                             onClick={() => {
                                 // Collapse submenu after navigating on mobile
                                 if (window.innerWidth < 768) {
@@ -83,12 +83,12 @@ export default function LinkItemDropdown({ icon, title, data, access, sidebarOpe
                             }}
                             className={`rounded-r-lg border-l-[3px] transition-all duration-200 ${
                                 sidebarOpen
-                                    ? "flex min-w-full items-center gap-x-3.5 px-5 py-2.5 text-sm font-medium capitalize hover:cursor-pointer line-clamp-1"
-                                    : "flex min-w-full items-center justify-center py-3 hover:cursor-pointer"
+                                    ? 'line-clamp-1 flex min-w-full items-center gap-x-3.5 px-5 py-2.5 text-sm font-medium capitalize hover:cursor-pointer'
+                                    : 'flex min-w-full items-center justify-center py-3 hover:cursor-pointer'
                             } ${
                                 isActive
-                                    ? "border-primary-500 bg-primary-50 font-semibold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300"
-                                    : "border-transparent text-slate-500 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-transparent dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                    ? 'border-primary-500 bg-primary-50 font-semibold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
+                                    : 'border-transparent text-slate-500 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-transparent dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200'
                             }`}
                             {...props}
                         >
@@ -98,7 +98,7 @@ export default function LinkItemDropdown({ icon, title, data, access, sidebarOpe
                                         size={18}
                                         strokeWidth={1.5}
                                         className="shrink-0"
-                                    />{" "}
+                                    />{' '}
                                     {item.title}
                                 </>
                             ) : (

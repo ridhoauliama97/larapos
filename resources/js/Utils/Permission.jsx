@@ -1,4 +1,4 @@
-import { canAny, isSuperAdmin } from "./authorization";
+import { canAny, isSuperAdmin } from './authorization';
 
 /**
  * Pure permission check — deliberately NOT a hook.
