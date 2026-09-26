@@ -87,7 +87,11 @@ export default function Index({ tables, areas, filters }) {
     const dragItem = useRef(null);
     const svgRef = useRef(null);
 
-    const { data, setData, post, patch, processing, errors, reset } = useForm({
+    // Function initializer: Inertia reassigns `defaults` to the last submitted
+    // payload after every successful submit, so `reset()` would refill the form with
+    // whatever was just saved. Only a function initializer makes `reset()` return
+    // the pristine values.
+    const { data, setData, post, patch, processing, errors, reset } = useForm(() => ({
         dine_area_id: '',
         name: '',
         capacity: 4,
@@ -96,7 +100,7 @@ export default function Index({ tables, areas, filters }) {
         pos_y: 0,
         sort_order: 0,
         is_active: true,
-    });
+    }));
 
     const gridWidth = 25;
     const gridHeight = 15;
@@ -131,15 +135,14 @@ export default function Index({ tables, areas, filters }) {
 
     const openCreate = () => {
         setEditingTable(null);
-        reset({
+        // `reset` takes field *names* and copies them from the defaults — passing an
+        // object of values is silently a no-op, which left the previous edit's values
+        // in the form. No args restores the defaults; `setData` then applies the two
+        // fields that are intentionally not the default.
+        reset();
+        setData({
             dine_area_id: filterArea || (areas[0]?.id ?? ''),
-            name: '',
-            capacity: 4,
-            shape: 'square',
-            pos_x: 0,
-            pos_y: 0,
             sort_order: tables.length,
-            is_active: true,
         });
         setModalOpen(true);
     };

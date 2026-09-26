@@ -17,15 +17,24 @@ export default function Index({ areas }) {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingArea, setEditingArea] = useState(null);
-    const { data, setData, post, patch, processing, errors, reset } = useForm({
+    // Function initializer: Inertia reassigns `defaults` to the last submitted
+    // payload after every successful submit, so `reset()` would refill the form with
+    // whatever was just saved. Only a function initializer makes `reset()` return
+    // the pristine values.
+    const { data, setData, post, patch, processing, errors, reset } = useForm(() => ({
         name: '',
         sort_order: 0,
         is_active: true,
-    });
+    }));
 
     const openCreate = () => {
         setEditingArea(null);
-        reset({ name: '', sort_order: areas.length, is_active: true });
+        // `reset` takes field *names* and copies them from the defaults — passing an
+        // object of values is silently a no-op, which left the previous edit's values
+        // in the form. No args restores the defaults; `setData` then applies the one
+        // field that is intentionally not the default.
+        reset();
+        setData('sort_order', areas.length);
         setModalOpen(true);
     };
 
