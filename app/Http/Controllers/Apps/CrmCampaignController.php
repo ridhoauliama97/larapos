@@ -157,16 +157,22 @@ class CrmCampaignController extends Controller
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', Rule::in([
-                CustomerCampaign::TYPE_PROMO_BROADCAST,
-                CustomerCampaign::TYPE_INVOICE_SHARE,
-                CustomerCampaign::TYPE_DUE_DATE_REMINDER,
-                CustomerCampaign::TYPE_REPEAT_ORDER_REMINDER,
-            ])],
-            'channel' => ['required', Rule::in([
-                CustomerCampaign::CHANNEL_INTERNAL,
-                CustomerCampaign::CHANNEL_WHATSAPP_LINK,
-            ])],
+            'type' => [
+                'required',
+                Rule::in([
+                    CustomerCampaign::TYPE_PROMO_BROADCAST,
+                    CustomerCampaign::TYPE_INVOICE_SHARE,
+                    CustomerCampaign::TYPE_DUE_DATE_REMINDER,
+                    CustomerCampaign::TYPE_REPEAT_ORDER_REMINDER,
+                ]),
+            ],
+            'channel' => [
+                'required',
+                Rule::in([
+                    CustomerCampaign::CHANNEL_INTERNAL,
+                    CustomerCampaign::CHANNEL_WHATSAPP_LINK,
+                ]),
+            ],
             'message_template' => ['nullable', 'string', 'max:4000'],
             'audience_filters' => ['nullable', 'array'],
             'audience_filters.segment_ids' => ['nullable', 'array'],

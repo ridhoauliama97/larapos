@@ -244,34 +244,46 @@ class PricingRuleController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'kind' => ['required', Rule::in([
-                PricingRule::KIND_STANDARD_DISCOUNT,
-                PricingRule::KIND_QTY_BREAK,
-                PricingRule::KIND_BUNDLE_PRICE,
-                PricingRule::KIND_BUY_X_GET_Y,
-            ])],
+            'kind' => [
+                'required',
+                Rule::in([
+                    PricingRule::KIND_STANDARD_DISCOUNT,
+                    PricingRule::KIND_QTY_BREAK,
+                    PricingRule::KIND_BUNDLE_PRICE,
+                    PricingRule::KIND_BUY_X_GET_Y,
+                ]),
+            ],
             'is_active' => ['nullable', 'boolean'],
             'priority' => ['required', 'integer', 'min:0'],
-            'target_type' => ['required', Rule::in([
-                PricingRule::TARGET_ALL,
-                PricingRule::TARGET_PRODUCT,
-                PricingRule::TARGET_CATEGORY,
-            ])],
+            'target_type' => [
+                'required',
+                Rule::in([
+                    PricingRule::TARGET_ALL,
+                    PricingRule::TARGET_PRODUCT,
+                    PricingRule::TARGET_CATEGORY,
+                ]),
+            ],
             'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
-            'customer_scope' => ['required', Rule::in([
-                PricingRule::SCOPE_ALL,
-                PricingRule::SCOPE_WALK_IN,
-                PricingRule::SCOPE_REGISTERED,
-                PricingRule::SCOPE_MEMBER,
-            ])],
+            'customer_scope' => [
+                'required',
+                Rule::in([
+                    PricingRule::SCOPE_ALL,
+                    PricingRule::SCOPE_WALK_IN,
+                    PricingRule::SCOPE_REGISTERED,
+                    PricingRule::SCOPE_MEMBER,
+                ]),
+            ],
             'eligible_loyalty_tiers' => ['nullable', 'array'],
             'eligible_loyalty_tiers.*' => ['string', Rule::in(array_keys($this->loyaltyService->tiers()))],
-            'discount_type' => ['required', Rule::in([
-                PricingRule::TYPE_PERCENTAGE,
-                PricingRule::TYPE_FIXED_AMOUNT,
-                PricingRule::TYPE_FIXED_PRICE,
-            ])],
+            'discount_type' => [
+                'required',
+                Rule::in([
+                    PricingRule::TYPE_PERCENTAGE,
+                    PricingRule::TYPE_FIXED_AMOUNT,
+                    PricingRule::TYPE_FIXED_PRICE,
+                ]),
+            ],
             'discount_value' => ['required', 'numeric', 'min:0.01'],
             'preview_quantity_multiplier' => ['nullable', 'integer', 'min:1'],
             'starts_at' => ['nullable', 'date'],
@@ -279,11 +291,14 @@ class PricingRuleController extends Controller
             'notes' => ['nullable', 'string', 'max:1000'],
             'qty_breaks' => ['nullable', 'array'],
             'qty_breaks.*.min_qty' => ['required_with:qty_breaks', 'integer', 'min:1'],
-            'qty_breaks.*.discount_type' => ['required_with:qty_breaks', Rule::in([
-                PricingRule::TYPE_PERCENTAGE,
-                PricingRule::TYPE_FIXED_AMOUNT,
-                PricingRule::TYPE_FIXED_PRICE,
-            ])],
+            'qty_breaks.*.discount_type' => [
+                'required_with:qty_breaks',
+                Rule::in([
+                    PricingRule::TYPE_PERCENTAGE,
+                    PricingRule::TYPE_FIXED_AMOUNT,
+                    PricingRule::TYPE_FIXED_PRICE,
+                ]),
+            ],
             'qty_breaks.*.discount_value' => ['required_with:qty_breaks', 'numeric', 'min:0.01'],
             'qty_breaks.*.sort_order' => ['nullable', 'integer', 'min:0'],
             'bundle_items' => ['nullable', 'array'],
@@ -292,10 +307,13 @@ class PricingRuleController extends Controller
             'bundle_items.*.sort_order' => ['nullable', 'integer', 'min:0'],
             'buy_get_items' => ['nullable', 'array'],
             'buy_get_items.*.product_id' => ['required_with:buy_get_items', 'integer', 'exists:products,id'],
-            'buy_get_items.*.role' => ['required_with:buy_get_items', Rule::in([
-                PricingRuleBuyGetItem::ROLE_BUY,
-                PricingRuleBuyGetItem::ROLE_GET,
-            ])],
+            'buy_get_items.*.role' => [
+                'required_with:buy_get_items',
+                Rule::in([
+                    PricingRuleBuyGetItem::ROLE_BUY,
+                    PricingRuleBuyGetItem::ROLE_GET,
+                ]),
+            ],
             'buy_get_items.*.quantity' => ['required_with:buy_get_items', 'integer', 'min:1'],
             'buy_get_items.*.sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
