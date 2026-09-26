@@ -13,11 +13,13 @@ import Select from "@/Components/Dashboard/Select";
  * disabled states, and wraps gracefully on mobile.
  */
 export default function Pagination({ links }) {
-    if (!links || links.length <= 3) return null;
-
+    // Hooks must run unconditionally, so perPage is initialised before the
+    // short-circuit below. Reading it in useState is a one-time read of the URL.
     const [perPage, setPerPage] = useState(
         () => new URLSearchParams(window.location.search).get("per_page") || "10"
     );
+
+    if (!links || links.length <= 3) return null;
 
     const changePerPage = (value) => {
         setPerPage(value);
