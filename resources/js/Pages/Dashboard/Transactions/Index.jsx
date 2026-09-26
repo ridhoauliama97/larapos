@@ -650,13 +650,21 @@ export default function Index({
                     qty: Number(item.qty),
                 })),
             };
-            queueTransaction(payload).then(() => {
-                refreshPendingCount();
-                setCarts([]);
-                setPricingPreview(initialPricingPreview);
-                toast.success("Transaksi disimpan offline. Akan dikirim saat online.");
-            });
-            setIsSubmitting(false);
+            // `carts` is an Inertia prop (server-side cart), not local state, so it
+            // cannot be cleared here while offline. The server clears it when the
+            // queue flushes and the page reloads carts (see the sync effect above).
+            queueTransaction(payload)
+                .then(() => {
+                    refreshPendingCount();
+                    setPricingPreview(initialPricingPreview);
+                    toast.success(
+                        "Transaksi disimpan offline. Keranjang akan kosong setelah tersinkronisasi."
+                    );
+                })
+                .catch(() => {
+                    toast.error("Gagal menyimpan transaksi offline. Coba lagi.");
+                })
+                .finally(() => setIsSubmitting(false));
             return;
         }
 
