@@ -46,6 +46,13 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
         ]);
 
+        // The POS page is a session-authenticated web page, but offline sync posts
+        // to /api/v1/pos/transactions/sync. Without this, auth:sanctum only accepts
+        // a Bearer token, so the browser's session cookie was rejected with 401 and
+        // queued offline sales were stranded in IndexedDB forever. Sanctum falls back
+        // to the session for the hosts in config/sanctum.php 'stateful'.
+        $middleware->statefulApi();
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,

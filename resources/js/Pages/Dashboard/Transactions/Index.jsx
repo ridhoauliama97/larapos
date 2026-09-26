@@ -451,16 +451,33 @@ export default function Index({
         const pending = await getPendingTransactions();
         if (pending.length === 0) return;
 
-        const { data } = await axios.post(
-            '/api/v1/pos/transactions/sync',
-            {
-                transactions: pending.map((row) => ({
-                    ...row.data,
-                    queue_id: row.id,
-                })),
-            },
-            { headers: { Accept: 'application/json' } }
-        );
+        let data;
+        try {
+            const res = await axios.post(
+                '/api/v1/pos/transactions/sync',
+                {
+                    transactions: pending.map((row) => ({
+                        ...row.data,
+                        queue_id: row.id,
+                    })),
+                },
+                { headers: { Accept: 'application/json' } }
+            );
+            data = res.data;
+        } catch (e) {
+            // Previously unhandled: the rejection escaped, so a 401/500 left the
+            // queue stranded with no message and it retried silently on every load.
+            // Keep the rows and tell the cashier the sync is still pending.
+            const status = e.response?.status;
+            toast.error(
+                status === 401 || status === 403
+                    ? 'Sinkronisasi ditolak. Sesi mungkin kedaluwarsa — silakan muat ulang halaman.'
+                    : `Sinkronisasi gagal (${status ?? 'jaringan'}). ${pending.length} transaksi masih tersimpan dan akan dicoba lagi.`,
+                { duration: 8000 }
+            );
+            await refreshPendingCount();
+            return;
+        }
 
         const results = data?.data?.results || [];
         let synced = 0;
