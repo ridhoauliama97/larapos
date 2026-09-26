@@ -25,8 +25,10 @@ class DineTableController extends Controller
             $query->where('is_active', true);
         }
 
-        $tables = $query->orderBy('dine_area_id')->orderBy('sort_order')->get();
-        $areas = DineArea::orderBy('sort_order')->get();
+        // `name` breaks ties so equal sort_order values cannot reshuffle between
+        // requests — mirrors the `code` tie-break the warehouse queries use.
+        $tables = $query->orderBy('dine_area_id')->orderBy('sort_order')->orderBy('name')->get();
+        $areas = DineArea::orderBy('sort_order')->orderBy('name')->get();
 
         return Inertia::render('Dashboard/DineIn/Tables/Index', [
             'tables' => $tables,
