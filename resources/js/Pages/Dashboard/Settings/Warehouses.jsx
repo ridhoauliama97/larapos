@@ -1,55 +1,52 @@
-import { useEffect, useState } from 'react';
-import { Head, usePage, router } from '@inertiajs/react';
+import { useState } from 'react';
+import { Head, router, useForm } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { IconBuildingWarehouse, IconPlus, IconPencil, IconTrash } from '@tabler/icons-react';
 import toast from 'react-hot-toast';
 import { useAuthorization } from '@/Utils/authorization';
+import Button from '@/Components/Dashboard/Button';
+import Drawer from '@/Components/Dashboard/Drawer';
 import Input from '@/Components/Dashboard/Input';
 import Select from '@/Components/Dashboard/Select';
 
+const blankWarehouse = {
+    code: '',
+    name: '',
+    type: 'branch',
+    address: '',
+    phone: '',
+    is_active: true,
+    sort_order: 0,
+};
+
 export default function Warehouses({ warehouses = [] }) {
-    const { flash } = usePage().props;
     const { can } = useAuthorization();
     const canCreate = can('warehouses-create');
     const canUpdate = can('warehouses-update');
     const canDelete = can('warehouses-delete');
 
-    const [showForm, setShowForm] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
     const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState({
-        code: '',
-        name: '',
-        type: 'branch',
-        address: '',
-        phone: '',
-        is_active: true,
-        sort_order: 0,
-    });
-    const [errors, setErrors] = useState({});
+    // Function initializer, not a plain object: Inertia reassigns `defaults` to the
+    // last submitted payload after every successful submit, so `reset()` would refill
+    // the form with whatever was just saved. Only a function initializer makes
+    // `reset()` return the pristine values.
+    const { data, setData, post, put, processing, errors, reset } = useForm(() => ({
+        ...blankWarehouse,
+    }));
 
-    useEffect(() => {
-        if (flash?.success) toast.success(flash.success);
-        if (flash?.error) toast.error(flash.error);
-    }, [flash]);
-
-    const resetForm = () => {
-        setForm({
-            code: '',
-            name: '',
-            type: 'branch',
-            address: '',
-            phone: '',
-            is_active: true,
-            sort_order: 0,
-        });
-        setErrors({});
+    const openCreate = () => {
         setEditing(null);
-        setShowForm(false);
+        // `reset` takes field *names* and copies them from the defaults — passing an
+        // object of values is silently a no-op. No args restores the blank defaults.
+        reset();
+        setDrawerOpen(true);
     };
 
     const openEdit = (w) => {
         setEditing(w);
-        setForm({
+        // `setData` is the one that accepts an object of new values.
+        setData({
             code: w.code,
             name: w.name,
             type: w.type,
@@ -58,30 +55,30 @@ export default function Warehouses({ warehouses = [] }) {
             is_active: w.is_active,
             sort_order: w.sort_order,
         });
-        setErrors({});
-        setShowForm(true);
+        setDrawerOpen(true);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrors({});
+        const onSuccess = () => {
+            toast.success(editing ? 'Gudang berhasil diperbarui.' : 'Gudang berhasil ditambahkan.');
+            setDrawerOpen(false);
+        };
+        const onError = () => toast.error('Gagal menyimpan gudang.');
 
         if (editing) {
-            router.put(route('settings.warehouses.update', editing.id), form, {
-                onError: (err) => setErrors(err),
-                onSuccess: () => resetForm(),
-            });
+            put(route('settings.warehouses.update', editing.id), { onSuccess, onError });
         } else {
-            router.post(route('settings.warehouses.store'), form, {
-                onError: (err) => setErrors(err),
-                onSuccess: () => resetForm(),
-            });
+            post(route('settings.warehouses.store'), { onSuccess, onError });
         }
     };
 
     const handleDelete = (w) => {
         if (!confirm(`Hapus gudang ${w.name}?`)) return;
-        router.delete(route('settings.warehouses.destroy', w.id));
+        router.delete(route('settings.warehouses.destroy', w.id), {
+            onSuccess: () => toast.success('Gudang berhasil dihapus.'),
+            onError: () => toast.error('Gagal menghapus gudang.'),
+        });
     };
 
     const typeLabel = (type) => {
@@ -120,10 +117,7 @@ export default function Warehouses({ warehouses = [] }) {
                         </h3>
                         {canCreate && (
                             <button
-                                onClick={() => {
-                                    resetForm();
-                                    setShowForm(true);
-                                }}
+                                onClick={openCreate}
                                 className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
                             >
                                 <IconPlus size={18} />
@@ -198,124 +192,95 @@ export default function Warehouses({ warehouses = [] }) {
                         </div>
                     )}
                 </div>
-
-                {showForm && (
-                    <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-                        <h3 className="font-semibold text-slate-800 dark:text-white">
-                            {editing ? 'Edit Gudang' : 'Tambah Gudang Baru'}
-                        </h3>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                <Input
-                                    label="Kode"
-                                    placeholder="WH-002"
-                                    value={form.code}
-                                    onChange={(e) => setForm({ ...form, code: e.target.value })}
-                                    errors={errors.code}
-                                    disabled={!!editing}
-                                />
-                                <Input
-                                    label="Nama Gudang"
-                                    placeholder="Gudang Cabang A"
-                                    value={form.name}
-                                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                    errors={errors.name}
-                                />
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                                        Tipe
-                                    </label>
-                                    <Select
-                                        value={form.type}
-                                        onChange={(value) => setForm({ ...form, type: value })}
-                                        options={[
-                                            { value: 'branch', label: 'Cabang' },
-                                            { value: 'warehouse', label: 'Gudang' },
-                                        ]}
-                                        error={errors.type}
-                                        className="w-full"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                                        Alamat
-                                    </label>
-                                    <textarea
-                                        value={form.address}
-                                        onChange={(e) =>
-                                            setForm({ ...form, address: e.target.value })
-                                        }
-                                        className="h-20 w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                                    />
-                                    {errors.address && (
-                                        <p className="mt-1 text-xs text-danger-500">
-                                            {errors.address}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="space-y-4">
-                                    <Input
-                                        label="Telepon"
-                                        placeholder="021-12345678"
-                                        value={form.phone}
-                                        onChange={(e) =>
-                                            setForm({ ...form, phone: e.target.value })
-                                        }
-                                        errors={errors.phone}
-                                    />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Input
-                                            label="Urutan"
-                                            type="number"
-                                            value={form.sort_order}
-                                            onChange={(e) =>
-                                                setForm({
-                                                    ...form,
-                                                    sort_order: parseInt(e.target.value) || 0,
-                                                })
-                                            }
-                                            errors={errors.sort_order}
-                                        />
-                                        <div className="flex items-end pb-2">
-                                            <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={form.is_active}
-                                                    onChange={(e) =>
-                                                        setForm({
-                                                            ...form,
-                                                            is_active: e.target.checked,
-                                                        })
-                                                    }
-                                                    className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600"
-                                                />
-                                                Aktif
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="submit"
-                                    className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600"
-                                >
-                                    {editing ? 'Update' : 'Simpan'}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={resetForm}
-                                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-                                >
-                                    Batal
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                )}
             </div>
+
+            <Drawer
+                show={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                title={editing ? 'Edit Gudang' : 'Tambah Gudang'}
+            >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input
+                        label="Kode"
+                        placeholder="WH-002"
+                        value={data.code}
+                        onChange={(e) => setData('code', e.target.value)}
+                        errors={errors.code}
+                        disabled={!!editing}
+                    />
+                    <Input
+                        label="Nama Gudang"
+                        placeholder="Gudang Cabang A"
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        errors={errors.name}
+                    />
+                    <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Tipe
+                        </label>
+                        <Select
+                            value={data.type}
+                            onChange={(value) => setData('type', value)}
+                            options={[
+                                { value: 'branch', label: 'Cabang' },
+                                { value: 'warehouse', label: 'Gudang' },
+                            ]}
+                            error={errors.type}
+                            className="w-full"
+                        />
+                    </div>
+                    <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Alamat
+                        </label>
+                        <textarea
+                            value={data.address}
+                            onChange={(e) => setData('address', e.target.value)}
+                            className="h-20 w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                        />
+                        {errors.address && (
+                            <p className="mt-1 text-xs text-danger-500">{errors.address}</p>
+                        )}
+                    </div>
+                    <Input
+                        label="Telepon"
+                        placeholder="021-12345678"
+                        value={data.phone}
+                        onChange={(e) => setData('phone', e.target.value)}
+                        errors={errors.phone}
+                    />
+                    <Input
+                        label="Urutan"
+                        type="number"
+                        value={data.sort_order}
+                        onChange={(e) => setData('sort_order', parseInt(e.target.value) || 0)}
+                        errors={errors.sort_order}
+                    />
+                    <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                        <input
+                            type="checkbox"
+                            checked={data.is_active}
+                            onChange={(e) => setData('is_active', e.target.checked)}
+                            className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600"
+                        />
+                        Aktif
+                    </label>
+                    <div className="flex justify-end gap-3 pt-2">
+                        <Button
+                            type={'button'}
+                            label={'Batal'}
+                            onClick={() => setDrawerOpen(false)}
+                        />
+                        <Button
+                            type={'submit'}
+                            label={editing ? 'Perbarui' : 'Simpan'}
+                            processing={processing}
+                            className={'bg-primary-500 text-white hover:bg-primary-600'}
+                        />
+                    </div>
+                </form>
+            </Drawer>
         </>
     );
 }

@@ -347,9 +347,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
 
     // settings bank accounts
     Route::get('/settings/bank-accounts', [BankAccountController::class, 'index'])->middleware('permission:payment-settings-access')->name('settings.bank-accounts.index');
-    Route::get('/settings/bank-accounts/create', [BankAccountController::class, 'create'])->middleware('permission:payment-settings-update')->name('settings.bank-accounts.create');
     Route::post('/settings/bank-accounts', [BankAccountController::class, 'store'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.store');
-    Route::get('/settings/bank-accounts/{bankAccount}/edit', [BankAccountController::class, 'edit'])->middleware('permission:payment-settings-update')->name('settings.bank-accounts.edit');
     Route::put('/settings/bank-accounts/{bankAccount}', [BankAccountController::class, 'update'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.update');
     Route::delete('/settings/bank-accounts/{bankAccount}', [BankAccountController::class, 'destroy'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.destroy');
     Route::patch('/settings/bank-accounts/{bankAccount}/toggle', [BankAccountController::class, 'toggleActive'])->middleware(['permission:payment-settings-update', 'step_up'])->name('settings.bank-accounts.toggle');

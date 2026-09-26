@@ -1,62 +1,67 @@
-import { useEffect, useState } from 'react';
-import { Head, usePage, router } from '@inertiajs/react';
+import { useState } from 'react';
+import { Head, router, useForm } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { IconRulerMeasure, IconPlus, IconPencil, IconTrash } from '@tabler/icons-react';
 import toast from 'react-hot-toast';
 import { useAuthorization } from '@/Utils/authorization';
+import Button from '@/Components/Dashboard/Button';
+import Drawer from '@/Components/Dashboard/Drawer';
 import Input from '@/Components/Dashboard/Input';
 
 export default function Units({ units = [] }) {
-    const { flash } = usePage().props;
     const { can } = useAuthorization();
     const canCreate = can('units-create');
     const canUpdate = can('units-update');
     const canDelete = can('units-delete');
 
-    const [showForm, setShowForm] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState({ code: '', name: '', symbol: '' });
-    const [errors, setErrors] = useState({});
+    // Function initializer, not a plain object: Inertia reassigns `defaults` to the
+    // last submitted payload after every successful submit, so `reset()` would refill
+    // the form with whatever was just saved. Only a function initializer makes
+    // `reset()` return the pristine values.
+    const { data, setData, post, patch, processing, errors, reset } = useForm(() => ({
+        code: '',
+        name: '',
+        symbol: '',
+    }));
 
-    useEffect(() => {
-        if (flash?.success) toast.success(flash.success);
-        if (flash?.error) toast.error(flash.error);
-    }, [flash]);
-
-    const resetForm = () => {
-        setForm({ code: '', name: '', symbol: '' });
-        setErrors({});
+    const openCreate = () => {
         setEditing(null);
-        setShowForm(false);
+        // `reset` takes field *names* and copies them from the defaults — passing an
+        // object of values is silently a no-op. No args restores the empty defaults.
+        reset();
+        setModalOpen(true);
     };
 
     const openEdit = (u) => {
         setEditing(u);
-        setForm({ code: u.code, name: u.name, symbol: u.symbol });
-        setErrors({});
-        setShowForm(true);
+        // `setData` is the one that accepts an object of new values.
+        setData({ code: u.code, name: u.name, symbol: u.symbol });
+        setModalOpen(true);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrors({});
+        const onSuccess = () => {
+            toast.success(editing ? 'Satuan berhasil diperbarui.' : 'Satuan berhasil ditambahkan.');
+            setModalOpen(false);
+        };
+        const onError = () => toast.error('Gagal menyimpan satuan.');
 
         if (editing) {
-            router.put(route('settings.units.update', editing.id), form, {
-                onError: (err) => setErrors(err),
-                onSuccess: () => resetForm(),
-            });
+            patch(route('settings.units.update', editing.id), { onSuccess, onError });
         } else {
-            router.post(route('settings.units.store'), form, {
-                onError: (err) => setErrors(err),
-                onSuccess: () => resetForm(),
-            });
+            post(route('settings.units.store'), { onSuccess, onError });
         }
     };
 
     const handleDelete = (u) => {
         if (!confirm(`Hapus satuan ${u.name}?`)) return;
-        router.delete(route('settings.units.destroy', u.id));
+        router.delete(route('settings.units.destroy', u.id), {
+            onSuccess: () => toast.success('Satuan berhasil dihapus.'),
+            onError: () => toast.error('Gagal menghapus satuan.'),
+        });
     };
 
     return (
@@ -81,10 +86,7 @@ export default function Units({ units = [] }) {
                         </h3>
                         {canCreate && (
                             <button
-                                onClick={() => {
-                                    resetForm();
-                                    setShowForm(true);
-                                }}
+                                onClick={openCreate}
                                 className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
                             >
                                 <IconPlus size={18} />
@@ -147,55 +149,50 @@ export default function Units({ units = [] }) {
                         </div>
                     )}
                 </div>
-
-                {showForm && (
-                    <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-                        <h3 className="font-semibold text-slate-800 dark:text-white">
-                            {editing ? 'Edit Satuan' : 'Tambah Satuan Baru'}
-                        </h3>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                <Input
-                                    label="Kode"
-                                    placeholder="PCS"
-                                    value={form.code}
-                                    onChange={(e) => setForm({ ...form, code: e.target.value })}
-                                    errors={errors.code}
-                                />
-                                <Input
-                                    label="Nama Satuan"
-                                    placeholder="Pieces"
-                                    value={form.name}
-                                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                    errors={errors.name}
-                                />
-                                <Input
-                                    label="Simbol"
-                                    placeholder="pcs"
-                                    value={form.symbol}
-                                    onChange={(e) => setForm({ ...form, symbol: e.target.value })}
-                                    errors={errors.symbol}
-                                />
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="submit"
-                                    className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600"
-                                >
-                                    {editing ? 'Update' : 'Simpan'}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={resetForm}
-                                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-                                >
-                                    Batal
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                )}
             </div>
+
+            <Drawer
+                show={modalOpen}
+                onClose={() => setModalOpen(false)}
+                title={editing ? 'Edit Satuan' : 'Tambah Satuan'}
+            >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input
+                        label="Kode"
+                        placeholder="PCS"
+                        value={data.code}
+                        onChange={(e) => setData('code', e.target.value)}
+                        errors={errors.code}
+                    />
+                    <Input
+                        label="Nama Satuan"
+                        placeholder="Pieces"
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        errors={errors.name}
+                    />
+                    <Input
+                        label="Simbol"
+                        placeholder="pcs"
+                        value={data.symbol}
+                        onChange={(e) => setData('symbol', e.target.value)}
+                        errors={errors.symbol}
+                    />
+                    <div className="flex justify-end gap-3 pt-2">
+                        <Button
+                            type={'button'}
+                            label={'Batal'}
+                            onClick={() => setModalOpen(false)}
+                        />
+                        <Button
+                            type={'submit'}
+                            label={editing ? 'Perbarui' : 'Simpan'}
+                            processing={processing}
+                            className={'bg-primary-500 text-white hover:bg-primary-600'}
+                        />
+                    </div>
+                </form>
+            </Drawer>
         </>
     );
 }
