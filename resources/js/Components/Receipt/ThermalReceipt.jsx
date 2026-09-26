@@ -8,6 +8,8 @@
  * - Simple lines using dashes
  * - Compact layout
  */
+import SimpleBarcode from '@/Components/Receipt/SimpleBarcode';
+
 export default function ThermalReceipt({
     transaction,
     storeName = 'TOKO ANDA',
@@ -60,21 +62,6 @@ export default function ThermalReceipt({
     // Line separator
     const line = '='.repeat(32);
     const dashLine = '-'.repeat(32);
-
-    const SimpleBarcode = ({ value }) => {
-        const bars = (value || '').split('').map((char, idx) => {
-            const weight = (char.charCodeAt(0) + idx * 17) % 5;
-            return 2 + weight;
-        });
-
-        return (
-            <div className="mt-2 flex items-end justify-center gap-[2px]">
-                {bars.map((w, i) => (
-                    <span key={i} style={{ width: `${w}px` }} className="block h-10 bg-black" />
-                ))}
-            </div>
-        );
-    };
 
     return (
         <div
@@ -272,21 +259,6 @@ export function ThermalReceipt58mm({
     const voucherDiscount = Number(transaction?.customer_voucher_discount || 0);
     const line = '-'.repeat(24);
 
-    const SimpleBarcode = ({ value }) => {
-        const bars = (value || '').split('').map((char, idx) => {
-            const weight = (char.charCodeAt(0) + idx * 17) % 4;
-            return 2 + weight;
-        });
-
-        return (
-            <div className="mt-2 flex items-end justify-center gap-[2px]">
-                {bars.map((w, i) => (
-                    <span key={i} style={{ width: `${w}px` }} className="block h-8 bg-black" />
-                ))}
-            </div>
-        );
-    };
-
     return (
         <div
             className="thermal-receipt-58 font-mono text-xs"
@@ -393,7 +365,7 @@ export function ThermalReceipt58mm({
             </div>
             <pre>{line}</pre>
             <p className="text-center">Terima kasih!</p>
-            <SimpleBarcode value={transaction?.invoice} />
+            <SimpleBarcode value={transaction?.invoice} divisor={4} barClassName="h-8 bg-black" />
 
             <style>{`
                 @media print {

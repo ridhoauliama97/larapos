@@ -17,6 +17,7 @@ import ShippingLabel from '@/Components/Receipt/ShippingLabel';
 import { useAuthorization } from '@/Utils/authorization';
 import { hasCachedPrinter, kickDrawer, printReceipt } from '@/Utils/escpos';
 import toast from 'react-hot-toast';
+import SimpleBarcode from '@/Components/Receipt/SimpleBarcode';
 
 export default function Print({ transaction }) {
     const { storeProfile, printerSettings } = usePage().props;
@@ -198,31 +199,6 @@ export default function Print({ transaction }) {
 
     const handlePrint = () => {
         window.print();
-    };
-
-    const SimpleBarcode = ({ value }) => {
-        const bars = useMemo(() => {
-            const data = value || '';
-            return data.split('').map((char, idx) => {
-                const weight = (char.charCodeAt(0) + idx * 17) % 5;
-                return 2 + weight; // 2-6px width
-            });
-        }, [value]);
-        const totalWidth = bars.reduce((acc, w) => acc + w, 0);
-        const targetWidth = 180; // px target
-        const scale = totalWidth ? Math.min(2.2, targetWidth / totalWidth) : 1;
-
-        return (
-            <div className="mt-4 flex items-end gap-[2px]">
-                {bars.map((w, i) => (
-                    <span
-                        key={i}
-                        style={{ width: `${w * scale}px` }}
-                        className="block h-10 bg-slate-800 dark:bg-slate-100 sm:h-14"
-                    />
-                ))}
-            </div>
-        );
     };
 
     return (
@@ -740,7 +716,12 @@ export default function Print({ transaction }) {
                                 <p className="text-xs text-slate-500 dark:text-slate-400">
                                     Invoice: {transaction.invoice}
                                 </p>
-                                <SimpleBarcode value={transaction.invoice} />
+                                <SimpleBarcode
+                                    value={transaction.invoice}
+                                    targetWidth={180}
+                                    className="mt-4"
+                                    barClassName="h-10 bg-slate-800 dark:bg-slate-100 sm:h-14"
+                                />
                                 <div className="mt-4 text-center">
                                     <p className="text-xs uppercase tracking-widest text-slate-400 dark:text-slate-500">
                                         Terima kasih telah berbelanja

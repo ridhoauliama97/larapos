@@ -1,4 +1,5 @@
 import { IconMapPin, IconPhone, IconUser, IconPackage } from '@tabler/icons-react';
+import SimpleBarcode from '@/Components/Receipt/SimpleBarcode';
 
 export default function ShippingLabel({ transaction, store = {} }) {
     const formatPrice = (price = 0) =>
@@ -16,21 +17,6 @@ export default function ShippingLabel({ transaction, store = {} }) {
             month: 'short',
             year: 'numeric',
         });
-    };
-
-    const SimpleBarcode = ({ value }) => {
-        const bars = (value || '').split('').map((char, idx) => {
-            const weight = (char.charCodeAt(0) + idx * 17) % 4;
-            return 2 + weight;
-        });
-
-        return (
-            <div className="mt-1 flex items-end justify-center gap-[1px] sm:justify-end">
-                {bars.map((w, i) => (
-                    <span key={i} style={{ width: `${w}px` }} className="block h-8 bg-black" />
-                ))}
-            </div>
-        );
     };
 
     const storeName = store?.name || 'TOKO';
@@ -189,7 +175,13 @@ export default function ShippingLabel({ transaction, store = {} }) {
                         Dicetak pada: {new Date().toLocaleString('id-ID')}
                     </div>
                     <div className="flex flex-col items-end">
-                        <SimpleBarcode value={transaction?.invoice} />
+                        <SimpleBarcode
+                            value={transaction?.invoice}
+                            divisor={4}
+                            className="mt-1 justify-center sm:justify-end"
+                            barClassName="h-8 bg-black"
+                            gapClassName="gap-[1px]"
+                        />
                         <span className="mr-1 mt-1 text-[10px] font-bold uppercase tracking-[3px] text-slate-800">
                             {transaction?.invoice}
                         </span>

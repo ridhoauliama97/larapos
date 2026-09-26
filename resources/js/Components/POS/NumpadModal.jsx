@@ -25,6 +25,47 @@ export default function NumpadModal({
 }) {
     const [value, setValue] = useState(String(initialValue || ''));
 
+    // Handlers are declared before the effects that use them. They used to sit
+    // below the keydown effect, which only worked because `value` was in the
+    // effect deps and happened to keep handleConfirm fresh — maxValue and
+    // minValue could still go stale mid-session.
+    const handleDigit = useCallback(
+        (digit) => {
+            setValue((prev) => {
+                const newValue = prev === '0' ? digit : prev + digit;
+                return parseInt(newValue, 10) > maxValue ? prev : newValue;
+            });
+        },
+        [maxValue]
+    );
+
+    const handleBackspace = useCallback(() => {
+        setValue((prev) => (prev.length > 1 ? prev.slice(0, -1) : '0'));
+    }, []);
+
+    const handleClear = useCallback(() => {
+        setValue('0');
+    }, []);
+
+    const handleConfirm = useCallback(() => {
+        const numValue = parseInt(value, 10) || 0;
+        if (numValue >= minValue && numValue <= maxValue) {
+            onConfirm(numValue);
+            onClose();
+        }
+    }, [value, minValue, maxValue, onConfirm, onClose]);
+
+    // Functional update, so this no longer needs `value` as a dependency.
+    const handleQuickAmount = useCallback(
+        (amount) => {
+            setValue((prev) => {
+                const next = (parseInt(prev, 10) || 0) + amount;
+                return next <= maxValue ? String(next) : prev;
+            });
+        },
+        [maxValue]
+    );
+
     // Reset value when modal opens
     useEffect(() => {
         if (isOpen) {
@@ -52,46 +93,7 @@ export default function NumpadModal({
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, value]);
-
-    const handleDigit = useCallback(
-        (digit) => {
-            setValue((prev) => {
-                const newValue = prev === '0' ? digit : prev + digit;
-                const numValue = parseInt(newValue, 10);
-                if (numValue > maxValue) return prev;
-                return newValue;
-            });
-        },
-        [maxValue]
-    );
-
-    const handleBackspace = useCallback(() => {
-        setValue((prev) => (prev.length > 1 ? prev.slice(0, -1) : '0'));
-    }, []);
-
-    const handleClear = useCallback(() => {
-        setValue('0');
-    }, []);
-
-    const handleConfirm = useCallback(() => {
-        const numValue = parseInt(value, 10) || 0;
-        if (numValue >= minValue && numValue <= maxValue) {
-            onConfirm(numValue);
-            onClose();
-        }
-    }, [value, minValue, maxValue, onConfirm, onClose]);
-
-    const handleQuickAmount = useCallback(
-        (amount) => {
-            const current = parseInt(value, 10) || 0;
-            const newValue = current + amount;
-            if (newValue <= maxValue) {
-                setValue(String(newValue));
-            }
-        },
-        [value, maxValue]
-    );
+    }, [isOpen, onClose, handleDigit, handleBackspace, handleConfirm, handleClear]);
 
     const formatDisplay = (val) => {
         const num = parseInt(val, 10) || 0;

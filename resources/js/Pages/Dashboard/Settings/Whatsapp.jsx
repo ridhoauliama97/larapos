@@ -20,16 +20,8 @@ export default function Whatsapp({ settings, waStatus }) {
     const [statusError, setStatusError] = useState(null);
     const [testNumber, setTestNumber] = useState('');
 
-    useEffect(() => {
-        let interval;
-        if (polling || status.starting) {
-            interval = setInterval(() => {
-                fetchStatus();
-            }, 3000);
-        }
-        return () => clearInterval(interval);
-    }, [polling, status.starting]);
-
+    // Declared before the polling effect that calls it. It was below, which only
+    // worked by accident and left the closure fragile.
     const fetchStatus = async () => {
         try {
             const res = await axios.get(route('settings.whatsapp.status'));
@@ -46,6 +38,16 @@ export default function Whatsapp({ settings, waStatus }) {
             setPolling(false);
         }
     };
+
+    useEffect(() => {
+        let interval;
+        if (polling || status.starting) {
+            interval = setInterval(() => {
+                fetchStatus();
+            }, 3000);
+        }
+        return () => clearInterval(interval);
+    }, [polling, status.starting]);
 
     const handleConnect = async () => {
         try {
