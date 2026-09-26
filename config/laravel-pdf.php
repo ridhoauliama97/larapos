@@ -26,7 +26,7 @@ return [
          * to call `->cache()`. Call `->cache()` or `->dontCache()` on a PDF
          * to override this.
          */
-        'automatic' => env('LARAVEL_PDF_CACHE_AUTOMATIC', false),
+        'automatic' => false,
 
         /*
          * The cache store to use. Leave null to use the default store.
@@ -115,13 +115,13 @@ return [
     ],
 
     /*
-    * WeasyPrint driver configuration.
-    *
-    * Requires the Weasyprint binary and pontedilana/php-weasyprint package:
-    * composer require pontedilana/php-weasyprint
-    *
-    * @see https://doc.courtbouillon.org/weasyprint/stable/first_steps.html
-    */
+     * WeasyPrint driver configuration.
+     *
+     * Requires the Weasyprint binary and pontedilana/php-weasyprint package:
+     * composer require pontedilana/php-weasyprint
+     *
+     * @see https://doc.courtbouillon.org/weasyprint/stable/first_steps.html
+     */
     'weasyprint' => [
         /*
          * Configure the paths to the Weasyprint binary.
