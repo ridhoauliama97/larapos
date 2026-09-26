@@ -21,17 +21,15 @@ export default function TransactionDetail({ transaction, token }) {
      * gateway's external `payment_url`, and a native form guarantees a full-page
      * hand-off instead of an Inertia round-trip.
      *
-     * The form MUST carry Laravel's CSRF token or the POST fails with 419.
-     * The token is not in any Blade view as a meta tag, so read it from the
-     * `XSRF-TOKEN` cookie that Laravel always sets (URL-encoded on the wire).
+     * The form MUST carry Laravel's CSRF token or the POST fails with 419. The
+     * token has to come from the `csrf-token` meta tag rendered by app.blade.php.
+     * The XSRF-TOKEN cookie is NOT usable here: Laravel encrypts it, so the value
+     * is a base64 blob rather than the plain session token.
      */
     const submitPayment = () => {
-        const csrfToken = decodeURIComponent(
-            document.cookie
-                .split("; ")
-                .find((row) => row.startsWith("XSRF-TOKEN="))
-                ?.split("=")[1] ?? ""
-        );
+        const csrfToken = document.querySelector(
+            'meta[name="csrf-token"]'
+        )?.content;
 
         if (!csrfToken) {
             alert("Sesi kedaluwarsa. Silakan muat ulang halaman.");
