@@ -380,6 +380,23 @@ export default function Notification() {
         }
     };
 
+    // Following a notification only navigates — it deliberately does not mark the
+    // item as read. "Dibaca" stays the explicit acknowledgement, which is what the
+    // unread badge counts.
+    const handleOpenItem = (item) => {
+        if (!item.url) return;
+
+        setIsOpen(false);
+        router.visit(item.url);
+    };
+
+    const handleRowKeyDown = (event, item) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+
+        event.preventDefault();
+        handleOpenItem(item);
+    };
+
     const NotificationList = () => (
         <div className="flex max-h-80 w-full flex-col items-start gap-3 overflow-y-auto pr-1">
             {displayData.length === 0 && (
@@ -387,10 +404,20 @@ export default function Notification() {
             )}
             {displayData.map((item) => {
                 const unread = isUnread(item);
+                const clickable = !!item.url;
 
                 return (
                     <div
-                        className={`flex w-full items-center justify-between rounded-2xl border p-5 transition-all hover:shadow ${
+                        // Kept a div rather than a button: it contains the "Dibaca"
+                        // button, and nesting interactive elements is invalid HTML.
+                        role={clickable ? 'button' : undefined}
+                        tabIndex={clickable ? 0 : undefined}
+                        aria-label={clickable ? `Buka ${item.title}` : undefined}
+                        onClick={clickable ? () => handleOpenItem(item) : undefined}
+                        onKeyDown={clickable ? (event) => handleRowKeyDown(event, item) : undefined}
+                        className={`flex w-full items-center justify-between rounded-2xl border p-5 transition-all ${
+                            clickable ? 'cursor-pointer hover:shadow' : ''
+                        } ${
                             unread
                                 ? 'border-primary-200 bg-primary-50/40 dark:border-primary-800 dark:bg-primary-500/5'
                                 : 'border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40'
@@ -432,7 +459,12 @@ export default function Notification() {
                         </div>
                         {unread ? (
                             <button
-                                onClick={() => handleMarkRead(item.id)}
+                                onClick={(event) => {
+                                    // Keep the acknowledgement click from also
+                                    // triggering the row's navigation.
+                                    event.stopPropagation();
+                                    handleMarkRead(item.id);
+                                }}
                                 disabled={item.noAck}
                                 className={`inline-flex items-center gap-1 rounded-lg border border-transparent px-2.5 py-1 text-xs font-semibold text-primary-600 hover:border-primary-200 hover:bg-primary-50 dark:text-primary-300 dark:hover:border-primary-800 dark:hover:bg-primary-900/30 ${item.noAck ? 'cursor-default opacity-50' : ''}`}
                             >
@@ -457,8 +489,16 @@ export default function Notification() {
     return (
         <>
             {isMobile === false ? (
-                <Menu className="relative z-50" as="div">
-                    <Menu.Button className="group flex items-center rounded-2xl border border-slate-200 bg-white px-3 py-2.5 transition hover:shadow dark:border-slate-800 dark:bg-slate-900">
+                <Menu
+                    className="relative z-50"
+                    as="div"
+                    open={isOpen}
+                    onClose={() => setIsOpen(false)}
+                >
+                    <Menu.Button
+                        onClick={() => setIsOpen((open) => !open)}
+                        className="group flex items-center rounded-2xl border border-slate-200 bg-white px-3 py-2.5 transition hover:shadow dark:border-slate-800 dark:bg-slate-900"
+                    >
                         <div className="absolute -right-2 top-0 rounded-md border border-rose-500/40 bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-500 duration-200 ease-in hover:bg-rose-500/20 group-hover:scale-110">
                             {badgeCount}
                         </div>
