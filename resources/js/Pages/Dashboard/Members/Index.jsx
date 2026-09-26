@@ -1,4 +1,3 @@
-import React from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Pagination from "@/Components/Dashboard/Pagination";
 import Select from "@/Components/Dashboard/Select";

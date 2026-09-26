@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { usePage, router } from "@inertiajs/react";
 import { IconLanguage } from "@tabler/icons-react";
 import { Menu, Transition } from "@headlessui/react";

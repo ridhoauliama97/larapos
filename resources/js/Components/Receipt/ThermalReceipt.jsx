@@ -1,4 +1,3 @@
-import React from "react";
 
 /**
  * ThermalReceipt - Receipt template optimized for thermal printers (58mm/80mm)

@@ -1,4 +1,3 @@
-import React from "react";
 import { Head, useForm } from "@inertiajs/react";
 import Button from "@/Components/Dashboard/Button";
 import Select from "@/Components/Dashboard/Select";

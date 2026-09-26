@@ -1,4 +1,3 @@
-import React from "react";
 
 export default function Input({ label, type, className, errors, icon, ...props }) {
     return (

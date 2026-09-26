@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { usePage, router } from "@inertiajs/react";
 import { IconLogout, IconRotate, IconUserCircle } from "@tabler/icons-react";

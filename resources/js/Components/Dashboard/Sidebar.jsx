@@ -1,4 +1,3 @@
-import React from "react";
 import { usePage } from "@inertiajs/react";
 import { IconLayoutGrid } from "@tabler/icons-react";
 import LinkItem from "@/Components/Dashboard/LinkItem";

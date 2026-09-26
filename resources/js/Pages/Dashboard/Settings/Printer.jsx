@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Select from "@/Components/Dashboard/Select";
 import { Head, useForm } from "@inertiajs/react";

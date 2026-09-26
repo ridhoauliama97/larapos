@@ -1,4 +1,3 @@
-import React from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Textarea from "@/Components/Dashboard/TextArea";

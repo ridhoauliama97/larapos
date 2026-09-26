@@ -1,4 +1,3 @@
-import React from "react";
 import SalesReturnForm from "./Form";
 import { useAuthorization } from "@/Utils/authorization";
 

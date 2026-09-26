@@ -1,4 +1,3 @@
-import React from "react";
 import SalesReturnForm from "./Form";
 
 export default function Create({ transaction }) {

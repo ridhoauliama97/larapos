@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { isSuperAdmin } from "@/Utils/authorization";
 import { isActiveUrl } from "@/Utils/activeUrl";

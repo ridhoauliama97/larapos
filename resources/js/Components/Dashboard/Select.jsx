@@ -1,10 +1,4 @@
-import React, {
-    useEffect,
-    useId,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
+import { useEffect, useId, useMemo, useRef, useState, } from "react";
 import { IconCheck, IconChevronDown, IconSearch } from "@tabler/icons-react";
 
 const SIZES = {

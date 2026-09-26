@@ -1,4 +1,3 @@
-import React from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
 import {

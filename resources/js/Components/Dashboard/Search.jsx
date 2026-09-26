@@ -1,6 +1,5 @@
 import { useForm } from '@inertiajs/react';
 import { IconSearch } from '@tabler/icons-react';
-import React from 'react'
 export default function Search({ url, placeholder }) {
 
     // define use form inertia

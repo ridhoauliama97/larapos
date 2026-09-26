@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import toast from "react-hot-toast";
 import {

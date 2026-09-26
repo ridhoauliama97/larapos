@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "@inertiajs/react";
 import { IconAlertTriangle, IconTrash } from "@tabler/icons-react";
 import Input from "@/Components/Dashboard/Input";

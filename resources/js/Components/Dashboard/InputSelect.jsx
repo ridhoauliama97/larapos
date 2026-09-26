@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from "react";
 import { Listbox } from '@headlessui/react'
 import { IconChevronDown, IconCircle, IconCircleFilled } from '@tabler/icons-react'
 

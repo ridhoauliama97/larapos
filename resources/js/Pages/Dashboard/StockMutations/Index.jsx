@@ -1,4 +1,3 @@
-import React from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, router } from "@inertiajs/react";
 import Table from "@/Components/Dashboard/Table";

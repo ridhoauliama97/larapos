@@ -44,7 +44,6 @@ import {
 } from "@tabler/icons-react";
 import checkPermission from "./Permission";
 import { isActiveUrl } from "./activeUrl";
-import React from "react";
 
 export default function Menu() {
     const { t } = useTranslation();

@@ -1,4 +1,3 @@
-import React from "react";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { IconCheck, IconX, IconAlertCircle, IconEye } from "@tabler/icons-react";
