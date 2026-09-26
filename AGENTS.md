@@ -88,7 +88,7 @@ Scheduling lives in `routes/console.php` (3 daily commands + Laravel's default `
 
 Two workflows, and they are **not** equivalent:
 
-- **`.github/workflows/build.yml`** — push to `main`/`development` + all PRs. PHP 8.4, Node 22, `pdo_sqlite`. Order: `composer install` → `npm ci` → `cp .env.example .env && key:generate` → **`vendor/bin/pint --test`** → **`npm run build`** (before tests, so the Vite manifest exists) → **`php artisan test`**. This is the workflow that gates a PR. A second parallel job builds the Docker image with `push: false`.
+- **`.github/workflows/build.yml`** — push to `main`/`development` + all PRs. PHP 8.4, Node 22, `pdo_sqlite`. Order: `composer install` → `npm ci` → `cp .env.example .env && key:generate` → **`vendor/bin/pint --test`** → **`npm run format:check`** → **`npm run build`** (before tests, so the Vite manifest exists) → **`npm run lint`** → **`php artisan test`**. This is the workflow that gates a PR. A second parallel job builds the Docker image with `push: false`.
 - **`.github/workflows/deploy.yml`** — push/PR to `main`. Its `ci` job only runs `composer validate` + installs + `npm run build`. It runs **neither Pint nor the test suite**, so a green `deploy.yml` does not mean tests passed.
 - The `deploy` job is gated on `push` to `main` **and** a guard step that skips gracefully when `secrets.VPS_HOST` is empty. It SSHes to `/var/www/Larapos.web.id` (Node 24.15.0 via nvm, `php8.4 artisan migrate --force`) and fails the job unless `https://Larapos.web.id/` returns 200.
 
@@ -126,9 +126,9 @@ npm run format:check    # verify only
 - **Pinned to ESLint 9 deliberately** — `eslint-plugin-react@7.37.5` declares peer `eslint ^3..^9.7`; ESLint 10 exists but the plugin doesn't support it yet. Bump both together or the install fails with ERESOLVE.
 - `react/no-children-prop` is **off**: `Page.layout = (page) => <Layout children={page} />` is this repo's convention across ~88 pages, not a defect.
 - The React Compiler-era rules (`set-state-in-effect`, `immutability`, `static-components`, `preserve-manual-memoization`) are pinned to `warn` — noisy for Inertia prop→state syncing. Promote to `error` when the backlog clears.
-- `no-unused-vars` is a `warn` with `^_` escape hatches. 127 files still `import React` needlessly (automatic JSX runtime makes it dead) — a mechanical cleanup, not done yet.
-- **Prettier has never been run across the repo.** 169 files are non-compliant. Do it as one dedicated formatting-only commit, never mixed with a feature — the same trap as Pint.
-- CI does **not** run ESLint/Prettier yet. Wire `npm run lint` into `build.yml` only after the 8 remaining errors are fixed (`no-prototype-builtins`, `no-empty`, `react/no-unescaped-entities`, and one `rules-of-hooks` in `Utils/Permission.jsx`).
+- `no-unused-vars` is a `warn` with `^_` escape hatches. 126 dead `import React` were removed (Sept 2026); ~101 remain and are **not** all safe to delete — `handlePrint` is unused in `Payables/Show` and `Receivables/Show`, and `totalRevenue`/`totalProfit`/`averageOrder` are computed but never rendered in `Dashboard/Index`. Those look like unfinished work, not noise.
+- Prettier ran once (Sept 2026, 169 files) as a dedicated formatting-only commit. `format:check` is clean and enforced in CI — run `npm run format` before pushing.
+- **CI runs `npm run lint`, not `lint:strict`.** `--max-warnings=0` would fail: 90 of the remaining warnings are React Compiler-era rules that need real refactors, not config. Flip to `lint:strict` only once those are genuinely fixed.
 
 ### Traps ESLint surfaced in this repo
 

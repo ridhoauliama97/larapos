@@ -37,8 +37,14 @@ jobs:
       - name: Code style (Pint)
         run: vendor/bin/pint --test
 
+      - name: Code style (Prettier)
+        run: npm run format:check
+
       - name: Build frontend
         run: npm run build
+
+      - name: Lint frontend (ESLint)
+        run: npm run lint
 
       - name: Run tests
         run: php artisan test
