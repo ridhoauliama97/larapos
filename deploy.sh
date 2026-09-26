@@ -175,4 +175,4 @@ if [ "$CMD" = "pdf-check" ]; then
 fi
 
 ok "Deploy complete — $APP_URL"
-printf '  status:   ./deploy.sh ps\n  logs:     ./deploy.sh logs\n  pdf:      ./deploy.sh pdf-check\n  shell:    ./deploy.sh shell\n'
+printf '  status:   ./deploy.sh status\n  logs:     ./deploy.sh logs\n  pdf:      ./deploy.sh pdf-check\n  shell:    ./deploy.sh shell\n'
