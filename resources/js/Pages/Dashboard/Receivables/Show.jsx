@@ -92,11 +92,6 @@ export default function ReceivableShow({ receivable, bankAccounts = [] }) {
         });
     };
 
-    const handlePrint = () => {
-        if (!printRef.current) return;
-        window.print();
-    };
-
     return (
         <>
             <Head title={`Nota ${receivable.invoice}`} />

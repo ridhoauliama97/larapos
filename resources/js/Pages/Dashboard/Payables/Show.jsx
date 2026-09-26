@@ -69,10 +69,6 @@ export default function PayableShow({ payable, bankAccounts = [] }) {
         });
     };
 
-    const handlePrint = () => {
-        window.print();
-    };
-
     return (
         <>
             <Head title={`Hutang ${payable.document_number}`} />
