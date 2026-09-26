@@ -8,7 +8,6 @@ import {
     IconCheck,
     IconCircleX,
     IconPackage,
-    IconShoppingCart,
     IconTruckDelivery,
 } from '@tabler/icons-react';
 import toast from 'react-hot-toast';

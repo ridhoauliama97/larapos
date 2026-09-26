@@ -1,7 +1,6 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
-import Input from '@/Components/Dashboard/Input';
 import toast from 'react-hot-toast';
 import { IconTarget, IconDeviceFloppy, IconCoin } from '@tabler/icons-react';
 

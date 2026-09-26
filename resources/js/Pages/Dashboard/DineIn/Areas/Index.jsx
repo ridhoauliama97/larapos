@@ -1,14 +1,8 @@
 import { useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, usePage, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
-import {
-    IconCirclePlus,
-    IconDatabaseOff,
-    IconPencilCog,
-    IconTrash,
-    IconLayoutGrid,
-} from '@tabler/icons-react';
+import { IconCirclePlus, IconDatabaseOff, IconPencilCog, IconTrash } from '@tabler/icons-react';
 import Table from '@/Components/Dashboard/Table';
 import Modal from '@/Components/Dashboard/Modal';
 import Input from '@/Components/Dashboard/Input';

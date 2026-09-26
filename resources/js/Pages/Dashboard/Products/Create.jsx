@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, usePage, Link } from '@inertiajs/react';
-import Button from '@/Components/Dashboard/Button';
 import ImageDropzone from '@/Components/Dashboard/ImageDropzone';
 import Input from '@/Components/Dashboard/Input';
 import Textarea from '@/Components/Dashboard/TextArea';

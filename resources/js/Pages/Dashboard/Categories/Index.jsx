@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
 import {
     IconCirclePlus,
@@ -10,7 +10,6 @@ import {
     IconLayoutGrid,
     IconList,
     IconCategory,
-    IconPhoto,
 } from '@tabler/icons-react';
 import Search from '@/Components/Dashboard/Search';
 import Table from '@/Components/Dashboard/Table';

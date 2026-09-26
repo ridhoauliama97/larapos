@@ -1,11 +1,4 @@
-import {
-    IconMapPin,
-    IconPhone,
-    IconUser,
-    IconPackage,
-    IconCalendar,
-    IconInvoice,
-} from '@tabler/icons-react';
+import { IconMapPin, IconPhone, IconUser, IconPackage } from '@tabler/icons-react';
 
 export default function ShippingLabel({ transaction, store = {} }) {
     const formatPrice = (price = 0) =>

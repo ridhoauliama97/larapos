@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import {
-    IconBuildingWarehouse,
-    IconPlus,
-    IconPencil,
-    IconTrash,
-    IconDots,
-} from '@tabler/icons-react';
+import { IconBuildingWarehouse, IconPlus, IconPencil, IconTrash } from '@tabler/icons-react';
 import toast from 'react-hot-toast';
 import { useAuthorization } from '@/Utils/authorization';
 import Input from '@/Components/Dashboard/Input';

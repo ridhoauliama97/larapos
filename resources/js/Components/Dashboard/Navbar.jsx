@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
-import { IconMenu2, IconMoon, IconSun, IconSearch, IconBook } from '@tabler/icons-react';
+import { IconMenu2, IconMoon, IconSun, IconBook } from '@tabler/icons-react';
 import AuthDropdown from '@/Components/Dashboard/AuthDropdown';
 import LanguageSwitcher from '@/Components/Dashboard/LanguageSwitcher';
 import Menu from '@/Utils/Menu';

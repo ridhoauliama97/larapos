@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import Table from '@/Components/Dashboard/Table';
 import Pagination from '@/Components/Dashboard/Pagination';

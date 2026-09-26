@@ -1,5 +1,4 @@
 import { usePage } from '@inertiajs/react';
-import { IconLayoutGrid } from '@tabler/icons-react';
 import LinkItem from '@/Components/Dashboard/LinkItem';
 import LinkItemDropdown from '@/Components/Dashboard/LinkItemDropdown';
 import { resolveActiveHrefs } from '@/Utils/activeUrl';

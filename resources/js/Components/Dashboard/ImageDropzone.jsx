@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { IconPhoto, IconReplace, IconX } from '@tabler/icons-react';
 
 const DEFAULT_ACCEPT = 'image/jpeg,image/png,image/webp';

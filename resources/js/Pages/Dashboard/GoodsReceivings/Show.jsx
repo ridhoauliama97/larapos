@@ -1,7 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 import Table from '@/Components/Dashboard/Table';
-import { IconArrowLeft, IconTruckDelivery, IconPackage } from '@tabler/icons-react';
+import { IconArrowLeft, IconPackage } from '@tabler/icons-react';
 
 const formatCurrency = (value = 0) =>
     new Intl.NumberFormat('id-ID', {

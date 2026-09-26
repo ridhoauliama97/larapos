@@ -1,6 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import Button from '@/Components/Dashboard/Button';
 import Table from '@/Components/Dashboard/Table';
 import {
     IconArrowLeft,

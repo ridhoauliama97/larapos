@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconShoppingBag, IconPhoto, IconMinus, IconPlus } from '@tabler/icons-react';
+import { IconShoppingBag, IconPhoto } from '@tabler/icons-react';
 import { getProductImageUrl } from '@/Utils/imageUrl';
 
 const formatPrice = (value = 0) =>

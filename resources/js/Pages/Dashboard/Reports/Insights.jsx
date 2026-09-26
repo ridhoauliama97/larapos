@@ -13,7 +13,6 @@ import {
     IconPackage,
     IconReceipt2,
     IconSearch,
-    IconTrendingDown,
     IconTrendingUp,
     IconUsers,
     IconX,

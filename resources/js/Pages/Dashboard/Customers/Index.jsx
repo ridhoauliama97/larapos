@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, usePage, Link, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
 import {
     IconCirclePlus,
@@ -9,7 +9,6 @@ import {
     IconTrash,
     IconLayoutGrid,
     IconList,
-    IconUser,
     IconPhone,
     IconMapPin,
     IconUpload,
@@ -19,7 +18,6 @@ import Search from '@/Components/Dashboard/Search';
 import Table from '@/Components/Dashboard/Table';
 import Pagination from '@/Components/Dashboard/Pagination';
 import { useAuthorization } from '@/Utils/authorization';
-import toast from 'react-hot-toast';
 
 // Customer Card for Grid View
 function CustomerCard({ customer, canUpdate, canDelete }) {
