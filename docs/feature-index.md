@@ -5,6 +5,8 @@
 | Modul | File | Status |
 |-------|------|--------|
 | POS / Checkout | `docs/features/pos-transactions.md` | ✅ |
+| Cashier Shifts (buka/tutup kas) | `docs/features/cashier-shifts.md` | ✅ |
+| Dine-In (QR Menu) | `docs/features/dine-in.md` | ✅ |
 | Sales Return | `docs/features/sales-returns.md` | ✅ |
 | Customer Portal (self-service) | `docs/features/customer-portal.md` | ✅ |
 | Offline Mode | `docs/features/offline-mode.md` | ✅ (queue + auto-sync dengan batasan cart) |
@@ -48,6 +50,7 @@
 | Modul | File | Status |
 |-------|------|--------|
 | Member Management | `docs/features/member-management.md` | ✅ |
+| Customers & Regions (provinsi/kota) | `docs/features/customers-regions.md` | ✅ |
 | Customer Segments | `docs/features/crm-segments.md` | ✅ |
 | Campaigns & Reminders | `docs/features/crm-segments.md` | ✅ |
 
@@ -80,6 +83,7 @@
 | Modul | File | Status |
 |-------|------|--------|
 | Import/Export CSV+Excel | `docs/features/import-export.md` | ✅ |
+| REST API v1 | `docs/features/api-integration.md` | ✅ (Sanctum + abilities) |
 | Mobile POS / PWA | `docs/features/mobile-pos.md` | ✅ |
 | Thermal Printer | `docs/features/thermal-printer.md` | ✅ (ESC/POS WebUSB + auto-print) |
 | Offline Mode | `docs/features/offline-mode.md` | ✅ (queue + auto-sync dengan batasan cart) |

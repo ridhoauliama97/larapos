@@ -115,8 +115,34 @@ cd whatsapp-service
 npm install && npm start
 ```
 
-Tidak ada akun default. Setelah `migrate --seed`, buka root aplikasi (`http://localhost:8000`); pada instalasi pertama aplikasi otomatis mengarahkan ke `/setup` untuk membuat akun admin dan profil toko.
+Pada `APP_ENV=local` (nilai bawaan `.env.example`), `migrate --seed` membuat dua akun:
+
+| Email | Password | Peran |
+| ----- | -------- | ----- |
+| `admin.nelsha@gmail.com` | `password` | Super Admin |
+| `cashier.nelsha@gmail.com` | `password` | Kasir |
+
+Keduanya sudah terverifikasi email, jadi bisa langsung login. Pada `APP_ENV=production` akun ini **tidak** dibuat — `UserSeeder` berhenti lebih awal demi keamanan. Buat akun pertama lewat `/setup` (atau dashboard admin). Buka root aplikasi (`http://localhost:8000`); selama `Setting app_setup_completed` masih `false`, aplikasi mengarahkan ke `/setup`.
+
 Seeder demo bersifat opt-in: `UserSeeder` lalu `SampleDataSeeder`.
+
+## Docker
+
+Untuk produksi, `./deploy.sh` adalah satu-satunya entrypoint — jangan memanggil `docker compose` langsung, karena skrip itu memvalidasi `.env.production` dulu.
+
+```bash
+cp .env.production.example .env.production   # lalu isi APP_KEY, POSTGRES_PASSWORD, APP_URL
+./deploy.sh                                   # build + up + tunggu healthy
+./deploy.sh --seed                            # instalasi pertama: sekalian db:seed
+```
+
+Tiga service: `app` (nginx + php-fpm + crond + queue worker), `postgres:17-alpine`, `redis:7-alpine`. Bawaan `APP_PORT=8080`.
+
+**Engine PDF Gotenberg sudah menyatu di container `app`** — bukan service terpisah. Image multi-stage menyalin binary `gotenberg`, `pdfcpu`, `exiftool`, dan `pdftk` dari `gotenberg/gotenberg:8`, memasang Chromium, lalu `docker/entrypoint.sh` menjalankannya di port 3000 dalam restart loop. Jadi `GOTENBERG_URL=http://localhost:3000` merujuk ke loopback **di dalam** container yang sama, bukan hostname service. Verifikasi dengan `./deploy.sh pdf-check` (cek `/health` + konversi HTML→PDF sungguhan).
+
+Perintah lain: `logs`, `status`, `down`, `shell`, `tinker`, `migrate-sqlite`, `gotenberg`. Catatan: `./deploy.sh ps` tidak valid — pakai `status`.
+
+Untuk **dev lokal** di `:8000` tidak ada engine PDF di dalamnya, jadi jalankan Gotenberg terpisah lebih dulu: `./deploy.sh gotenberg` (container `gotenberg-local` di `:3000`).
 
 ## Dokumentasi Detail
 
@@ -125,7 +151,7 @@ Seeder demo bersifat opt-in: `UserSeeder` lalu `SampleDataSeeder`.
 | `docs/getting-started.md` | Setup lengkap |
 | `docs/configuration.md` | Konfigurasi environment, payment, pajak, printer, WhatsApp |
 | `docs/architecture-overview.md` | Arsitektur, middleware, service layer, Node service |
-| `docs/feature-index.md` | Indeks semua modul (44 fitur) |
+| `docs/feature-index.md` | Indeks semua modul (28 file di `docs/features/`) |
 
 ## REST API (OpenAPI)
 
