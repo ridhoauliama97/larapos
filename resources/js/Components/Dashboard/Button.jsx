@@ -2,7 +2,27 @@ import { Link } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 
-export default function Button({ className, icon, label, type, href, added, url, id, ...props }) {
+/**
+ * Polymorphic button.
+ *
+ * `processing` is destructured out on purpose. It used to fall into ...props and
+ * land on the DOM node as an invalid attribute (React logged
+ * "Received `false` for a non-boolean attribute `processing`"), while doing
+ * nothing functionally. It is honoured below instead: the button disables itself
+ * and shows a spinner, so a double-click cannot submit a form twice.
+ */
+export default function Button({
+    className,
+    icon,
+    label,
+    type,
+    href,
+    added,
+    url,
+    id,
+    processing = false,
+    ...props
+}) {
     const { delete: destroy } = useForm();
 
     const deleteData = async (url) => {
@@ -66,10 +86,19 @@ export default function Button({ className, icon, label, type, href, added, url,
             {type === 'submit' && (
                 <button
                     type="submit"
-                    className={`${baseStyles} ${sizeStyles} ${className}`}
+                    disabled={processing}
+                    aria-busy={processing || undefined}
+                    className={`${baseStyles} ${sizeStyles} ${processing ? 'cursor-not-allowed opacity-70' : ''} ${className}`}
                     {...props}
                 >
-                    {icon}{' '}
+                    {processing ? (
+                        <span
+                            aria-hidden="true"
+                            className="mr-1 inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent align-[-2px]"
+                        />
+                    ) : (
+                        icon
+                    )}{' '}
                     <span className={`${added === true ? 'hidden lg:block' : ''}`}>{label}</span>
                 </button>
             )}

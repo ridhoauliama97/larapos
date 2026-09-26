@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { IconBackspace, IconX, IconCheck } from '@tabler/icons-react';
 
 /**
@@ -24,6 +24,12 @@ export default function NumpadModal({
     isCurrency = false,
 }) {
     const [value, setValue] = useState(String(initialValue || ''));
+
+    // Latest handlers, readable from a listener that is attached only once.
+    // handleConfirm closes over `value`, so listing the handlers directly in the
+    // keydown effect deps re-registered the window listener on every keystroke —
+    // a fast typist could lose a digit in the gap between remove and add.
+    const handlersRef = useRef(null);
 
     // Handlers are declared before the effects that use them. They used to sit
     // below the keydown effect, which only worked because `value` was in the
@@ -66,6 +72,19 @@ export default function NumpadModal({
         [maxValue]
     );
 
+    // Keep the ref pointing at the current closures after every render.
+    // Done in an effect rather than during render: the React Compiler rejects
+    // ref writes in the render body.
+    useEffect(() => {
+        handlersRef.current = {
+            handleDigit,
+            handleBackspace,
+            handleConfirm,
+            handleClear,
+            onClose,
+        };
+    });
+
     // Reset value when modal opens
     useEffect(() => {
         if (isOpen) {
@@ -73,27 +92,30 @@ export default function NumpadModal({
         }
     }, [isOpen, initialValue]);
 
-    // Keyboard support
+    // Keyboard support — attached once per open, never re-registered.
     useEffect(() => {
         if (!isOpen) return;
 
         const handleKeyDown = (e) => {
+            const h = handlersRef.current;
+            if (!h) return;
+
             if (e.key >= '0' && e.key <= '9') {
-                handleDigit(e.key);
+                h.handleDigit(e.key);
             } else if (e.key === 'Backspace') {
-                handleBackspace();
+                h.handleBackspace();
             } else if (e.key === 'Enter') {
-                handleConfirm();
+                h.handleConfirm();
             } else if (e.key === 'Escape') {
-                onClose();
+                h.onClose();
             } else if (e.key === 'c' || e.key === 'C') {
-                handleClear();
+                h.handleClear();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onClose, handleDigit, handleBackspace, handleConfirm, handleClear]);
+    }, [isOpen]);
 
     const formatDisplay = (val) => {
         const num = parseInt(val, 10) || 0;
