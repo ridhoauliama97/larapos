@@ -15,15 +15,24 @@ const STATUS_CONFIG = {
 export default function DineOrderStatus({ order, table, storeName }) {
     const [currentOrder, setCurrentOrder] = useState(order);
     const [refreshing, setRefreshing] = useState(false);
+    const [pollError, setPollError] = useState(null);
 
     useEffect(() => {
         if (currentOrder.status === "submitted") {
+            // Previously every failure was swallowed, so a broken status endpoint left
+            // the customer staring at a permanent "Menunggu" spinner. Give up after a
+            // few attempts instead of polling a dead endpoint forever.
+            const MAX_ATTEMPTS = 3;
+            let attempts = 0;
+
             const interval = setInterval(async () => {
                 setRefreshing(true);
                 try {
                     const res = await fetch(route("dine-order.status-check", currentOrder.access_token), {
                         headers: { Accept: "application/json" },
                     });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
                     const data = await res.json();
                     if (data.order) {
                         // status-check returns minimal scalar fields — merge so items/product rows from the initial render are kept
@@ -32,7 +41,16 @@ export default function DineOrderStatus({ order, table, storeName }) {
                             clearInterval(interval);
                         }
                     }
-                } catch (_) {}
+                    setPollError(null);
+                } catch (e) {
+                    attempts += 1;
+                    if (attempts >= MAX_ATTEMPTS) {
+                        clearInterval(interval);
+                        setPollError(
+                            "Status tidak dapat diperbarui. Muat ulang halaman untuk melihat status terbaru."
+                        );
+                    }
+                }
                 setRefreshing(false);
             }, 5000);
             return () => clearInterval(interval);
@@ -101,6 +119,11 @@ export default function DineOrderStatus({ order, table, storeName }) {
                                     Refresh
                                 </button>
                             </div>
+                            {pollError && (
+                                <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                                    {pollError}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

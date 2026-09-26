@@ -226,7 +226,7 @@ export default function Contributing() {
                             Siap Berkontribusi?
                         </h2>
                         <p className="opacity-90 mb-7">
-                            Mulai dari issue berlabel "good first issue" — atau
+                            Mulai dari issue berlabel &ldquo;good first issue&rdquo; — atau
                             baca panduan lengkap di CONTRIBUTING.md.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

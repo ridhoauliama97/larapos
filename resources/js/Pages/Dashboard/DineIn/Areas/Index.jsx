@@ -198,7 +198,7 @@ export default function Index({ areas }) {
                         label="Nama Area"
                         value={data.name}
                         onChange={(e) => setData("name", e.target.value)}
-                        error={errors.name}
+                        errors={errors.name}
                         placeholder="Contoh: Indoor, Outdoor, VIP"
                         required
                     />
@@ -208,7 +208,7 @@ export default function Index({ areas }) {
                         min="0"
                         value={data.sort_order}
                         onChange={(e) => setData("sort_order", parseInt(e.target.value) || 0)}
-                        error={errors.sort_order}
+                        errors={errors.sort_order}
                     />
                     <label className="flex items-center gap-3 cursor-pointer">
                         <input

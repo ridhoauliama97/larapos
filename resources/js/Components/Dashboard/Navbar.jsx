@@ -25,12 +25,12 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
     // Get current page title
     const links = menuNavigation.flatMap((item) => item.details);
     const sublinks = links
-        .filter((item) => item.hasOwnProperty("subdetails"))
+        .filter((item) => Object.hasOwn(item, "subdetails"))
         .flatMap((item) => item.subdetails);
 
     const getCurrentTitle = () => {
         for (const link of links) {
-            if (link.hasOwnProperty("subdetails")) {
+            if (Object.hasOwn(link, "subdetails")) {
                 const activeSublink = sublinks.find((s) => s.active);
                 if (activeSublink) return activeSublink.title;
             } else if (link.active) {

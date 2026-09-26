@@ -108,7 +108,7 @@ export default function Sidebar({ sidebarOpen }) {
                                 {section.details.map((detail, idx) => {
                                     if (!detail.permissions) return null;
 
-                                    if (detail.hasOwnProperty("subdetails")) {
+                                    if (Object.hasOwn(detail, "subdetails")) {
                                         return (
                                             <LinkItemDropdown
                                                 key={idx}

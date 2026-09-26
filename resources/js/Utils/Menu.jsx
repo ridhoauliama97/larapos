@@ -42,13 +42,19 @@ import {
     IconBrandWhatsapp,
     IconToolsKitchen2,
 } from "@tabler/icons-react";
-import hasAnyPermission from "./Permission";
+import checkPermission from "./Permission";
 import { isActiveUrl } from "./activeUrl";
 import React from "react";
 
 export default function Menu() {
     const { t } = useTranslation();
-    const { url } = usePage();
+    const { url, props } = usePage();
+
+    // Bind auth once here so the ~50 static `hasAnyPermission([...])` call sites in
+    // the literal below stay untouched. The underlying helper is a pure function,
+    // not a hook — see Utils/Permission.jsx.
+    const hasAnyPermission = (permissions) =>
+        checkPermission(permissions, props.auth);
 
     // define menu navigations
     const menuNavigation = [

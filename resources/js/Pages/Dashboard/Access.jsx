@@ -59,9 +59,7 @@ const cards = [
 function AccessPage() {
     const { auth } = usePage().props;
 
-    const visibleCards = cards.filter((card) =>
-        hasAnyPermission(card.perms, auth?.permissions)
-    );
+    const visibleCards = cards.filter((card) => hasAnyPermission(card.perms, auth));
 
     return (
         <>

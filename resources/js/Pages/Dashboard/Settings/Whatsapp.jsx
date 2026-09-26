@@ -15,6 +15,7 @@ export default function Whatsapp({ settings, waStatus }) {
 
     const [status, setStatus] = useState(waStatus || { connected: false, phone: null, qr: null, starting: false });
     const [polling, setPolling] = useState(false);
+    const [statusError, setStatusError] = useState(null);
     const [testNumber, setTestNumber] = useState("");
 
     useEffect(() => {
@@ -31,8 +32,17 @@ export default function Whatsapp({ settings, waStatus }) {
         try {
             const res = await axios.get(route("settings.whatsapp.status"));
             setStatus(res.data);
+            setStatusError(null);
             if (res.data.connected) setPolling(false);
-        } catch (e) {}
+        } catch (e) {
+            // Previously swallowed: the card sat on "Terputus" with no hint that the
+            // Node service was unreachable, and the 3s poll kept hammering it.
+            setStatusError(
+                e.response?.data?.message ||
+                    "Gagal menghubungi WhatsApp service. Pastikan service berjalan di port 3001."
+            );
+            setPolling(false);
+        }
     };
 
     const handleConnect = async () => {
@@ -100,6 +110,12 @@ export default function Whatsapp({ settings, waStatus }) {
                                     : "Terputus"}
                         </span>
                     </div>
+
+                    {statusError && (
+                        <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
+                            {statusError}
+                        </div>
+                    )}
 
                     {status.qr && !status.connected && (
                         <div className="mb-4 text-center">

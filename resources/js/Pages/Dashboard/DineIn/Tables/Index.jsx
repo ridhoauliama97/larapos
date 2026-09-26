@@ -427,7 +427,7 @@ export default function Index({ tables, areas, filters }) {
                         label="Nama Meja"
                         value={data.name}
                         onChange={(e) => setData("name", e.target.value)}
-                        error={errors.name}
+                        errors={errors.name}
                         placeholder="Contoh: M1, Outdoor-1"
                         required
                     />
@@ -456,7 +456,7 @@ export default function Index({ tables, areas, filters }) {
                             min="1"
                             value={data.capacity}
                             onChange={(e) => setData("capacity", parseInt(e.target.value) || 1)}
-                            error={errors.capacity}
+                            errors={errors.capacity}
                         />
                         <div>
                             <label className="text-sm text-slate-600 dark:text-slate-400 mb-1 block">Bentuk</label>
@@ -476,7 +476,7 @@ export default function Index({ tables, areas, filters }) {
                             max={gridWidth - 1}
                             value={data.pos_x}
                             onChange={(e) => setData("pos_x", parseInt(e.target.value) || 0)}
-                            error={errors.pos_x}
+                            errors={errors.pos_x}
                         />
                         <Input
                             label="Posisi Y"
@@ -485,7 +485,7 @@ export default function Index({ tables, areas, filters }) {
                             max={gridHeight - 1}
                             value={data.pos_y}
                             onChange={(e) => setData("pos_y", parseInt(e.target.value) || 0)}
-                            error={errors.pos_y}
+                            errors={errors.pos_y}
                         />
                     </div>
                     <label className="flex items-center gap-3 cursor-pointer">
