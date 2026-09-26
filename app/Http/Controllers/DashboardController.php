@@ -23,9 +23,6 @@ class DashboardController extends Controller
         $totalProducts = Product::count();
         $totalTransactions = Transaction::count();
         $totalCustomers = Customer::count();
-        $totalRevenue = Transaction::sum('grand_total');
-        $totalProfit = Profit::sum('total');
-        $averageOrder = Transaction::avg('grand_total') ?? 0;
         $todayTransactions = Transaction::whereDate('created_at', Carbon::today())->count();
 
         // New: Today's Sales and Profit
@@ -172,9 +169,6 @@ class DashboardController extends Controller
             'totalTransactions' => $totalTransactions,
             'totalCustomers' => $totalCustomers,
             'revenueTrend' => $revenueTrend,
-            'totalRevenue' => (int) $totalRevenue,
-            'totalProfit' => (int) $totalProfit,
-            'averageOrder' => (int) round($averageOrder),
             'todayTransactions' => (int) $todayTransactions,
             'todaySales' => (int) $todaySales,
             'todayProfit' => (int) $todayProfit,
