@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import Button from '@/Components/Dashboard/Button';
 import {
     IconCirclePlus,
@@ -13,14 +15,32 @@ import {
     IconMapPin,
     IconUpload,
     IconDownload,
+    IconDeviceFloppy,
 } from '@tabler/icons-react';
 import Search from '@/Components/Dashboard/Search';
 import Table from '@/Components/Dashboard/Table';
 import Pagination from '@/Components/Dashboard/Pagination';
+import Drawer from '@/Components/Dashboard/Drawer';
+import Input from '@/Components/Dashboard/Input';
+import Select from '@/Components/Dashboard/Select';
+import Textarea from '@/Components/Dashboard/TextArea';
 import { useAuthorization } from '@/Utils/authorization';
 
+const blankCustomer = {
+    _method: 'POST',
+    name: '',
+    no_telp: '',
+    address: '',
+    is_loyalty_member: false,
+    loyalty_tier: 'regular',
+    province_id: '',
+    regency_id: '',
+    district_id: '',
+    village_id: '',
+};
+
 // Customer Card for Grid View
-function CustomerCard({ customer, canUpdate, canDelete }) {
+function CustomerCard({ customer, canUpdate, canDelete, onEdit }) {
     return (
         <div className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-slate-300 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
             {/* Avatar & Name */}
@@ -78,13 +98,13 @@ function CustomerCard({ customer, canUpdate, canDelete }) {
             {(canUpdate || canDelete) && (
                 <div className="flex gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
                     {canUpdate && (
-                        <Link
-                            href={route('customers.edit', customer.id)}
+                        <button
+                            onClick={() => onEdit(customer)}
                             className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-warning-100 py-2 text-sm font-medium text-warning-600 transition-colors hover:bg-warning-200 dark:bg-warning-900/50 dark:text-warning-400"
                         >
                             <IconPencilCog size={16} />
                             <span>Edit</span>
-                        </Link>
+                        </button>
                     )}
                     {canDelete && (
                         <Button
@@ -109,6 +129,133 @@ export default function Index({ customers }) {
     const canCreateCustomers = can('customers-create');
     const canEditCustomers = can('customers-edit');
     const canDeleteCustomers = can('customers-delete');
+
+    // Supplied by CustomerController@index — the dedicated create/edit pages used to
+    // pass these, and the form has to live on this page now.
+    const { provinces = [], tierOptions = [] } = usePage().props;
+
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [editing, setEditing] = useState(null);
+    // Plain-object defaults are fine here because every open path calls `setData`
+    // with a complete payload rather than `reset()` — reset() would copy from
+    // Inertia's `defaults`, which gets reassigned to the last submitted payload after
+    // every successful submit.
+    const { data, setData, post, processing, errors } = useForm({ ...blankCustomer });
+
+    const [regencies, setRegencies] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [villages, setVillages] = useState([]);
+
+    const fetchRegencies = async (provinceId) => {
+        if (!provinceId) return setRegencies([]);
+        const res = await axios.get(route('regions.regencies'), {
+            params: { province_id: provinceId },
+        });
+        setRegencies(res.data);
+    };
+
+    const fetchDistricts = async (regencyId) => {
+        if (!regencyId) return setDistricts([]);
+        const res = await axios.get(route('regions.districts'), {
+            params: { regency_id: regencyId },
+        });
+        setDistricts(res.data);
+    };
+
+    const fetchVillages = async (districtId) => {
+        if (!districtId) return setVillages([]);
+        const res = await axios.get(route('regions.villages'), {
+            params: { district_id: districtId },
+        });
+        setVillages(res.data);
+    };
+
+    // The cascade is driven from the change handlers rather than effects on the form
+    // data, so picking a parent never needs a second render pass to clear its
+    // children.
+    const handleProvinceChange = (provinceId) => {
+        setData((previous) => ({
+            ...previous,
+            province_id: provinceId,
+            regency_id: '',
+            district_id: '',
+            village_id: '',
+        }));
+        setDistricts([]);
+        setVillages([]);
+        fetchRegencies(provinceId);
+    };
+
+    const handleRegencyChange = (regencyId) => {
+        setData((previous) => ({
+            ...previous,
+            regency_id: regencyId,
+            district_id: '',
+            village_id: '',
+        }));
+        setVillages([]);
+        fetchDistricts(regencyId);
+    };
+
+    const handleDistrictChange = (districtId) => {
+        setData((previous) => ({ ...previous, district_id: districtId, village_id: '' }));
+        fetchVillages(districtId);
+    };
+
+    const openCreate = () => {
+        setEditing(null);
+        setData({ ...blankCustomer });
+        setRegencies([]);
+        setDistricts([]);
+        setVillages([]);
+        setDrawerOpen(true);
+    };
+
+    const openEdit = (customer) => {
+        setEditing(customer);
+        setData({
+            ...blankCustomer,
+            _method: 'PUT',
+            name: customer.name || '',
+            no_telp: customer.no_telp || '',
+            address: customer.address || '',
+            is_loyalty_member: !!customer.is_loyalty_member,
+            loyalty_tier: customer.loyalty_tier || 'regular',
+            province_id: customer.province_id || '',
+            regency_id: customer.regency_id || '',
+            district_id: customer.district_id || '',
+            village_id: customer.village_id || '',
+        });
+        // The old edit page received the whole region chain as page props. The index
+        // has none, so load all three levels from the saved record.
+        setRegencies([]);
+        setDistricts([]);
+        setVillages([]);
+        if (customer.province_id) fetchRegencies(customer.province_id);
+        if (customer.regency_id) fetchDistricts(customer.regency_id);
+        if (customer.district_id) fetchVillages(customer.district_id);
+        setDrawerOpen(true);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const onSuccess = () => {
+            toast.success(
+                editing ? 'Pelanggan berhasil diperbarui' : 'Pelanggan berhasil ditambahkan'
+            );
+            setDrawerOpen(false);
+        };
+        const onError = () =>
+            toast.error(editing ? 'Gagal memperbarui pelanggan' : 'Gagal menyimpan pelanggan');
+
+        // `customers.update` only answers PUT|PATCH, so the update keeps the existing
+        // POST + `_method` spoofing rather than switching to put().
+        if (editing) {
+            post(route('customers.update', editing.id), { onSuccess, onError });
+        } else {
+            post(route('customers.store'), { onSuccess, onError });
+        }
+    };
 
     return (
         <>
@@ -161,7 +308,7 @@ export default function Index({ customers }) {
                                     'bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600'
                                 }
                                 label={'Tambah Pelanggan'}
-                                href={route('customers.create')}
+                                onClick={openCreate}
                             />
                         </div>
                     )}
@@ -210,6 +357,7 @@ export default function Index({ customers }) {
                                 customer={customer}
                                 canUpdate={canEditCustomers}
                                 canDelete={canDeleteCustomers}
+                                onEdit={openEdit}
                             />
                         ))}
                     </div>
@@ -286,7 +434,7 @@ export default function Index({ customers }) {
                                             <div className="flex gap-2">
                                                 {canEditCustomers && (
                                                     <Button
-                                                        type={'edit'}
+                                                        type={'modal'}
                                                         icon={
                                                             <IconPencilCog
                                                                 size={16}
@@ -296,7 +444,7 @@ export default function Index({ customers }) {
                                                         className={
                                                             'border border-warning-200 bg-warning-100 text-warning-600 hover:bg-warning-200 dark:border-warning-800 dark:bg-warning-900/50 dark:text-warning-400'
                                                         }
-                                                        href={route('customers.edit', customer.id)}
+                                                        onClick={() => openEdit(customer)}
                                                     />
                                                 )}
                                                 {canDeleteCustomers && (
@@ -342,12 +490,177 @@ export default function Index({ customers }) {
                         icon={<IconCirclePlus size={18} />}
                         className={'bg-primary-500 text-white hover:bg-primary-600'}
                         label={'Tambah Pelanggan'}
-                        href={route('customers.create')}
+                        onClick={openCreate}
                     />
                 </div>
             )}
 
             {customers.last_page !== 1 && <Pagination links={customers.links} />}
+
+            <Drawer
+                show={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                title={editing ? 'Edit Pelanggan' : 'Tambah Pelanggan'}
+                width="lg"
+            >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input
+                        type="text"
+                        label="Nama Pelanggan"
+                        placeholder="Masukkan nama lengkap"
+                        errors={errors.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        value={data.name}
+                    />
+                    <Input
+                        type="text"
+                        label="No. Handphone"
+                        placeholder="08xxxxxxxxxx"
+                        errors={errors.no_telp}
+                        onChange={(e) => setData('no_telp', e.target.value)}
+                        value={data.no_telp}
+                    />
+
+                    <div className="rounded-2xl border border-primary-100 bg-primary-50/70 p-4 dark:border-primary-900/40 dark:bg-primary-950/20">
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                    Aktivasi Loyalty Member
+                                </p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    Member mendapat poin, voucher, dan harga khusus.
+                                </p>
+                            </div>
+                            <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                <input
+                                    type="checkbox"
+                                    checked={data.is_loyalty_member}
+                                    onChange={(e) => setData('is_loyalty_member', e.target.checked)}
+                                    className="h-4 w-4 rounded border-slate-300 text-primary-500"
+                                />
+                                Member
+                            </label>
+                        </div>
+
+                        {data.is_loyalty_member && (
+                            <div className="mt-4">
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                    Tier Awal
+                                </label>
+                                <Select
+                                    value={data.loyalty_tier}
+                                    onChange={(value) => setData('loyalty_tier', value)}
+                                    options={tierOptions}
+                                    className="mt-2 w-full"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Provinsi
+                        </label>
+                        <Select
+                            value={data.province_id}
+                            onChange={handleProvinceChange}
+                            options={provinces.map((prov) => ({
+                                value: prov.code,
+                                label: prov.name,
+                            }))}
+                            placeholder="Pilih Provinsi"
+                            className="w-full"
+                        />
+                        {errors.province_id && (
+                            <p className="mt-1 text-xs text-danger-500">{errors.province_id}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Kota/Kabupaten
+                        </label>
+                        <Select
+                            value={data.regency_id}
+                            onChange={handleRegencyChange}
+                            options={regencies.map((item) => ({
+                                value: item.code,
+                                label: item.name,
+                            }))}
+                            placeholder="Pilih Kota/Kabupaten"
+                            disabled={!data.province_id}
+                            className="w-full"
+                        />
+                        {errors.regency_id && (
+                            <p className="mt-1 text-xs text-danger-500">{errors.regency_id}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Kecamatan
+                        </label>
+                        <Select
+                            value={data.district_id}
+                            onChange={handleDistrictChange}
+                            options={districts.map((item) => ({
+                                value: item.code,
+                                label: item.name,
+                            }))}
+                            placeholder="Pilih Kecamatan"
+                            disabled={!data.regency_id}
+                            className="w-full"
+                        />
+                        {errors.district_id && (
+                            <p className="mt-1 text-xs text-danger-500">{errors.district_id}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Kelurahan
+                        </label>
+                        <Select
+                            value={data.village_id}
+                            onChange={(value) => setData('village_id', value)}
+                            options={villages.map((item) => ({
+                                value: item.code,
+                                label: item.name,
+                            }))}
+                            placeholder="Pilih Kelurahan"
+                            disabled={!data.district_id}
+                            className="w-full"
+                        />
+                        {errors.village_id && (
+                            <p className="mt-1 text-xs text-danger-500">{errors.village_id}</p>
+                        )}
+                    </div>
+
+                    <Textarea
+                        label="Alamat Detail"
+                        placeholder="Alamat lengkap pelanggan"
+                        errors={errors.address}
+                        onChange={(e) => setData('address', e.target.value)}
+                        value={data.address}
+                        rows={3}
+                    />
+
+                    <div className="flex justify-end gap-3 pt-2">
+                        <button
+                            type="button"
+                            onClick={() => setDrawerOpen(false)}
+                            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
+                        >
+                            <IconDeviceFloppy size={18} />
+                            {processing ? 'Menyimpan...' : 'Simpan'}
+                        </button>
+                    </div>
+                </form>
+            </Drawer>
         </>
     );
 }

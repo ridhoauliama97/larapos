@@ -134,20 +134,39 @@ class SupplierTest extends TestCase
         $this->assertSame('LATIUNG', $supplier->village_name);
     }
 
-    public function test_supplier_pages_render(): void
+    public function test_index_renders(): void
+    {
+        Supplier::create([
+            'name' => 'Supplier Lama',
+            'address' => 'Alamat lama',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('suppliers.index'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Dashboard/Suppliers/Index')
+                // The add/edit form is a Drawer on this page now, so the province
+                // list it needs has to arrive with the index.
+                ->has('provinces'));
+    }
+
+    public function test_supplier_create_and_edit_pages_are_gone(): void
     {
         $supplier = Supplier::create([
             'name' => 'Supplier Lama',
             'address' => 'Alamat lama',
         ]);
 
+        // `/suppliers/create` now collides with the `/suppliers/{supplier}` URI
+        // pattern, so Laravel answers 405 rather than 404. Either way the page is gone.
         $this->actingAs($this->admin)
-            ->get(route('suppliers.create'))
-            ->assertOk();
+            ->get('/dashboard/suppliers/create')
+            ->assertStatus(405);
 
         $this->actingAs($this->admin)
-            ->get(route('suppliers.edit', $supplier))
-            ->assertOk();
+            ->get("/dashboard/suppliers/{$supplier->id}/edit")
+            ->assertNotFound();
     }
 
     public function test_index_searches_suppliers(): void

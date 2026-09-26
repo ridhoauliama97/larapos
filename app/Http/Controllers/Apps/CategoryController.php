@@ -34,11 +34,6 @@ class CategoryController extends Controller
      *
      * @return Response
      */
-    public function create()
-    {
-        return Inertia::render('Dashboard/Categories/Create');
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -76,13 +71,6 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function edit(Category $category)
-    {
-        return Inertia::render('Dashboard/Categories/Edit', [
-            'category' => $category,
-        ]);
-    }
-
     /**
      * Update the specified resource in storage.
      *

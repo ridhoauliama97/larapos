@@ -127,9 +127,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::get('/regions/villages', [RegionController::class, 'villages'])->name('regions.villages');
 
     Route::resource('categories', CategoryController::class)
+        ->except(['create', 'edit'])
         ->middlewareFor(['index', 'show'], 'permission:categories-access')
-        ->middlewareFor(['create', 'store'], 'permission:categories-create')
-        ->middlewareFor(['edit', 'update'], 'permission:categories-edit')
+        ->middlewareFor('store', 'permission:categories-create')
+        ->middlewareFor('update', 'permission:categories-edit')
         ->middlewareFor('destroy', 'permission:categories-delete');
     Route::resource('products', ProductController::class)
         ->middlewareFor(['index', 'show'], 'permission:products-access')
@@ -171,9 +172,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::post('cashier-shifts/{cashierShift}/cash-movements', [CashierShiftController::class, 'storeCashMovement'])->middleware('permission:cashier-shifts-access')->name('cashier-shifts.cash-movements.store');
     Route::get('cashier-shifts/{cashierShift}/report/{type}', [CashierShiftController::class, 'printReport'])->middleware('permission:cashier-shifts-access')->name('cashier-shifts.report');
     Route::resource('customers', CustomerController::class)
+        ->except(['create', 'edit'])
         ->middlewareFor(['index', 'show'], 'permission:customers-access')
-        ->middlewareFor(['create', 'store'], 'permission:customers-create')
-        ->middlewareFor(['edit', 'update'], 'permission:customers-edit')
+        ->middlewareFor('store', 'permission:customers-create')
+        ->middlewareFor('update', 'permission:customers-edit')
         ->middlewareFor('destroy', 'permission:customers-delete');
     Route::resource('members', MemberController::class)
         ->parameters(['members' => 'member'])
@@ -305,8 +307,6 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::post('/receivables/{receivable}/share-campaign', [CrmCampaignController::class, 'shareReceivable'])->middleware('permission:crm-campaigns-create')->name('receivables.share-campaign');
     // suppliers & payables
     Route::get('/suppliers', [SupplierController::class, 'index'])->middleware('permission:suppliers-access')->name('suppliers.index');
-    Route::get('/suppliers/create', [SupplierController::class, 'create'])->middleware('permission:suppliers-access')->name('suppliers.create');
-    Route::get('/suppliers/{supplier}/edit', [SupplierController::class, 'edit'])->middleware('permission:suppliers-access')->name('suppliers.edit');
     Route::post('/suppliers', [SupplierController::class, 'store'])->middleware('permission:suppliers-access')->name('suppliers.store');
     Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->middleware('permission:suppliers-access')->name('suppliers.update');
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->middleware('permission:suppliers-access')->name('suppliers.destroy');

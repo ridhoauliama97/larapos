@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import Button from '@/Components/Dashboard/Button';
 import {
     IconCirclePlus,
@@ -10,14 +10,22 @@ import {
     IconLayoutGrid,
     IconList,
     IconCategory,
+    IconDeviceFloppy,
 } from '@tabler/icons-react';
+import toast from 'react-hot-toast';
 import Search from '@/Components/Dashboard/Search';
 import Table from '@/Components/Dashboard/Table';
 import Pagination from '@/Components/Dashboard/Pagination';
+import Drawer from '@/Components/Dashboard/Drawer';
+import ImageDropzone from '@/Components/Dashboard/ImageDropzone';
+import Input from '@/Components/Dashboard/Input';
+import Textarea from '@/Components/Dashboard/TextArea';
 import { useAuthorization } from '@/Utils/authorization';
 
+const blankCategory = { name: '', description: '', image: '', _method: 'POST' };
+
 // Category Card for Grid View
-function CategoryCard({ category, canUpdate, canDelete }) {
+function CategoryCard({ category, canUpdate, canDelete, onEdit }) {
     return (
         <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-200 hover:border-slate-300 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
             {/* Category Image */}
@@ -43,12 +51,12 @@ function CategoryCard({ category, canUpdate, canDelete }) {
                 {(canUpdate || canDelete) && (
                     <div className="absolute inset-0 flex items-center justify-center gap-2 bg-slate-900/0 opacity-0 transition-all group-hover:bg-slate-900/40 group-hover:opacity-100">
                         {canUpdate && (
-                            <Link
-                                href={route('categories.edit', category.id)}
+                            <button
+                                onClick={() => onEdit(category)}
                                 className="rounded-xl bg-white p-2.5 text-warning-600 shadow-lg transition-colors hover:bg-warning-50"
                             >
                                 <IconPencilCog size={18} />
-                            </Link>
+                            </button>
                         )}
                         {canDelete && (
                             <Button
@@ -86,6 +94,100 @@ export default function Index({ categories }) {
     const canEditCategories = can('categories-edit');
     const canDeleteCategories = can('categories-delete');
 
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [editing, setEditing] = useState(null);
+    // Every open path sends a complete payload via setData rather than reset(): the
+    // record is only reachable from the paginated list, so there is no "reload the
+    // page" fallback, and reset() would copy from Inertia's `defaults`, which gets
+    // reassigned to the last submitted payload after every successful submit.
+    const { data, setData, post, processing, errors, transform } = useForm({
+        ...blankCategory,
+    });
+
+    const originalImage = editing?.image || null;
+    const [imagePreview, setImagePreview] = useState(null);
+    const objectUrlRef = useRef(null);
+
+    useEffect(
+        () => () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        },
+        []
+    );
+
+    const revokePreview = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+    };
+
+    const openCreate = () => {
+        revokePreview();
+        setEditing(null);
+        setData({ ...blankCategory });
+        setImagePreview(null);
+        setDrawerOpen(true);
+    };
+
+    const openEdit = (category) => {
+        revokePreview();
+        setEditing(category);
+        setData({
+            name: category.name,
+            description: category.description ?? '',
+            image: '',
+            _method: 'PUT',
+        });
+        setImagePreview(category.image || null);
+        setDrawerOpen(true);
+    };
+
+    const handleSelect = (file) => {
+        revokePreview();
+        objectUrlRef.current = URL.createObjectURL(file);
+        setData('image', file);
+        setImagePreview(objectUrlRef.current);
+    };
+
+    const handleReset = () => {
+        revokePreview();
+        setData('image', '');
+        setImagePreview(originalImage);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        // Drop an untouched image field so the update does not try to validate an
+        // empty string against the `image` rule.
+        transform((formData) => {
+            const { image, ...rest } = formData;
+
+            return image ? { ...rest, image } : rest;
+        });
+
+        const onSuccess = () => {
+            toast.success(
+                editing ? 'Kategori berhasil diperbarui' : 'Kategori berhasil ditambahkan'
+            );
+            setDrawerOpen(false);
+        };
+        const onError = () =>
+            toast.error(editing ? 'Gagal memperbarui kategori' : 'Gagal menyimpan kategori');
+
+        // `categories.update` only answers PUT|PATCH, and the form payload may hold a
+        // File, so the update keeps the existing POST + `_method` spoofing rather than
+        // switching to put().
+        if (editing) {
+            post(route('categories.update', editing.id), { onSuccess, onError });
+        } else {
+            post(route('categories.store'), { onSuccess, onError });
+        }
+    };
+
     return (
         <>
             <Head title="Kategori" />
@@ -109,7 +211,7 @@ export default function Index({ categories }) {
                                 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600'
                             }
                             label={'Tambah Kategori'}
-                            href={route('categories.create')}
+                            onClick={openCreate}
                         />
                     )}
                 </div>
@@ -157,6 +259,7 @@ export default function Index({ categories }) {
                                 category={category}
                                 canUpdate={canEditCategories}
                                 canDelete={canDeleteCategories}
+                                onEdit={openEdit}
                             />
                         ))}
                     </div>
@@ -214,7 +317,7 @@ export default function Index({ categories }) {
                                             <div className="flex gap-2">
                                                 {canEditCategories && (
                                                     <Button
-                                                        type={'edit'}
+                                                        type={'modal'}
                                                         icon={
                                                             <IconPencilCog
                                                                 size={16}
@@ -224,7 +327,7 @@ export default function Index({ categories }) {
                                                         className={
                                                             'border border-warning-200 bg-warning-100 text-warning-600 hover:bg-warning-200 dark:border-warning-800 dark:bg-warning-900/50 dark:text-warning-400'
                                                         }
-                                                        href={route('categories.edit', category.id)}
+                                                        onClick={() => openEdit(category)}
                                                     />
                                                 )}
                                                 {canDeleteCategories && (
@@ -270,12 +373,67 @@ export default function Index({ categories }) {
                         icon={<IconCirclePlus size={18} />}
                         className={'bg-primary-500 text-white hover:bg-primary-600'}
                         label={'Tambah Kategori'}
-                        href={route('categories.create')}
+                        onClick={openCreate}
                     />
                 </div>
             )}
 
             {categories.last_page !== 1 && <Pagination links={categories.links} />}
+
+            <Drawer
+                show={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                title={editing ? 'Edit Kategori' : 'Tambah Kategori'}
+            >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Gambar
+                        </label>
+                        <ImageDropzone
+                            preview={imagePreview}
+                            original={originalImage}
+                            onSelect={handleSelect}
+                            onReset={handleReset}
+                            error={errors.image}
+                            hint="Rasio 4:3 disarankan."
+                        />
+                    </div>
+                    <Input
+                        type="text"
+                        label="Nama Kategori"
+                        placeholder="Masukkan nama"
+                        errors={errors.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        value={data.name}
+                    />
+                    <Textarea
+                        label="Deskripsi"
+                        placeholder="Deskripsi kategori"
+                        errors={errors.description}
+                        onChange={(e) => setData('description', e.target.value)}
+                        value={data.description}
+                        rows={4}
+                    />
+                    <div className="flex justify-end gap-3 pt-2">
+                        <button
+                            type="button"
+                            onClick={() => setDrawerOpen(false)}
+                            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
+                        >
+                            <IconDeviceFloppy size={18} />
+                            {processing ? 'Menyimpan...' : 'Simpan'}
+                        </button>
+                    </div>
+                </form>
+            </Drawer>
         </>
     );
 }
