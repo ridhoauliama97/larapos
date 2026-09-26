@@ -25,6 +25,7 @@ export default function Print({ transaction }) {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [isConfirming, setIsConfirming] = useState(false);
     const [liveStatus, setLiveStatus] = useState(transaction?.payment_status || 'pending');
+    const [printFailed, setPrintFailed] = useState(false);
     const canConfirmPayment = can('transactions-confirm-payment');
 
     const showQris = Boolean(transaction?.qr_string) && liveStatus === 'pending';
@@ -181,7 +182,15 @@ export default function Print({ transaction }) {
                     await kickDrawer().catch(() => {});
                 }
             } catch {
-                // printer busy/disconnected — manual print still available
+                // Printer busy, disconnected, or a browser without WebUSB. The
+                // old comment here claimed "manual print still available", but no
+                // button was ever rendered and the error was swallowed, so the
+                // cashier got no receipt and no explanation. Tell them, and point
+                // them at the manual print button.
+                setPrintFailed(true);
+                toast.error('Printer tidak tersedia. Gunakan tombol "Cetak" untuk cetak manual.', {
+                    duration: 8000,
+                });
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -233,6 +242,18 @@ export default function Print({ transaction }) {
                         </Link>
 
                         <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
+                            {printFailed && (
+                                <div className="flex w-full items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300 sm:w-auto">
+                                    <span>Printer thermal tidak tersedia.</span>
+                                    <button
+                                        type="button"
+                                        onClick={handlePrint}
+                                        className="shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-amber-700"
+                                    >
+                                        Cetak
+                                    </button>
+                                </div>
+                            )}
                             {/* Print Mode Selector */}
                             <div className="flex w-full rounded-xl bg-slate-200 p-1 dark:bg-slate-800 sm:w-auto">
                                 <button
